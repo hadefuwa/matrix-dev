@@ -1092,6 +1092,59 @@ footer p {
     }
 }
 
+/* Product Tab Navigation */
+.product-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 15, 25, 0.97);
+    backdrop-filter: blur(16px) saturate(140%);
+    border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+    display: flex;
+    gap: 0;
+    padding: 0 2.5rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.prod-tab {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-medium);
+    font-family: 'Sora', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.prod-tab:hover {
+    color: var(--text-dark);
+    border-bottom-color: rgba(212, 165, 116, 0.4);
+    background: rgba(255,255,255,0.03);
+}
+
+.prod-tab.active {
+    color: var(--accent-gold);
+    border-bottom-color: var(--accent-gold);
+}
+
+@media (max-width: 768px) {
+    .product-tabs {
+        padding: 0 0.25rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .product-tabs::-webkit-scrollbar { display: none; }
+    .prod-tab {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.78rem;
+    }
+}
+
 /* Loading State */
 .loading {
     display: inline-block;

@@ -65,8 +65,15 @@
             </div>
         </header>
 
+        <nav class="product-tabs" role="tablist" aria-label="Select product">
+            <button class="prod-tab" data-target="section-overview" role="tab">Overview</button>
+            <button class="prod-tab active" data-target="section-im6930" role="tab" aria-selected="true">IM6930 – PLC Fundamentals</button>
+            <button class="prod-tab" data-target="section-im0004" role="tab">IM0004 – Closed Loop</button>
+            <button class="prod-tab" data-target="section-im3214" role="tab">IM3214 – LOGO! Trainer</button>
+        </nav>
+
         <main class="container">
-            <section class="section">
+            <section class="section" id="section-overview" hidden>
                 <h2 class="section-title">Industrial Maintenance Overview</h2>
                 <p class="section-summary">Hands-on industrial maintenance training designed for higher education and vocational learners. The range focuses on PLC control, closed-loop systems, troubleshooting, and real-world automation skills using Siemens PLC hardware.</p>
                 <div class="dashboard-grid">
@@ -79,7 +86,7 @@
                 </div>
             </section>
 
-            <section class="section">
+            <section class="section" id="section-im6930">
                 <h2 class="section-title">IM6930 – PLC Fundamentals Trainer</h2>
                 <p class="section-summary">A hands-on PLC training platform built around a Siemens S7‑1214 PLC and 7" Unified Basic HMI. Teaches core control panel layout, industrial wiring standards, I/O interaction, and practical maintenance foundations.</p>
                 <div class="section-media">
@@ -143,7 +150,7 @@
                 </div>
             </section>
 
-            <section class="section">
+            <section class="section" id="section-im0004" hidden>
                 <h2 class="section-title">IM0004 – Maintenance of Closed Loop Systems</h2>
                 <p class="section-summary">A real‑world flow control trainer for fault diagnosis, system behaviour analysis, and closed‑loop troubleshooting. Includes Siemens S7‑1200 PLC, Unified Basic HMI, turbine flow sensor, proportional control valve, and industrial instrumentation.</p>
                 <div class="section-media">
@@ -208,7 +215,7 @@
                 </div>
             </section>
 
-            <section class="section">
+            <section class="section" id="section-im3214" hidden>
                 <h2 class="section-title">IM3214 – Siemens PLC LOGO! Trainer</h2>
                 <p class="section-summary">Compact Siemens LOGO! PLC training module on Locktronics platform. Supports wired/wireless programming, I/O logic control, and hands‑on PLC fundamentals for maintenance learners.</p>
                 <div class="section-media">
@@ -298,5 +305,22 @@
 
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        // Product tab switching
+        document.querySelectorAll('.prod-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                var target = tab.dataset.target;
+                document.querySelectorAll('.prod-tab').forEach(function(t) {
+                    t.classList.remove('active');
+                    t.removeAttribute('aria-selected');
+                });
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                document.querySelectorAll('main .section').forEach(function(section) {
+                    section.hidden = section.id !== target;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
