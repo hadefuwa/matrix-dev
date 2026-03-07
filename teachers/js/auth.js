@@ -116,8 +116,10 @@ document.addEventListener('keydown', function(event) {
 
 // Initialize auth check on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-login: bypass the login screen
+    sessionStorage.setItem(AUTH_CONFIG.sessionKey, 'true');
     checkAuth();
-    
+
     // Add form submit handler
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
