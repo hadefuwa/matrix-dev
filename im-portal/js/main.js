@@ -7,7 +7,7 @@ const resources = {
             <p>Our Industrial Maintenance Training range provides a comprehensive, hands-on approach to developing the skills required in modern industry. Designed for higher education and vocational training, this equipment enables learners to explore the maintenance of closed-loop systems, understand the fundamentals of PLC control, and gain practical experience with PLC controllers.</p>
             <p>By combining real-world hardware, including industry standard Siemens PLCs, with clear instructional resources, the range helps students bridge the gap between theory and practice—building confidence, competence, and career-ready expertise in industrial automation and maintenance.</p>
             <div class="document-link">
-                <a href="https://www.matrixtsl.com/industrial-maintenance/" target="_blank" class="btn btn-info">🌐 View Industrial Maintenance Overview</a>
+                <a href="https://www.matrixtsl.com/industrial-maintenance/" target="_blank" class="btn btn-info">View Industrial Maintenance Overview</a>
             </div>
         `
     },
@@ -27,7 +27,7 @@ const resources = {
             <p><strong>Size:</strong> L 514mm × W 466mm × D 250mm</p>
             <p>The PLC Fundamentals Trainer is a hands‑on training platform designed for learners new to industrial maintenance and automation. It provides a structured introduction to PLC‑controlled systems using real‑world components and industrial wiring standards. The system is built around a Siemens S7‑1214 PLC with a 7" Unified Basic HMI, giving learners a realistic interface for monitoring inputs and outputs in an automated process.</p>
             <div class="document-link">
-                <a href="assets/documents/IM6930/spec.pdf" target="_blank" class="btn btn-primary">📄 Open Specification (PDF)</a>
+                <a href="assets/documents/IM6930/spec.pdf" target="_blank" class="btn btn-primary">Open Specification (PDF)</a>
             </div>
         `
     },
@@ -37,7 +37,7 @@ const resources = {
             <h2>IM6930 Curriculum (CP2388)</h2>
             <p>PLC Fundamentals for Maintenance Engineers curriculum provides structured learning activities focused on PLC basics, I/O, control logic, and maintenance diagnostics.</p>
             <div class="document-link">
-                <a href="assets/documents/IM6930/curriculum.pdf" target="_blank" class="btn btn-success">📚 Open Curriculum (PDF)</a>
+                <a href="assets/documents/IM6930/curriculum.pdf" target="_blank" class="btn btn-success">Open Curriculum (PDF)</a>
             </div>
         `
     },
@@ -47,7 +47,7 @@ const resources = {
             <h2>IM6930 Teacher Notes</h2>
             <p>Instructor guidance to support delivery of CP2388 with lesson structure, expected outcomes, and assessment guidance.</p>
             <div class="document-link">
-                <a href="assets/documents/IM6930/teachers-notes.pdf" target="_blank" class="btn btn-info">👨‍🏫 Open Teacher Notes (PDF)</a>
+                <a href="assets/documents/IM6930/teachers-notes.pdf" target="_blank" class="btn btn-info">Open Teacher Notes (PDF)</a>
             </div>
         `
     },
@@ -64,7 +64,7 @@ const resources = {
                 <li>Appendix: Electrical drawings & CE declaration</li>
             </ul>
             <div class="document-link">
-                <a href="assets/documents/IM6930/user-manual.pdf" target="_blank" class="btn btn-warning">📖 Open User Manual (PDF)</a>
+                <a href="assets/documents/IM6930/user-manual.pdf" target="_blank" class="btn btn-warning">Open User Manual (PDF)</a>
             </div>
         `
     },
@@ -195,7 +195,7 @@ const resources = {
             <p>The Industrial Maintenance Closed Loop PID Control System is a hands‑on training solution designed to teach fault diagnosis, system behaviour analysis, and component‑level troubleshooting in a real‑world flow control environment.</p>
             <p>Key hardware includes Siemens S7‑1200 PLC, Unified Basic HMI, turbine flow sensor, proportional control valve, analogue flow gauge, IFM temperature sensor, float switches, and a proximity sensor.</p>
             <div class="document-link">
-                <a href="assets/documents/IM0004/spec.pdf" target="_blank" class="btn btn-primary">📄 Open Specification (PDF)</a>
+                <a href="assets/documents/IM0004/spec.pdf" target="_blank" class="btn btn-primary">Open Specification (PDF)</a>
             </div>
         `
     },
@@ -205,7 +205,7 @@ const resources = {
             <h2>IM0004 Curriculum (CP0539 / CP6773)</h2>
             <p>Curriculum focuses on closed‑loop control, troubleshooting, fault‑finding, and system behaviour analysis using real industrial instrumentation.</p>
             <div class="document-link">
-                <a href="assets/documents/IM0004/curriculum.pdf" target="_blank" class="btn btn-success">📚 Open Curriculum (PDF)</a>
+                <a href="assets/documents/IM0004/curriculum.pdf" target="_blank" class="btn btn-success">Open Curriculum (PDF)</a>
             </div>
         `
     },
@@ -215,7 +215,7 @@ const resources = {
             <h2>IM0004 Teacher Notes</h2>
             <p>Instructor notes covering CP0539 and CP6773 with delivery structure, expected outcomes, and assessment guidance.</p>
             <div class="document-link">
-                <a href="assets/documents/IM0004/teachers-notes.pdf" target="_blank" class="btn btn-info">👨‍🏫 Open Teacher Notes (PDF)</a>
+                <a href="assets/documents/IM0004/teachers-notes.pdf" target="_blank" class="btn btn-info">Open Teacher Notes (PDF)</a>
             </div>
         `
     },
@@ -232,7 +232,7 @@ const resources = {
                 <li>Appendix: Electrical drawings & CE declaration</li>
             </ul>
             <div class="document-link">
-                <a href="assets/documents/IM0004/user-manual.pdf" target="_blank" class="btn btn-warning">📖 Open User Manual (PDF)</a>
+                <a href="assets/documents/IM0004/user-manual.pdf" target="_blank" class="btn btn-warning">Open User Manual (PDF)</a>
             </div>
         `
     },
@@ -287,7 +287,7 @@ const resources = {
             <p><strong>Dimensions:</strong> L 32cm × W 90cm × H 10cm</p>
             <p>The Siemens PLC LOGO! Module introduces learners to core concepts in industrial automation and programmable control in a compact, self‑contained system. Built around the Siemens LOGO! PLC and Locktronics platform, it supports hands‑on exploration of PLC programming, control logic, and real‑world I/O systems. Supports wired and wireless connectivity with program upload via MicroSD.</p>
             <div class="document-link">
-                <a href="assets/documents/IM3214/spec.pdf" target="_blank" class="btn btn-primary">📄 Open Specification (PDF)</a>
+                <a href="assets/documents/IM3214/spec.pdf" target="_blank" class="btn btn-primary">Open Specification (PDF)</a>
             </div>
         `
     },
@@ -297,7 +297,7 @@ const resources = {
             <h2>IM3214 Worksheets (CP6211)</h2>
             <p>Sense & Control worksheets focused on PLC fundamentals, logic control, and I/O troubleshooting using the LOGO! platform.</p>
             <div class="document-link">
-                <a href="assets/documents/IM3214/curriculum.pdf" target="_blank" class="btn btn-success">📚 Open Worksheets (PDF)</a>
+                <a href="assets/documents/IM3214/curriculum.pdf" target="_blank" class="btn btn-success">Open Worksheets (PDF)</a>
             </div>
         `
     },
@@ -307,7 +307,7 @@ const resources = {
             <h2>IM3214 Instructor Guide</h2>
             <p>Instructor guide for CP6211 with structured teaching support and delivery guidance.</p>
             <div class="document-link">
-                <a href="assets/documents/IM3214/teachers-guide.pdf" target="_blank" class="btn btn-info">👨‍🏫 Open Instructor Guide (PDF)</a>
+                <a href="assets/documents/IM3214/teachers-guide.pdf" target="_blank" class="btn btn-info">Open Instructor Guide (PDF)</a>
             </div>
         `
     },
@@ -317,7 +317,7 @@ const resources = {
             <h2>IM3214 User Manual</h2>
             <p>Manual includes LOGO! module usage, parameter specification, program transfer, analogue inputs, and version control.</p>
             <div class="document-link">
-                <a href="assets/documents/IM3214/user-manual.pdf" target="_blank" class="btn btn-warning">📖 Open User Manual (PDF)</a>
+                <a href="assets/documents/IM3214/user-manual.pdf" target="_blank" class="btn btn-warning">Open User Manual (PDF)</a>
             </div>
         `
     },
