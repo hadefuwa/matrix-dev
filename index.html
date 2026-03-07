@@ -215,67 +215,198 @@
     }
 
     /* ── Apps section ────────────────────────── */
-    .apps-section { background: var(--bg); }
-    .apps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-    .app-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      text-decoration: none;
-      color: var(--ink);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    .apps-section {
+      background: #07233a;
       position: relative;
       overflow: hidden;
     }
-    .app-card::before {
+    .apps-section::before {
       content: "";
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--ca, var(--brand)), var(--cb, var(--teal)));
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 50%, rgba(15,95,140,0.2) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 30%, rgba(22,143,139,0.15) 0%, transparent 70%);
     }
-    .app-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 50px rgba(13,42,62,0.12);
-      border-color: #c0d8e4;
+    .apps-section .section-label { color: #5bc8c5; }
+    .apps-section .section-title { color: #fff; }
+    .apps-section .section-body  { color: rgba(255,255,255,0.55); }
+    .apps-section .container { position: relative; z-index: 1; }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.75rem;
+      margin-top: 3rem;
     }
+
+    /* Card wrapper for glow border trick */
+    .app-card-wrap {
+      border-radius: 20px;
+      padding: 2px;
+      background: rgba(255,255,255,0.07);
+      position: relative;
+      transition: background 0.3s;
+    }
+    .app-card-wrap::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 21px;
+      background: conic-gradient(from var(--angle, 0deg),
+        var(--ca, #0f5f8c),
+        var(--cb, #168f8b),
+        transparent 40%,
+        transparent 60%,
+        var(--ca, #0f5f8c));
+      opacity: 0;
+      transition: opacity 0.35s;
+      z-index: 0;
+    }
+    .app-card-wrap:hover::before {
+      opacity: 1;
+      animation: spin-border 3s linear infinite;
+    }
+    @keyframes spin-border {
+      to { --angle: 360deg; }
+    }
+    @property --angle {
+      syntax: "<angle>";
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    .app-card {
+      background: linear-gradient(145deg, #0d2e47 0%, #0a2238 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 2.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.25s cubic-bezier(.22,.68,0,1.2), border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      will-change: transform;
+    }
+    .app-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.04) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .app-card-wrap:hover .app-card::after { opacity: 1; }
+    .app-card-wrap:hover .app-card {
+      border-color: rgba(255,255,255,0.16);
+    }
+
     .app-icon {
-      width: 52px; height: 52px;
-      border-radius: 12px;
-      background: var(--ci, #e3f1f8);
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      background: var(--ci-bg, rgba(15,95,140,0.25));
+      border: 1px solid var(--ci-border, rgba(15,95,140,0.4));
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.75rem;
+      position: relative;
+      flex-shrink: 0;
+      transition: transform 0.25s, box-shadow 0.25s;
     }
+    .app-icon::before {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 20px;
+      background: radial-gradient(circle, var(--ci-glow, rgba(15,95,140,0.3)) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .app-card-wrap:hover .app-icon { transform: scale(1.08); box-shadow: 0 0 24px var(--ci-glow, rgba(15,95,140,0.5)); }
+    .app-card-wrap:hover .app-icon::before { opacity: 1; }
+
+    .app-card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ca, #5bc8c5);
+      font-family: "Space Grotesk", sans-serif;
+      opacity: 0.8;
+    }
+    .app-card-tag::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--ca, #5bc8c5);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
     .app-card h3 {
       font-family: "Space Grotesk", sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 700;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
+      color: #fff;
+      line-height: 1.2;
     }
-    .app-card p { font-size: 0.92rem; color: var(--muted); line-height: 1.6; flex: 1; }
+    .app-card p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.65;
+      flex: 1;
+    }
+
     .app-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.5rem;
       font-size: 0.87rem;
       font-weight: 700;
-      color: var(--brand);
+      color: var(--ca, #5bc8c5);
       font-family: "Space Grotesk", sans-serif;
-      margin-top: 0.25rem;
+      margin-top: 0.5rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      align-self: flex-start;
+      transition: background 0.2s, border-color 0.2s, gap 0.2s;
     }
-    .app-link svg { transition: transform 0.15s; }
-    .app-card:hover .app-link svg { transform: translateX(4px); }
-    .card--sow      { --ca: #0f5f8c; --cb: #168f8b; --ci: #e3f1f8; }
-    .card--teachers { --ca: #5b3fa6; --cb: #9c49c4; --ci: #ede8f8; }
+    .app-card-wrap:hover .app-link {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.18);
+      gap: 0.75rem;
+    }
+
+    .card--sow {
+      --ca: #5bc8c5; --cb: #168f8b;
+      --ci-bg: rgba(22,143,139,0.15);
+      --ci-border: rgba(22,143,139,0.35);
+      --ci-glow: rgba(22,143,139,0.45);
+    }
+    .card--teachers {
+      --ca: #b07ef8; --cb: #9c49c4;
+      --ci-bg: rgba(156,73,196,0.15);
+      --ci-border: rgba(156,73,196,0.35);
+      --ci-glow: rgba(156,73,196,0.45);
+    }
+
+    /* Staggered card entrance */
+    .app-card-wrap.fade-in { transition-delay: 0s; }
+    .app-card-wrap.fade-in:nth-child(2) { transition-delay: 0.15s; }
 
     /* ── About section ───────────────────────── */
     .about-section { background: var(--surface); }
@@ -427,19 +558,25 @@
       <p class="section-body fade-in">Purpose-built web applications to support Matrix TSL educators. Plan courses, manage resources, and deliver outstanding engineering lessons.</p>
       <div class="apps-grid">
 
-        <a href="/sow-generator" class="app-card card--sow fade-in">
-          <div class="app-icon">&#128203;</div>
-          <h3>Scheme of Work Generator</h3>
-          <p>Plan, sequence, and deliver your engineering courses with confidence. Select topics, arrange lessons, and generate a complete Scheme of Work ready to print or save as PDF.</p>
-          <span class="app-link">Open app <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        </a>
+        <div class="app-card-wrap card--sow fade-in">
+          <a href="/sow-generator" class="app-card">
+            <span class="app-card-tag">Teaching Tool</span>
+            <div class="app-icon">&#128203;</div>
+            <h3>Scheme of Work Generator</h3>
+            <p>Plan, sequence, and deliver your engineering courses with confidence. Select topics, arrange lessons, and generate a complete Scheme of Work ready to print or save as PDF.</p>
+            <span class="app-link">Open app <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+        </div>
 
-        <a href="/teachers/" class="app-card card--teachers fade-in">
-          <div class="app-icon">&#127891;</div>
-          <h3>IM Teachers Portal</h3>
-          <p>Resources, lesson plans, and course materials for Industrial Maintenance programme teachers. Covers IM0004, IM3214, and IM6930 qualifications.</p>
-          <span class="app-link">Open app <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        </a>
+        <div class="app-card-wrap card--teachers fade-in">
+          <a href="/teachers/" class="app-card">
+            <span class="app-card-tag">Teacher Resources</span>
+            <div class="app-icon">&#127891;</div>
+            <h3>IM Teachers Portal</h3>
+            <p>Resources, lesson plans, and course materials for Industrial Maintenance programme teachers. Covers IM0004, IM3214, and IM6930 qualifications.</p>
+            <span class="app-link">Open app <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+        </div>
 
       </div>
     </div>
@@ -525,6 +662,23 @@
       { threshold: 0.1 }
     );
     document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
+
+    // Mouse-tracking spotlight on app cards
+    document.querySelectorAll(".app-card-wrap").forEach(wrap => {
+      wrap.addEventListener("mousemove", e => {
+        const card = wrap.querySelector(".app-card");
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+        const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+        card.style.setProperty("--mx", x + "%");
+        card.style.setProperty("--my", y + "%");
+      });
+      wrap.addEventListener("mouseleave", () => {
+        const card = wrap.querySelector(".app-card");
+        card.style.setProperty("--mx", "50%");
+        card.style.setProperty("--my", "50%");
+      });
+    });
   </script>
 
 </body>
