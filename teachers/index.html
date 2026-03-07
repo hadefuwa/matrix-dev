@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Industrial Maintenance Teachers Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo" class="login-logo">
+                <h1>Industrial Maintenance Teachers Portal</h1>
+                <p>Authorized Access Only</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter username" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <button type="submit" id="loginBtn" class="btn btn-primary login-btn">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Matrix Technology Solutions</p>
+                <div class="login-banner">
+                    <strong>Need access?</strong> If you don’t have or know the login, contact our sales team and we’ll create you an account.<br>
+                    <span class="contact">📞 01422 252380</span> · <span class="contact">✉️ sales@matrixtsl.com</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Portal Content -->
+    <div id="mainContent" style="display: none;">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo-container">
+                        <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo">
+                    </div>
+                    <div class="header-text">
+                        <h1>Industrial Maintenance Teachers Portal</h1>
+                        <p class="subtitle">Your resource hub for industrial maintenance training and PLC education</p>
+                    </div>
+                    <div class="logout-container">
+                        <button class="btn btn-secondary logout-btn" onclick="handleLogout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container">
+            <section class="section">
+                <h2 class="section-title">Industrial Maintenance Overview</h2>
+                <p class="section-summary">Hands-on industrial maintenance training designed for higher education and vocational learners. The range focuses on PLC control, closed-loop systems, troubleshooting, and real-world automation skills using Siemens PLC hardware.</p>
+                <div class="dashboard-grid">
+                    <div class="tile tile-overview" data-resource="im-overview">
+                        <div class="tile-icon">🏭</div>
+                        <h2>Programme Overview</h2>
+                        <p>Industry 4.0 context, vocational focus, and training outcomes</p>
+                        <button class="btn btn-overview">View Overview</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-title">IM6930 – PLC Fundamentals Trainer</h2>
+                <p class="section-summary">A hands-on PLC training platform built around a Siemens S7‑1214 PLC and 7" Unified Basic HMI. Teaches core control panel layout, industrial wiring standards, I/O interaction, and practical maintenance foundations.</p>
+                <div class="section-media">
+                    <img src="assets/images/im6930.png" alt="IM6930 PLC Fundamentals Trainer" class="section-image">
+                </div>
+                <div class="dashboard-grid">
+                    <div class="tile tile-primary" data-resource="im6930-overview">
+                        <div class="tile-icon">🧠</div>
+                        <h2>Product Overview</h2>
+                        <p>Purpose, learning outcomes, and delivery focus</p>
+                        <button class="btn btn-primary">View Overview</button>
+                    </div>
+                    <div class="tile tile-info" data-resource="im6930-spec">
+                        <div class="tile-icon">📋</div>
+                        <h2>Specification</h2>
+                        <p>SP6930 – PLC Fundamentals Trainer Spec Doc</p>
+                        <button class="btn btn-info">Open Spec</button>
+                    </div>
+                    <div class="tile tile-success" data-resource="im6930-curriculum">
+                        <div class="tile-icon">📚</div>
+                        <h2>Curriculum</h2>
+                        <p>CP2388 – PLC Fundamentals for Maintenance Engineers</p>
+                        <button class="btn btn-success">Open Curriculum</button>
+                    </div>
+                    <div class="tile tile-scheme" data-resource="im6930-teachers">
+                        <div class="tile-icon">👨‍🏫</div>
+                        <h2>Teacher Notes</h2>
+                        <p>CP2388 Teachers Notes</p>
+                        <button class="btn btn-scheme">Open Notes</button>
+                    </div>
+                    <div class="tile tile-warning" data-resource="im6930-manual">
+                        <div class="tile-icon">📖</div>
+                        <h2>User Manual</h2>
+                        <p>IM6930 User Manual</p>
+                        <button class="btn btn-warning">Open Manual</button>
+                    </div>
+                    <div class="tile tile-download" data-resource="im6930-resources">
+                        <div class="tile-icon">⬇️</div>
+                        <h2>Resources</h2>
+                        <p>Download all IM6930 documents</p>
+                        <button class="btn btn-download">Download Pack</button>
+                    </div>
+                    <div class="tile tile-scheme" data-resource="im6930-sow">
+                        <div class="tile-icon">🗂️</div>
+                        <h2>Scheme of Work</h2>
+                        <p>Sequenced teaching plan for IM6930</p>
+                        <button class="btn btn-scheme">View Scheme</button>
+                    </div>
+                    <div class="tile tile-info" data-link="https://youtu.be/1g8mtHUCMHQ">
+                        <div class="tile-icon">🎥</div>
+                        <h2>IM6930 Video</h2>
+                        <p>Watch the IM6930 training video</p>
+                        <a class="btn btn-info" href="https://youtu.be/1g8mtHUCMHQ" target="_blank" rel="noopener">Watch Video</a>
+                    </div>
+                    <div class="tile tile-info" data-link="https://matrixtsl.github.io/IM6930/">
+                        <div class="tile-icon">🧩</div>
+                        <h2>Interactive Curriculum</h2>
+                        <p>Open the interactive IM6930 curriculum in a new tab</p>
+                        <a class="btn btn-info" href="https://matrixtsl.github.io/IM6930/" target="_blank" rel="noopener">Open Interactive</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-title">IM0004 – Maintenance of Closed Loop Systems</h2>
+                <p class="section-summary">A real‑world flow control trainer for fault diagnosis, system behaviour analysis, and closed‑loop troubleshooting. Includes Siemens S7‑1200 PLC, Unified Basic HMI, turbine flow sensor, proportional control valve, and industrial instrumentation.</p>
+                <div class="section-media">
+                    <img src="assets/images/im0004-1.png" alt="IM0004 Closed Loop Systems" class="section-image">
+                    <img src="assets/images/im0004-2.png" alt="IM0004 Closed Loop Systems Render" class="section-image">
+                </div>
+                <div class="dashboard-grid">
+                    <div class="tile tile-primary" data-resource="im0004-overview">
+                        <div class="tile-icon">🔁</div>
+                        <h2>Product Overview</h2>
+                        <p>Closed-loop maintenance training and diagnostics</p>
+                        <button class="btn btn-primary">View Overview</button>
+                    </div>
+                    <div class="tile tile-info" data-resource="im0004-spec">
+                        <div class="tile-icon">📋</div>
+                        <h2>Specification</h2>
+                        <p>SP0004 – Maintenance of Closed Loop Spec Doc</p>
+                        <button class="btn btn-info">Open Spec</button>
+                    </div>
+                    <div class="tile tile-success" data-resource="im0004-curriculum">
+                        <div class="tile-icon">📚</div>
+                        <h2>Curriculum</h2>
+                        <p>CP0539 – Industrial Maintenance of Closed Loop Systems</p>
+                        <button class="btn btn-success">Open Curriculum</button>
+                    </div>
+                    <div class="tile tile-scheme" data-resource="im0004-teachers">
+                        <div class="tile-icon">👨‍🏫</div>
+                        <h2>Teacher Notes</h2>
+                        <p>CP0539 & CP6773 Teachers Notes</p>
+                        <button class="btn btn-scheme">Open Notes</button>
+                    </div>
+                    <div class="tile tile-warning" data-resource="im0004-manual">
+                        <div class="tile-icon">📖</div>
+                        <h2>User Manual</h2>
+                        <p>IM0004 User Manual</p>
+                        <button class="btn btn-warning">Open Manual</button>
+                    </div>
+                    <div class="tile tile-download" data-resource="im0004-resources">
+                        <div class="tile-icon">⬇️</div>
+                        <h2>Resources</h2>
+                        <p>Download all IM0004 documents</p>
+                        <button class="btn btn-download">Download Pack</button>
+                    </div>
+                    <div class="tile tile-scheme" data-resource="im0004-sow">
+                        <div class="tile-icon">🗂️</div>
+                        <h2>Scheme of Work</h2>
+                        <p>Sequenced teaching plan for IM0004</p>
+                        <button class="btn btn-scheme">View Scheme</button>
+                    </div>
+                    <div class="tile tile-info" data-link="https://youtu.be/CPwaUnomzc8">
+                        <div class="tile-icon">🎥</div>
+                        <h2>IM0004 Video</h2>
+                        <p>Watch the IM0004 training video</p>
+                        <a class="btn btn-info" href="https://youtu.be/CPwaUnomzc8" target="_blank" rel="noopener">Watch Video</a>
+                    </div>
+                    <div class="tile tile-info" data-link="https://matrixtsl.github.io/IM0004/">
+                        <div class="tile-icon">🧩</div>
+                        <h2>Interactive Curriculum</h2>
+                        <p>Open the interactive IM0004 curriculum in a new tab</p>
+                        <a class="btn btn-info" href="https://matrixtsl.github.io/IM0004/" target="_blank" rel="noopener">Open Interactive</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-title">IM3214 – Siemens PLC LOGO! Trainer</h2>
+                <p class="section-summary">Compact Siemens LOGO! PLC training module on Locktronics platform. Supports wired/wireless programming, I/O logic control, and hands‑on PLC fundamentals for maintenance learners.</p>
+                <div class="section-media">
+                    <img src="assets/images/im3214.png" alt="IM3214 Siemens PLC LOGO! Trainer" class="section-image">
+                </div>
+                <div class="dashboard-grid">
+                    <div class="tile tile-primary" data-resource="im3214-overview">
+                        <div class="tile-icon">⚡</div>
+                        <h2>Product Overview</h2>
+                        <p>LOGO! PLC training with sense & control focus</p>
+                        <button class="btn btn-primary">View Overview</button>
+                    </div>
+                    <div class="tile tile-info" data-resource="im3214-spec">
+                        <div class="tile-icon">📋</div>
+                        <h2>Specification</h2>
+                        <p>SP3214 – Siemens PLC LOGO! Trainer Spec Doc</p>
+                        <button class="btn btn-info">Open Spec</button>
+                    </div>
+                    <div class="tile tile-success" data-resource="im3214-curriculum">
+                        <div class="tile-icon">📚</div>
+                        <h2>Worksheets</h2>
+                        <p>CP6211 Sense & Control Worksheets</p>
+                        <button class="btn btn-success">Open Worksheets</button>
+                    </div>
+                    <div class="tile tile-scheme" data-resource="im3214-teachers">
+                        <div class="tile-icon">👨‍🏫</div>
+                        <h2>Instructor Guide</h2>
+                        <p>CP6211 Instructor Guide</p>
+                        <button class="btn btn-scheme">Open Guide</button>
+                    </div>
+                    <div class="tile tile-warning" data-resource="im3214-manual">
+                        <div class="tile-icon">📖</div>
+                        <h2>User Manual</h2>
+                        <p>IM3214 User Manual</p>
+                        <button class="btn btn-warning">Open Manual</button>
+                    </div>
+                    <div class="tile tile-download" data-resource="im3214-resources">
+                        <div class="tile-icon">⬇️</div>
+                        <h2>Resources</h2>
+                        <p>Download all IM3214 documents</p>
+                        <button class="btn btn-download">Download Pack</button>
+                    </div>
+                    <div class="tile tile-scheme" data-resource="im3214-sow">
+                        <div class="tile-icon">🗂️</div>
+                        <h2>Scheme of Work</h2>
+                        <p>Sequenced teaching plan for IM3214</p>
+                        <button class="btn btn-scheme">View Scheme</button>
+                    </div>
+                    <div class="tile tile-info" data-link="https://youtu.be/AoEq7CHWH9U">
+                        <div class="tile-icon">🎥</div>
+                        <h2>IM3214 Video</h2>
+                        <p>Watch the IM3214 training video</p>
+                        <a class="btn btn-info" href="https://youtu.be/AoEq7CHWH9U" target="_blank" rel="noopener">Watch Video</a>
+                    </div>
+                    <div class="tile tile-info" data-link="https://matrixtsl.github.io/IM3214/">
+                        <div class="tile-icon">🧩</div>
+                        <h2>Interactive Curriculum</h2>
+                        <p>Open the interactive IM3214 curriculum in a new tab</p>
+                        <a class="btn btn-info" href="https://matrixtsl.github.io/IM3214/" target="_blank" rel="noopener">Open Interactive</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resource Modal -->
+            <div id="resourceModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <div id="modalBody">
+                        <!-- Content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 Matrix Technology Solutions | Industrial Maintenance Teachers Portal</p>
+                <p class="footer-links">
+                    <a href="mailto:sales@matrixtsl.com">Support</a> | 
+                    <a href="mailto:sales@matrixtsl.com">Contact</a> | 
+                    <a href="https://www.matrixtsl.com/industrial-maintenance/" target="_blank" rel="noopener">About Industrial Maintenance</a>
+                </p>
+                <p class="footer-address">Address: <span id="addressPlaceholder">(please provide official address)</span></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
