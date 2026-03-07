@@ -626,7 +626,7 @@ function renderHardware() {
 
     if (row.image) {
       const img = document.createElement("img");
-      img.src = row.image;
+      img.src = row.image.startsWith('/') || row.image.startsWith('http') ? row.image : '/' + row.image;
       img.alt = `${row.name} image`;
       img.className = "hardware-image";
       img.loading = "lazy";

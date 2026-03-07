@@ -173,6 +173,10 @@ async function readJsonBody(req) {
 }
 
 async function serveStatic(pathname, res) {
+  if (pathname === "/favicon.ico") {
+    return sendFile(res, path.join(ROOT_DIR, "assets", "matrix-icon.ico"));
+  }
+
   // Dashboard
   if (pathname === "/" || pathname === "/index.html") {
     return sendFile(res, path.join(ROOT_DIR, "dashboard", "index.html"));

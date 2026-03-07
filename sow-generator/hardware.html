@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hardware Editor - Matrix TSL</title>
-  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="icon" type="image/x-icon" href="/assets/matrix-icon.ico">
+  <link rel="icon" type="image/png" href="/assets/matrix-icon.png">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -412,7 +413,7 @@
             <div class="form-group"><label>Supported Tags</label><div style="font-size:0.9rem">${esc((item.supports_tags || []).join(', ') || '-')}</div></div>
             <div class="form-group full"><label>Notes</label><div style="font-size:0.9rem">${esc(item.notes || '-')}</div></div>
             <div class="form-group full"><label>Image</label><div style="font-size:0.9rem">${esc(item.image || '-')}</div></div>
-            <div class="form-group full">${item.image ? `<img src="${esc(item.image)}" alt="${esc(item.name || 'Hardware')}" class="thumb">` : ''}</div>
+            <div class="form-group full">${item.image ? `<img src="${esc(item.image.startsWith('/') || item.image.startsWith('http') ? item.image : '/' + item.image)}" alt="${esc(item.name || 'Hardware')}" class="thumb">` : ''}</div>
           </div>
           <div class="card-actions">
             <button class="btn btn-ghost" onclick="editItem(${i})">Edit</button>
