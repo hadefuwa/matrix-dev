@@ -13,7 +13,8 @@ class EblocksApp {
     this.serialManager = new SerialManager();
     this.codeRunner = new CodeRunner();
     this.firmataController = new FirmataController();
-    
+    this.availablePorts = []; // previously-authorized ports
+
     // Default code template
     this.defaultCode = `// eBlocks Online - Arduino C++ Example
 // This code runs in-browser using JSCPP interpreter
@@ -22,10 +23,10 @@ class EblocksApp {
 void setup() {
   // Initialize serial communication
   Serial.begin(115200);
-  
+
   // Set pin 13 (built-in LED) as output
   pinMode(13, OUTPUT);
-  
+
   Serial.println("eBlocks Online - Ready!");
 }
 
@@ -34,7 +35,7 @@ void loop() {
   digitalWrite(13, HIGH);
   Serial.println("LED ON");
   delay(1000);
-  
+
   digitalWrite(13, LOW);
   Serial.println("LED OFF");
   delay(1000);
@@ -46,21 +47,24 @@ void loop() {
   async init() {
     // Check browser compatibility
     this.checkBrowserSupport();
-    
+
     // Initialize Monaco Editor
     await this.initMonacoEditor();
-    
+
     // Set up event listeners
     this.setupEventListeners();
-    
+
     // Set up serial communication listeners
     this.setupSerialListeners();
-    
+
     // Load saved code if exists
     this.loadSavedCode();
 
     // Curriculum / worksheets
     this.initCurriculum();
+
+    // Populate COM port list from previously-authorized ports
+    await this.refreshPortList();
 
     // Ensure JSCPP is loaded, then debug info
     await this.ensureJSCPP();
@@ -164,18 +168,23 @@ void loop() {
     // About link
     on('about-link', 'click', (e) => { e.preventDefault(); this.showAbout(); });
 
-    // Refresh ports button
-    on('refresh-ports-btn', 'click', () => this.handleConnect());
+    // Refresh ports button — scan authorized ports, don't open Chrome picker
+    on('refresh-ports-btn', 'click', () => this.refreshPortList());
   }
 
   setupSerialListeners() {
-    // Listen for connection state changes
-    this.serialManager.on('connected', (portInfo) => {
+    this.serialManager.on('connected', async (portInfo) => {
       this.updateConnectionStatus(true, portInfo);
       this.logToConsole('✅ Board connected successfully', 'success');
-      
+
       // Initialize Firmata controller with the port
       this.firmataController.setPort(this.serialManager.port);
+
+      // Refresh port list so the newly-authorized port appears
+      await this.refreshPortList();
+
+      // Mark the connected port as selected in the dropdown
+      this.markConnectedPortInSelect();
     });
 
     this.serialManager.on('disconnected', () => {
@@ -192,27 +201,99 @@ void loop() {
     });
   }
 
-  async handleConnect() {
-    const connectBtn = document.getElementById('connect-btn');
+  /**
+   * Scan previously-authorized ports and populate the COM port dropdown
+   */
+  async refreshPortList() {
+    this.availablePorts = await this.serialManager.getAvailablePorts();
 
+    const select = document.getElementById('com-port-select');
+    if (!select) return;
+
+    const previousValue = select.value;
+    select.innerHTML = '<option value="">Select a port...</option>';
+
+    this.availablePorts.forEach((port, i) => {
+      const info = port.getInfo();
+      const label = this.getPortLabel(info, i);
+      const option = document.createElement('option');
+      option.value = String(i);
+      option.textContent = label;
+      select.appendChild(option);
+    });
+
+    // Restore previous selection if it still exists
+    if (previousValue !== '' && select.querySelector(`option[value="${previousValue}"]`)) {
+      select.value = previousValue;
+    }
+
+    console.log(`[eBlocks] Found ${this.availablePorts.length} authorized port(s)`);
+  }
+
+  /**
+   * After connection, select the connected port in the dropdown
+   */
+  markConnectedPortInSelect() {
+    const select = document.getElementById('com-port-select');
+    if (!select || !this.serialManager.port) return;
+
+    // Find the index of the connected port in our list
+    const idx = this.availablePorts.indexOf(this.serialManager.port);
+    if (idx !== -1) {
+      select.value = String(idx);
+    }
+  }
+
+  /**
+   * Build a human-readable label for a serial port
+   */
+  getPortLabel(info, index) {
+    const knownVendors = {
+      0x2341: 'Arduino',
+      0x1A86: 'CH340',
+      0x0403: 'FTDI',
+      0x10C4: 'Silicon Labs CP210x',
+      0x04D8: 'Microchip',
+      0x239A: 'Adafruit',
+    };
+
+    const vid = info.usbVendorId;
+    const pid = info.usbProductId;
+
+    if (vid && knownVendors[vid]) {
+      return `Port ${index + 1} — ${knownVendors[vid]} (${pid ? `PID:${pid.toString(16).toUpperCase()}` : 'unknown PID'})`;
+    }
+    if (vid) {
+      return `Port ${index + 1} — VID:${vid.toString(16).toUpperCase()} PID:${pid ? pid.toString(16).toUpperCase() : '?'}`;
+    }
+    return `Port ${index + 1}`;
+  }
+
+  async handleConnect() {
     if (this.serialManager.isConnected) {
       await this.serialManager.disconnect();
-      if (connectBtn) connectBtn.innerHTML = '<span class="icon">🔌</span> Connect to Board';
-    } else {
-      try {
-        if (connectBtn) { connectBtn.disabled = true; connectBtn.innerHTML = '<span class="icon">⏳</span> Connecting...'; }
+      return;
+    }
 
-        const baudEl = document.getElementById('baud-select');
-        const baudRate = baudEl ? parseInt(baudEl.value) : 115200;
+    try {
+      const baudEl = document.getElementById('baud-select');
+      const baudRate = baudEl ? parseInt(baudEl.value) : 115200;
+
+      // Check if user has selected a previously-authorized port in the dropdown
+      const select = document.getElementById('com-port-select');
+      const selectedIndex = select ? parseInt(select.value) : NaN;
+      const selectedPort = !isNaN(selectedIndex) && this.availablePorts[selectedIndex];
+
+      if (selectedPort) {
+        // Connect to the chosen port directly — no Chrome picker
+        await this.serialManager.connect(baudRate, selectedPort);
+      } else {
+        // No port selected — open Chrome's serial port picker
         await this.serialManager.connect(baudRate);
-
-        if (connectBtn) connectBtn.innerHTML = '<span class="icon">🔌</span> Disconnect';
-      } catch (error) {
-        this.logToConsole(`❌ Connection failed: ${error.message}`, 'error');
-        if (connectBtn) connectBtn.innerHTML = '<span class="icon">🔌</span> Connect to Board';
-      } finally {
-        if (connectBtn) connectBtn.disabled = false;
       }
+
+    } catch (error) {
+      this.logToConsole(`❌ Connection failed: ${error.message}`, 'error');
     }
   }
 
@@ -224,23 +305,21 @@ void loop() {
     try {
       if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = '⏳ Running...'; }
       if (statusBar) { statusBar.style.display = ''; statusBar.textContent = 'Executing code...'; }
-      
+
       this.clearConsole();
       this.logToConsole('🚀 Starting code execution...', 'success');
-      
-      // Run the code through JSCPP interpreter
+
       const result = await this.codeRunner.run(code, {
         onOutput: (output) => {
           this.logToConsole(output);
         },
         onFirmataCommand: (command, args) => {
-          // Send Firmata commands to the board
           if (this.serialManager.isConnected) {
             this.firmataController.executeCommand(command, args);
           }
         }
       });
-      
+
       this.logToConsole('✅ Code execution completed', 'success');
       if (statusBar) statusBar.textContent = 'Ready';
 
@@ -254,6 +333,19 @@ void loop() {
   }
 
   updateConnectionStatus(connected, portInfo = {}) {
+    // Board image glow
+    const boardImage = document.getElementById('board-image');
+    if (boardImage) {
+      if (connected) {
+        boardImage.classList.add('connected');
+        boardImage.classList.remove('disconnected');
+      } else {
+        boardImage.classList.remove('connected');
+        boardImage.classList.add('disconnected');
+      }
+    }
+
+    // Legacy status indicator (if present)
     const statusIndicator = document.getElementById('connection-status');
     if (statusIndicator) {
       const statusText = statusIndicator.querySelector('.status-text');
@@ -300,14 +392,14 @@ void loop() {
     const input = document.getElementById('serial-input') || document.getElementById('console-input');
     if (!input) return;
     const message = input.value.trim();
-    
+
     if (!message) return;
-    
+
     if (!this.serialManager.isConnected) {
       this.logToConsole('⚠️ Not connected to board', 'warning');
       return;
     }
-    
+
     try {
       await this.serialManager.send(message + '\n');
       this.logToConsole(`📤 Sent: ${message}`, 'success');
@@ -319,10 +411,10 @@ void loop() {
 
   saveCode() {
     const code = this.editor.getValue();
-    
+
     // Save to localStorage
     localStorage.setItem('eblocks-code', code);
-    
+
     // Also download as file
     const blob = new Blob([code], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -331,7 +423,7 @@ void loop() {
     a.download = 'sketch.cpp';
     a.click();
     URL.revokeObjectURL(url);
-    
+
     this.logToConsole('💾 Code saved', 'success');
   }
 
@@ -339,11 +431,11 @@ void loop() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.cpp,.ino,.txt';
-    
+
     input.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      
+
       const reader = new FileReader();
       reader.onload = (event) => {
         this.editor.setValue(event.target.result);
@@ -351,7 +443,7 @@ void loop() {
       };
       reader.readAsText(file);
     };
-    
+
     input.click();
   }
 
@@ -390,7 +482,7 @@ void loop() {
     const worksheetContent = document.getElementById('worksheet-content');
     const closeBtn = document.getElementById('worksheet-close-btn');
 
-    if (!curriculumContent) return; // curriculum UI not present
+    if (!curriculumContent) return;
 
     const list = [
       { code: 'CP4807', title: 'Curriculum Overview', file: 'assets/curriculum1.txt' },
@@ -466,8 +558,7 @@ Features:
 Browser Requirements:
 - Chrome 89+ / Edge 89+ / Opera 75+
 
-Created with ❤️ for the eBlocks community
-https://github.com/hadefuwa/eblocks-online`);
+Created with love for the eBlocks community`);
   }
 }
 
