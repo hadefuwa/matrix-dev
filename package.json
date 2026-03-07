@@ -1,0 +1,6 @@
+{
+  "name": "matrix-home",
+  "scripts": {
+    "start": "npx serve . -p ${PORT:-3000} -s"
+  }
+}
