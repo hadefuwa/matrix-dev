@@ -244,16 +244,22 @@
     </main>
   </div>
 
-  <!-- Monaco Editor from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
-
   <!-- Lodash (required by JSCPP) -->
   <script src="vendor/lodash.min.js"></script>
 
-  <!-- JSCPP bundled locally for reliability -->
+  <!-- JSCPP must load before Monaco loader to avoid AMD define() conflict -->
   <script src="vendor/jscpp.bundle.js"></script>
   <script>
     window.EBLOCKS_VERSION = "v1.1.2";
+    // Save JSCPP reference before Monaco loader overwrites global define
+    window._JSCPP_saved = window.JSCPP;
+  </script>
+
+  <!-- Monaco Editor from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  <script>
+    // Restore JSCPP in case Monaco loader shadowed it
+    if (!window.JSCPP && window._JSCPP_saved) window.JSCPP = window._JSCPP_saved;
   </script>
 
   <!-- Main application modules -->

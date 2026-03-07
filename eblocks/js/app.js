@@ -71,31 +71,37 @@ void loop() {
 
   checkBrowserSupport() {
     const supportInfo = document.getElementById('browser-support');
-    
+
     if ('serial' in navigator) {
-      supportInfo.textContent = '✅ Supported';
-      supportInfo.style.color = '#4ec9b0';
+      if (supportInfo) {
+        supportInfo.textContent = '✅ Supported';
+        supportInfo.style.color = '#4ec9b0';
+      }
     } else {
-      supportInfo.textContent = '❌ Not Supported';
-      supportInfo.style.color = '#f48771';
-      
+      if (supportInfo) {
+        supportInfo.textContent = '❌ Not Supported';
+        supportInfo.style.color = '#f48771';
+      }
+
       // Show warning modal
       setTimeout(() => {
-        document.getElementById('unsupported-modal').style.display = 'flex';
+        const modal = document.getElementById('unsupported-modal');
+        if (modal) modal.style.display = 'flex';
       }, 1000);
     }
   }
 
   async initMonacoEditor() {
     return new Promise((resolve, reject) => {
-      require.config({ 
-        paths: { 
-          vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' 
-        } 
+      require.config({
+        paths: {
+          vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs'
+        }
       });
 
       require(['vs/editor/editor.main'], () => {
-        this.editor = monaco.editor.create(document.getElementById('editor-container'), {
+        const editorEl = document.getElementById('monaco-editor') || document.getElementById('editor-container');
+        this.editor = monaco.editor.create(editorEl, {
           value: this.defaultCode,
           language: 'cpp',
           theme: 'vs-dark',
@@ -115,50 +121,51 @@ void loop() {
   }
 
   setupEventListeners() {
-    // Connect button
-    document.getElementById('connect-btn').addEventListener('click', () => {
-      this.handleConnect();
-    });
+    const on = (id, event, fn) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener(event, fn);
+    };
 
-    // Run code button
-    document.getElementById('run-btn').addEventListener('click', () => {
-      this.handleRunCode();
-    });
+    // Connect button (may not exist in all HTML versions)
+    on('connect-btn', 'click', () => this.handleConnect());
+
+    // Run / Upload button
+    on('run-btn', 'click', () => this.handleRunCode());
+    on('upload-btn', 'click', () => this.handleRunCode());
 
     // Save/Load buttons
-    document.getElementById('save-btn').addEventListener('click', () => {
-      this.saveCode();
-    });
+    on('save-btn', 'click', () => this.saveCode());
+    on('load-btn', 'click', () => this.loadCode());
 
-    document.getElementById('load-btn').addEventListener('click', () => {
-      this.loadCode();
-    });
+    // Console / Serial monitor controls
+    on('clear-console-btn', 'click', () => this.clearConsole());
+    on('clear-monitor-btn', 'click', () => this.clearConsole());
 
-    // Console controls
-    document.getElementById('clear-console-btn').addEventListener('click', () => {
-      this.clearConsole();
-    });
-
-    document.getElementById('send-btn').addEventListener('click', () => {
-      this.sendToBoard();
-    });
-
-    document.getElementById('console-input').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
+    // Send button & serial form
+    on('send-btn', 'click', () => this.sendToBoard());
+    const serialForm = document.getElementById('serial-send-form');
+    if (serialForm) {
+      serialForm.addEventListener('submit', (e) => {
+        e.preventDefault();
         this.sendToBoard();
-      }
-    });
+      });
+    }
+
+    // Serial/console input enter key
+    on('console-input', 'keypress', (e) => { if (e.key === 'Enter') this.sendToBoard(); });
+    on('serial-input',  'keypress', (e) => { if (e.key === 'Enter') this.sendToBoard(); });
 
     // Modal close
-    document.getElementById('close-modal-btn').addEventListener('click', () => {
-      document.getElementById('unsupported-modal').style.display = 'none';
+    on('close-modal-btn', 'click', () => {
+      const modal = document.getElementById('unsupported-modal');
+      if (modal) modal.style.display = 'none';
     });
 
     // About link
-    document.getElementById('about-link').addEventListener('click', (e) => {
-      e.preventDefault();
-      this.showAbout();
-    });
+    on('about-link', 'click', (e) => { e.preventDefault(); this.showAbout(); });
+
+    // Refresh ports button
+    on('refresh-ports-btn', 'click', () => this.handleConnect());
   }
 
   setupSerialListeners() {
@@ -187,39 +194,36 @@ void loop() {
 
   async handleConnect() {
     const connectBtn = document.getElementById('connect-btn');
-    
+
     if (this.serialManager.isConnected) {
-      // Disconnect
       await this.serialManager.disconnect();
-      connectBtn.innerHTML = '<span class="icon">🔌</span> Connect to Board';
+      if (connectBtn) connectBtn.innerHTML = '<span class="icon">🔌</span> Connect to Board';
     } else {
-      // Connect
       try {
-        connectBtn.disabled = true;
-        connectBtn.innerHTML = '<span class="icon">⏳</span> Connecting...';
-        
-        const baudRate = parseInt(document.getElementById('baud-select').value);
+        if (connectBtn) { connectBtn.disabled = true; connectBtn.innerHTML = '<span class="icon">⏳</span> Connecting...'; }
+
+        const baudEl = document.getElementById('baud-select');
+        const baudRate = baudEl ? parseInt(baudEl.value) : 115200;
         await this.serialManager.connect(baudRate);
-        
-        connectBtn.innerHTML = '<span class="icon">🔌</span> Disconnect';
+
+        if (connectBtn) connectBtn.innerHTML = '<span class="icon">🔌</span> Disconnect';
       } catch (error) {
         this.logToConsole(`❌ Connection failed: ${error.message}`, 'error');
-        connectBtn.innerHTML = '<span class="icon">🔌</span> Connect to Board';
+        if (connectBtn) connectBtn.innerHTML = '<span class="icon">🔌</span> Connect to Board';
       } finally {
-        connectBtn.disabled = false;
+        if (connectBtn) connectBtn.disabled = false;
       }
     }
   }
 
   async handleRunCode() {
     const code = this.editor.getValue();
-    const runBtn = document.getElementById('run-btn');
-    const statusBar = document.getElementById('editor-status');
-    
+    const runBtn = document.getElementById('run-btn') || document.getElementById('upload-btn');
+    const statusBar = document.getElementById('editor-status') || document.getElementById('upload-status');
+
     try {
-      runBtn.disabled = true;
-      runBtn.innerHTML = '⏳ Running...';
-      statusBar.textContent = 'Executing code...';
+      if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = '⏳ Running...'; }
+      if (statusBar) { statusBar.style.display = ''; statusBar.textContent = 'Executing code...'; }
       
       this.clearConsole();
       this.logToConsole('🚀 Starting code execution...', 'success');
@@ -238,62 +242,63 @@ void loop() {
       });
       
       this.logToConsole('✅ Code execution completed', 'success');
-      statusBar.textContent = 'Ready';
-      
+      if (statusBar) statusBar.textContent = 'Ready';
+
     } catch (error) {
       this.logToConsole(`❌ Execution error: ${error.message}`, 'error');
-      statusBar.textContent = 'Error - See console';
+      if (statusBar) statusBar.textContent = 'Error - See console';
       console.error('Code execution error:', error);
     } finally {
-      runBtn.disabled = false;
-      runBtn.innerHTML = '▶️ Run Code';
+      if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = '▶️ Run Code'; }
     }
   }
 
   updateConnectionStatus(connected, portInfo = {}) {
     const statusIndicator = document.getElementById('connection-status');
-    const statusText = statusIndicator.querySelector('.status-text');
-    const boardStatus = document.getElementById('board-status');
-    const boardType = document.getElementById('board-type');
-    
-    if (connected) {
-      statusIndicator.classList.add('connected');
-      statusText.textContent = 'Connected';
-      boardStatus.textContent = 'Connected';
-      boardType.textContent = portInfo.productName || 'Arduino/ESP32';
-    } else {
-      statusIndicator.classList.remove('connected');
-      statusText.textContent = 'Disconnected';
-      boardStatus.textContent = 'Not connected';
-      boardType.textContent = 'Unknown';
+    if (statusIndicator) {
+      const statusText = statusIndicator.querySelector('.status-text');
+      if (connected) {
+        statusIndicator.classList.add('connected');
+        if (statusText) statusText.textContent = 'Connected';
+      } else {
+        statusIndicator.classList.remove('connected');
+        if (statusText) statusText.textContent = 'Disconnected';
+      }
     }
+
+    const boardStatus = document.getElementById('board-status');
+    if (boardStatus) boardStatus.textContent = connected ? 'Connected' : 'Not connected';
+
+    const boardType = document.getElementById('board-type');
+    if (boardType) boardType.textContent = connected ? (portInfo.productName || 'Arduino/ESP32') : 'Unknown';
   }
 
   logToConsole(message, type = 'normal') {
-    const consoleOutput = document.getElementById('console-output');
+    const consoleOutput = document.getElementById('monitor-content') || document.getElementById('console-output');
+    if (!consoleOutput) return;
+
     const line = document.createElement('div');
     line.className = `console-line ${type}`;
-    
-    // Add timestamp
+
     const timestamp = new Date().toLocaleTimeString();
     line.textContent = `[${timestamp}] ${message}`;
-    
+
     consoleOutput.appendChild(line);
-    
-    // Auto-scroll if enabled
-    const autoScroll = document.getElementById('autoscroll-checkbox').checked;
-    if (autoScroll) {
+
+    const autoScrollEl = document.getElementById('autoscroll-checkbox');
+    if (!autoScrollEl || autoScrollEl.checked) {
       consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
   }
 
   clearConsole() {
-    const consoleOutput = document.getElementById('console-output');
-    consoleOutput.innerHTML = '';
+    const consoleOutput = document.getElementById('monitor-content') || document.getElementById('console-output');
+    if (consoleOutput) consoleOutput.innerHTML = '';
   }
 
   async sendToBoard() {
-    const input = document.getElementById('console-input');
+    const input = document.getElementById('serial-input') || document.getElementById('console-input');
+    if (!input) return;
     const message = input.value.trim();
     
     if (!message) return;

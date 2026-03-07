@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Smart Factory 2 Teachers Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo" class="login-logo">
+                <h1>Smart Factory 2 Teachers Portal</h1>
+                <p>Authorized Access Only</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter username" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                </div>
+
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+                <button type="submit" id="loginBtn" class="btn btn-primary login-btn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <a href="https://matrixtsl.dev/" style="display:inline-block;margin-bottom:1rem;font-size:0.82rem;color:#a0b4c0;text-decoration:none;">&#8962; Back to Matrix Apps</a>
+                <p>Matrix Technology Solutions</p>
+                <div class="login-banner">
+                    <strong>Need access?</strong> If you do not have or know the login, contact our sales team and we will create you an account.<br>
+                    <span class="contact">01422 252380</span> · <span class="contact">sales@matrixtsl.com</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo-container">
+                        <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo">
+                    </div>
+                    <div class="header-text">
+                        <h1>Smart Factory 2 Teachers Portal</h1>
+                        <p class="subtitle">Your resource hub for Smart Factory 2 and Industry 4.0 delivery</p>
+                    </div>
+                    <div class="logout-container">
+                        <a href="https://matrixtsl.dev/" class="btn btn-secondary" style="text-decoration:none;">&#8962; Home</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="product-tabs" role="tablist" aria-label="Select section">
+            <button class="prod-tab active" data-target="section-overview" role="tab" aria-selected="true">Overview</button>
+            <button class="prod-tab" data-target="section-sf2" role="tab">SF2 - Smart Factory 2</button>
+        </nav>
+
+        <main class="container">
+            <section class="section" id="section-overview">
+                <h2 class="section-title">Smart Factory 2 Programme</h2>
+                <p class="section-summary">A hands-on Industry 4.0 teaching platform covering conveyors, sensing, pneumatics, robot integration, data logging, communications, and predictive maintenance. Open the Smart Factory 2 section to access the full teaching pack.</p>
+                <div class="product-selector">
+                    <button class="product-card" data-target="section-sf2">
+                        <div class="product-card-img" style="display:flex;align-items:center;justify-content:center;padding:2rem;">
+                            <img src="assets/matrix-logo.png" alt="Smart Factory 2" style="max-width:220px;object-fit:contain;">
+                        </div>
+                        <div class="product-card-info">
+                            <h3>SF2</h3>
+                            <p>Smart Factory 2 and Industry 4.0 teaching resources</p>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <section class="section" id="section-sf2" hidden>
+                <h2 class="section-title">SF2 - Smart Factory 2</h2>
+                <p class="section-summary">Smart Factory 2 immerses learners in modern manufacturing systems through conveyors, optical and proximity sensing, colour sorting, pneumatic pick-and-place, stepper positioning, robot integration, and PLC/HMI control.</p>
+                <div class="dashboard-grid">
+                    <div class="tile tile-primary" data-resource="specification">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg></div>
+                        <h2>Specification</h2>
+                        <p>Technical specifications, learning outcomes, product references, and Smart Factory system components.</p>
+                        <button class="btn btn-primary">Open Specification</button>
+                    </div>
+
+                    <div class="tile tile-success" data-resource="curriculum">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+                        <h2>Curriculum</h2>
+                        <p>Worksheet-led curriculum covering sensors, conveyors, robot arm work, RFID, analytics, IO-Link, and predictive maintenance.</p>
+                        <button class="btn btn-success">Open Curriculum</button>
+                    </div>
+
+                    <div class="tile tile-info" data-resource="teachers-guide">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                        <h2>Teachers Guide</h2>
+                        <p>Structured teaching guidance for conveyor, gantry, robot arm, and integrated factory-cell delivery.</p>
+                        <button class="btn btn-info">Open Guide</button>
+                    </div>
+
+                    <div class="tile tile-warning" data-resource="user-manual">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+                        <h2>User Manual</h2>
+                        <p>Setup, wiring, pneumatics, software loading, operating guidance, and robot-arm integration notes.</p>
+                        <button class="btn btn-warning">Open Manual</button>
+                    </div>
+
+                    <div class="tile tile-download" data-resource="tia-portal">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                        <h2>TIA Portal Project</h2>
+                        <p>Download the Smart Factory PLC and HMI project pack used by the teaching materials.</p>
+                        <button class="btn btn-download">Open Download</button>
+                    </div>
+
+                    <div class="tile tile-secondary" data-resource="quick-start">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+                        <h2>Quick Start</h2>
+                        <p>A short setup sequence for getting Smart Factory 2 ready for classroom delivery.</p>
+                        <button class="btn btn-secondary">Open Quick Start</button>
+                    </div>
+
+                    <div class="tile tile-info" data-resource="overview">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+                        <h2>System Overview</h2>
+                        <p>A technical overview of Smart Factory 2 hardware, software, learning objectives, and Industry 4.0 use cases.</p>
+                        <button class="btn btn-info">View Overview</button>
+                    </div>
+
+                    <div class="tile tile-scheme" data-resource="scheme-of-work">
+                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                        <h2>Scheme of Work</h2>
+                        <p>Suggested weekly pacing, practical activities, and assessment guidance for Smart Factory 2.</p>
+                        <button class="btn btn-scheme">View Scheme</button>
+                    </div>
+                </div>
+            </section>
+
+            <div id="resourceModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <div id="modalBody"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 Matrix Technology Solutions | Smart Factory 2 Teachers Portal</p>
+                <p class="footer-links">
+                    <a href="mailto:sales@matrixtsl.com">Support</a> |
+                    <a href="mailto:sales@matrixtsl.com">Contact</a> |
+                    <a href="https://www.matrixtsl.com/smartfactory/" target="_blank" rel="noopener">About Smart Factory</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function switchTab(target) {
+            document.querySelectorAll('.prod-tab').forEach(function(tab) {
+                var isActive = tab.dataset.target === target;
+                tab.classList.toggle('active', isActive);
+                if (isActive) tab.setAttribute('aria-selected', 'true');
+                else tab.removeAttribute('aria-selected');
+            });
+            document.querySelectorAll('main .section').forEach(function(section) {
+                section.hidden = section.id !== target;
+            });
+        }
+
+        document.querySelectorAll('.prod-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() { switchTab(tab.dataset.target); });
+        });
+
+        document.querySelectorAll('.product-card').forEach(function(card) {
+            card.addEventListener('click', function() { switchTab(card.dataset.target); });
+        });
+    </script>
+</body>
+</html>
