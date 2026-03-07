@@ -270,12 +270,16 @@ void loop() {
   }
 
   async handleConnect() {
+    const connectBtn = document.getElementById('connect-btn');
+
     if (this.serialManager.isConnected) {
       await this.serialManager.disconnect();
       return;
     }
 
     try {
+      if (connectBtn) { connectBtn.disabled = true; connectBtn.textContent = 'Connecting...'; }
+
       const baudEl = document.getElementById('baud-select');
       const baudRate = baudEl ? parseInt(baudEl.value) : 115200;
 
@@ -294,6 +298,7 @@ void loop() {
 
     } catch (error) {
       this.logToConsole(`❌ Connection failed: ${error.message}`, 'error');
+      if (connectBtn) { connectBtn.disabled = false; connectBtn.textContent = 'Connect'; connectBtn.classList.remove('connected'); }
     }
   }
 
@@ -333,6 +338,18 @@ void loop() {
   }
 
   updateConnectionStatus(connected, portInfo = {}) {
+    // Connect button label + style
+    const connectBtn = document.getElementById('connect-btn');
+    if (connectBtn) {
+      connectBtn.disabled = false;
+      connectBtn.textContent = connected ? 'Disconnect' : 'Connect';
+      if (connected) {
+        connectBtn.classList.add('connected');
+      } else {
+        connectBtn.classList.remove('connected');
+      }
+    }
+
     // Board image glow
     const boardImage = document.getElementById('board-image');
     if (boardImage) {
