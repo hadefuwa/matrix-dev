@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Apps &ndash; Matrix TSL</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f3e8;
+      --surface: #ffffff;
+      --ink: #10222e;
+      --muted: #4d6577;
+      --border: #d6e1e7;
+      --brand: #0f5f8c;
+      --brand-2: #168f8b;
+      --accent: #f29f05;
+      --shadow-md: 0 10px 26px rgba(13,42,62,0.09);
+      --shadow-lg: 0 24px 60px rgba(13,42,62,0.16);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 7% 8%, #fbe4b2 0%, transparent 22%),
+        radial-gradient(circle at 90% 3%, #b4d8e2 0%, transparent 25%),
+        linear-gradient(180deg, #f6f3e8 0%, #f3f6f8 48%, #eef3f6 100%);
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      padding: 2.5rem 2rem 2rem;
+      overflow: hidden;
+      text-align: center;
+    }
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, #08415f 0%, #0f5f8c 45%, #168f8b 100%);
+      border-bottom: 3px solid rgba(255,255,255,0.18);
+      z-index: -1;
+    }
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      z-index: -1;
+    }
+    .logo {
+      height: 44px;
+      margin-bottom: 1.2rem;
+      filter: brightness(0) invert(1);
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    header p {
+      margin-top: 0.6rem;
+      color: rgba(255,255,255,0.75);
+      font-size: 1.05rem;
+      font-weight: 400;
+    }
+
+    /* Grid */
+    main {
+      max-width: 960px;
+      margin: 3rem auto 4rem;
+      padding: 0 1.5rem;
+    }
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* App Card */
+    .app-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem 1.75rem 1.5rem;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--ink);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--card-a, var(--brand)), var(--card-b, var(--brand-2)));
+    }
+    .app-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: #b0ccd8;
+    }
+    .app-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      background: var(--card-icon-bg, #e8f3f8);
+      flex-shrink: 0;
+    }
+    .app-card h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    .app-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+    .app-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--brand);
+      margin-top: 0.25rem;
+    }
+    .app-cta svg { transition: transform 0.15s ease; }
+    .app-card:hover .app-cta svg { transform: translateX(3px); }
+
+    .card--sow      { --card-a: #0f5f8c; --card-b: #168f8b; --card-icon-bg: #e3f1f8; }
+    .card--teachers { --card-a: #5b3fa6; --card-b: #9c49c4; --card-icon-bg: #ede8f8; }
+
+    .card--coming {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .badge {
+      position: absolute;
+      top: 0.85rem; right: 1rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="matrix-light.png" alt="Matrix TSL" class="logo">
+    <h1>Matrix Apps</h1>
+    <p>Internal tools &amp; teaching resources for Matrix TSL</p>
+  </header>
+
+  <main>
+    <p class="section-label">Available Apps</p>
+    <div class="app-grid">
+
+      <a href="https://sow.matrixtsl.dev" class="app-card card--sow">
+        <div class="app-icon">&#128203;</div>
+        <h2>Scheme of Work Generator</h2>
+        <p>Plan, sequence, and deliver engineering courses. Select topics, arrange lessons, and generate a complete SoW ready to print.</p>
+        <span class="app-cta">Open app <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+
+      <a href="https://teachers.matrixtsl.dev" class="app-card card--teachers card--coming">
+        <span class="badge">Coming soon</span>
+        <div class="app-icon">&#127891;</div>
+        <h2>IM Teachers Portal</h2>
+        <p>Resources, lesson plans, and course management tools for IM programme teachers.</p>
+        <span class="app-cta">Open app <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Matrix TSL &mdash; Internal use only
+  </footer>
+
+</body>
+</html>
