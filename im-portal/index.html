@@ -74,15 +74,36 @@
 
         <main class="container">
             <section class="section" id="section-overview" hidden>
-                <h2 class="section-title">Industrial Maintenance Overview</h2>
-                <p class="section-summary">Hands-on industrial maintenance training designed for higher education and vocational learners. The range focuses on PLC control, closed-loop systems, troubleshooting, and real-world automation skills using Siemens PLC hardware.</p>
-                <div class="dashboard-grid">
-                    <div class="tile tile-overview" data-resource="im-overview">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
-                        <h2>Programme Overview</h2>
-                        <p>Industry 4.0 context, vocational focus, and training outcomes</p>
-                        <button class="btn btn-overview">View Overview</button>
-                    </div>
+                <h2 class="section-title">Industrial Maintenance Programme</h2>
+                <p class="section-summary">Hands-on industrial maintenance training designed for higher education and vocational learners. Select a product to explore its resources.</p>
+                <div class="product-selector">
+                    <button class="product-card" data-target="section-im6930">
+                        <div class="product-card-img">
+                            <img src="assets/images/im6930.png" alt="IM6930 PLC Fundamentals Trainer">
+                        </div>
+                        <div class="product-card-info">
+                            <h3>IM6930</h3>
+                            <p>PLC Fundamentals Trainer</p>
+                        </div>
+                    </button>
+                    <button class="product-card" data-target="section-im0004">
+                        <div class="product-card-img">
+                            <img src="assets/images/im0004-1.png" alt="IM0004 Closed Loop Systems">
+                        </div>
+                        <div class="product-card-info">
+                            <h3>IM0004</h3>
+                            <p>Maintenance of Closed Loop Systems</p>
+                        </div>
+                    </button>
+                    <button class="product-card" data-target="section-im3214">
+                        <div class="product-card-img">
+                            <img src="assets/images/im3214.png" alt="IM3214 Siemens LOGO! Trainer">
+                        </div>
+                        <div class="product-card-info">
+                            <h3>IM3214</h3>
+                            <p>Siemens PLC LOGO! Trainer</p>
+                        </div>
+                    </button>
                 </div>
             </section>
 
@@ -306,20 +327,24 @@
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Product tab switching
-        document.querySelectorAll('.prod-tab').forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                var target = tab.dataset.target;
-                document.querySelectorAll('.prod-tab').forEach(function(t) {
-                    t.classList.remove('active');
-                    t.removeAttribute('aria-selected');
-                });
-                tab.classList.add('active');
-                tab.setAttribute('aria-selected', 'true');
-                document.querySelectorAll('main .section').forEach(function(section) {
-                    section.hidden = section.id !== target;
-                });
+        function switchTab(target) {
+            document.querySelectorAll('.prod-tab').forEach(function(t) {
+                var isActive = t.dataset.target === target;
+                t.classList.toggle('active', isActive);
+                if (isActive) t.setAttribute('aria-selected', 'true');
+                else t.removeAttribute('aria-selected');
             });
+            document.querySelectorAll('main .section').forEach(function(section) {
+                section.hidden = section.id !== target;
+            });
+        }
+
+        document.querySelectorAll('.prod-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() { switchTab(tab.dataset.target); });
+        });
+
+        document.querySelectorAll('.product-card').forEach(function(card) {
+            card.addEventListener('click', function() { switchTab(card.dataset.target); });
         });
     </script>
 </body>
