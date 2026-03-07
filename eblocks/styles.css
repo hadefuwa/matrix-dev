@@ -1370,9 +1370,7 @@ body {
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
+  overflow: hidden;
 }
 
 .curriculum-header {
@@ -1395,9 +1393,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
 }
 
 .curriculum-loading {
@@ -1533,7 +1528,6 @@ body {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  height: 100%;
 }
 
 .curriculum-list {
@@ -1544,7 +1538,6 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px;
-  height: 100%;
 }
 
 /* Curriculum Item (Top Level) */
