@@ -487,10 +487,17 @@
       --ci-border: rgba(156,73,196,0.35);
       --ci-glow: rgba(156,73,196,0.45);
     }
+    .card--eblocks {
+      --ca: #f29f05; --cb: #e08f04;
+      --ci-bg: rgba(242,159,5,0.15);
+      --ci-border: rgba(242,159,5,0.35);
+      --ci-glow: rgba(242,159,5,0.45);
+    }
 
     /* Staggered card entrance */
     .app-card-wrap.fade-in { transition-delay: 0s; }
     .app-card-wrap.fade-in:nth-child(2) { transition-delay: 0.15s; }
+    .app-card-wrap.fade-in:nth-child(3) { transition-delay: 0.30s; }
 
     /* ── About section ───────────────────────── */
     .about-section { background: var(--surface); }
@@ -662,6 +669,16 @@
           </a>
         </div>
 
+        <div class="app-card-wrap card--eblocks fade-in">
+          <a href="/eblocks/" class="app-card">
+            <span class="app-card-tag">Hardware Tool</span>
+            <div class="app-icon">&#9881;</div>
+            <h3>E-Blocks 3 Companion</h3>
+            <p>Browser-based IDE for Arduino and ESP32 E-Blocks boards. Write and run code, connect via Web Serial, and access the curriculum — no installation required. Includes USB drivers for Windows.</p>
+            <span class="app-link">Open app <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+        </div>
+
       </div>
     </div>
   </section>
@@ -718,6 +735,7 @@
     <div class="footer-links">
       <a href="/sow-generator">SOW Generator</a>
       <a href="/im-portal/">IM Teachers Portal</a>
+      <a href="/eblocks/">E-Blocks 3 Companion</a>
       <a href="https://www.matrixtsl.com" target="_blank" rel="noopener">matrixtsl.com</a>
       <a href="mailto:sales@matrixtsl.com">sales@matrixtsl.com</a>
     </div>

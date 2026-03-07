@@ -80,7 +80,7 @@ function buildCoverHtml({ subjects, lessonCount, totalHours, classSize, generate
   return `
     <div class="sow-cover">
       <div class="cover-logo-row">
-        <img src="assets/matrix%20light.png" alt="Matrix TSL" class="cover-logo">
+        <img src="/assets/matrix%20light.png" alt="Matrix TSL" class="cover-logo">
       </div>
       <h1 class="cover-title">Scheme of Work</h1>
       <p class="cover-subject">${escapeHtml(subjects || "Engineering")}</p>

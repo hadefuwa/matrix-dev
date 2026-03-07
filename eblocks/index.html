@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Blocks 3 Companion</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Titlebar -->
+    <header class="app-titlebar">
+      <div class="titlebar-icon">
+        <img src="assets/matrix.png" alt="Matrix Logo" class="titlebar-logo">
+      </div>
+      <div class="titlebar-title">E-Blocks 3 Companion</div>
+      <div class="titlebar-menu">
+        <button id="menu-code-editor" class="menu-btn active">Code Editor</button>
+        <button id="menu-graphical" class="menu-btn" disabled>Graphical</button>
+        <button id="menu-shop" class="menu-btn" onclick="location.href='shop.html'">Shop</button>
+        <button id="menu-settings" class="menu-btn" onclick="location.href='settings.html'">⚙️ Settings</button>
+      </div>
+    </header>
+
+    <!-- Menu Navigation Script -->
+    <script>
+      // Handle menu navigation - run immediately when DOM is ready
+      (function() {
+        function initMenuNavigation() {
+          const codeEditorBtn = document.getElementById('menu-code-editor');
+          const shopBtn = document.getElementById('menu-shop');
+          const settingsBtn = document.getElementById('menu-settings');
+          
+          if (codeEditorBtn) {
+            codeEditorBtn.addEventListener('click', () => {
+              // Already on code editor page, just ensure active state
+              codeEditorBtn.classList.add('active');
+              shopBtn?.classList.remove('active');
+              settingsBtn?.classList.remove('active');
+            });
+          }
+          
+          if (shopBtn) {
+            shopBtn.addEventListener('click', () => {
+              window.location.href = '/shop.html';
+            });
+          }
+          
+          if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => {
+              window.location.href = '/settings.html';
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initMenuNavigation);
+        } else {
+          initMenuNavigation();
+        }
+      })();
+    </script>
+
+    <!-- Driver Installation Banner -->
+    <div id="driver-banner" class="driver-banner" style="display: none;">
+      <div class="driver-banner-content">
+        <div class="driver-banner-icon">⚠️</div>
+        <div class="driver-banner-text">
+          <strong>E-Blocks USB drivers are not installed.</strong> Install drivers to connect your E-Blocks board.
+        </div>
+        <button id="driver-banner-install-btn" class="driver-banner-btn">Install Drivers</button>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="app-container">
+      <!-- Left Sidebar -->
+      <div class="sidebar sidebar-left" id="leftSidebar">
+        <div class="sidebar-header">
+          <button class="sidebar-toggle" id="leftSidebarToggle" title="Collapse">←</button>
+        </div>
+        <div class="sidebar-content">
+          <!-- Board Image -->
+          <div class="board-image-container">
+            <img id="board-image" src="assets/eblocks_Ard.png" alt="Selected Board" class="board-image">
+          </div>
+          <!-- Setup Page -->
+          <div class="setup-page">
+            <div class="setup-section">
+              <div class="section-header">
+                <h3>Connection Setup</h3>
+              </div>
+              <div class="setup-item">
+                <label for="com-port-select">COM Port</label>
+                <div class="port-selector-group">
+                  <select id="com-port-select" class="port-select">
+                    <option value="">Select a port...</option>
+                  </select>
+                  <button id="refresh-ports-btn" class="btn-scan" title="Refresh ports">↻</button>
+                </div>
+                <div id="port-warning" class="port-warning" style="display: none;">No COM port selected</div>
+              </div>
+            </div>
+
+            <!-- Combo Board Visualization -->
+            <div class="setup-section">
+              <div class="section-header">
+                <h3>Combo Board</h3>
+              </div>
+              <div class="setup-item">
+                <label for="combo-port-select">Port Pair</label>
+                <select id="combo-port-select" class="port-select">
+                  <option value="a/b">Port A / Port B</option>
+                  <option value="b/c">Port B / Port C</option>
+                  <option value="c/d">Port C / Port D</option>
+                  <option value="d/e">Port D / Port E</option>
+                  <option value="e/f">Port E / Port F</option>
+                </select>
+              </div>
+              <div class="combo-board-frame">
+                <!-- Top Row - First Port LEDs (8 LEDs) -->
+                <div class="combo-board-row combo-board-row-top">
+                  <div class="combo-led" data-port="first" data-bit="0"></div>
+                  <div class="combo-led" data-port="first" data-bit="1"></div>
+                  <div class="combo-led" data-port="first" data-bit="2"></div>
+                  <div class="combo-led" data-port="first" data-bit="3"></div>
+                  <div class="combo-led" data-port="first" data-bit="4"></div>
+                  <div class="combo-led" data-port="first" data-bit="5"></div>
+                  <div class="combo-led" data-port="first" data-bit="6"></div>
+                  <div class="combo-led" data-port="first" data-bit="7"></div>
+                </div>
+                
+                <!-- Center Display Area -->
+                <div class="combo-board-display">
+                  <div class="combo-board-display-content">
+                    <div class="combo-board-status" id="combo-board-status">
+                      <span class="status-text">Waiting for data...</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Bottom Row - Second Port LEDs (8 LEDs) -->
+                <div class="combo-board-row combo-board-row-bottom">
+                  <div class="combo-led" data-port="second" data-bit="0"></div>
+                  <div class="combo-led" data-port="second" data-bit="1"></div>
+                  <div class="combo-led" data-port="second" data-bit="2"></div>
+                  <div class="combo-led" data-port="second" data-bit="3"></div>
+                  <div class="combo-led" data-port="second" data-bit="4"></div>
+                  <div class="combo-led" data-port="second" data-bit="5"></div>
+                  <div class="combo-led" data-port="second" data-bit="6"></div>
+                  <div class="combo-led" data-port="second" data-bit="7"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-resizer sidebar-resizer-left" id="leftResizer"></div>
+
+      <!-- Main Editor Area -->
+      <div class="app-main">
+        <div class="code-editor">
+          <div class="editor-header">
+            <h2>Code Editor</h2>
+            <div class="editor-actions">
+              <button id="load-btn" class="btn-sm btn-outline">Load</button>
+              <button id="save-btn" class="btn-sm btn-outline">Save</button>
+            </div>
+          </div>
+          <div class="board-selector">
+            <label for="editor-board-select">Board Type:</label>
+            <select id="editor-board-select" class="editor-board-select">
+              <option value="arduino:avr:mega">Arduino Mega</option>
+              <option value="esp32:esp32:esp32">ESP32</option>
+              <option value="pic" disabled>PIC (Not Available)</option>
+            </select>
+          </div>
+          <div id="monaco-editor" class="editor-container"></div>
+          <div id="upload-status" class="upload-status" style="display: none;"></div>
+          <div class="upload-actions">
+            <button id="upload-btn" class="btn-upload">Upload Code</button>
+          </div>
+        </div>
+        
+        <!-- Serial Monitor (below code editor) -->
+        <div class="serial-monitor">
+          <div class="monitor-header">
+            <h2>Serial Monitor</h2>
+            <div class="monitor-controls">
+              <button id="clear-monitor-btn" class="btn-sm btn-outline">Clear</button>
+              <label class="checkbox-label">
+                <input type="checkbox" id="autoscroll-checkbox" checked>
+                Auto-scroll
+              </label>
+            </div>
+          </div>
+          <div id="monitor-content" class="monitor-content">
+            <div class="monitor-empty">Waiting for serial data...</div>
+          </div>
+          <div class="monitor-input-section">
+            <form id="serial-send-form" class="monitor-input-form">
+              <input type="text" id="serial-input" class="monitor-input" placeholder="Send data...">
+              <button type="submit" class="btn-sm btn-outline btn-send">Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="sidebar-resizer sidebar-resizer-right" id="rightResizer"></div>
+      <div class="sidebar sidebar-right" id="rightSidebar">
+        <div class="sidebar-header">
+          <button class="sidebar-toggle" id="rightSidebarToggle" title="Collapse">→</button>
+        </div>
+        <div class="sidebar-content">
+          <!-- Curriculum Page -->
+          <div class="curriculum-page">
+            <!-- Worksheet Viewer (shown when worksheet is selected) -->
+            <div id="worksheet-viewer" class="worksheet-viewer" style="display: none;">
+              <div class="worksheet-header">
+                <div class="worksheet-title-section">
+                  <h3 id="worksheet-viewer-title">Worksheet</h3>
+                  <span id="worksheet-viewer-code" class="worksheet-code"></span>
+                </div>
+                <button id="worksheet-close-btn" class="btn-sm btn-outline" title="Back to Curriculum">← Back</button>
+              </div>
+              <div id="worksheet-content" class="worksheet-content">
+                <!-- Worksheet content will be loaded here -->
+              </div>
+            </div>
+            
+            <!-- Curriculum List (shown by default) -->
+            <div id="curriculum-list" class="curriculum-list">
+              <div class="curriculum-header">
+                <h3>E-Blocks Curriculum</h3>
+              </div>
+              <div id="curriculum-content" class="curriculum-content">
+                <div class="curriculum-loading">Loading curriculum...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Monaco Editor from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+  <!-- Lodash (required by JSCPP) -->
+  <script src="vendor/lodash.min.js"></script>
+
+  <!-- JSCPP bundled locally for reliability -->
+  <script src="vendor/jscpp.bundle.js"></script>
+  <script>
+    window.EBLOCKS_VERSION = "v1.1.2";
+  </script>
+
+  <!-- Main application modules -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

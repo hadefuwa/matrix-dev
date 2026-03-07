@@ -175,11 +175,20 @@ async function readJsonBody(req) {
 async function serveStatic(pathname, res) {
   // Dashboard
   if (pathname === "/" || pathname === "/index.html") {
-    return sendFile(res, path.join(ROOT_DIR, "index.html"));
+    return sendFile(res, path.join(ROOT_DIR, "dashboard", "index.html"));
   }
   // SOW Generator
   if (pathname === "/sow-generator" || pathname === "/sow-generator/") {
-    return sendFile(res, path.join(ROOT_DIR, "sow.html"));
+    return sendFile(res, path.join(ROOT_DIR, "sow-generator", "index.html"));
+  }
+  if (pathname === "/review.html") {
+    return sendFile(res, path.join(ROOT_DIR, "sow-generator", "review.html"));
+  }
+  if (pathname === "/admin.html") {
+    return sendFile(res, path.join(ROOT_DIR, "sow-generator", "admin.html"));
+  }
+  if (pathname === "/hardware.html") {
+    return sendFile(res, path.join(ROOT_DIR, "sow-generator", "hardware.html"));
   }
 
   const safePath = path.normalize(pathname).replace(/^(\.\.(\/|\\|$))+/, "");

@@ -43,9 +43,9 @@ init().catch((error) => {
 
 async function init() {
   const [topics, hardware, templates] = await Promise.all([
-    fetchJsonWithFallback("/api/topics", "data/topics.json"),
-    fetchJsonWithFallback("/api/hardware", "data/hardware.json"),
-    fetchJsonWithFallback("/api/templates", "data/templates.json")
+    fetchJsonWithFallback("/api/topics", "/data/topics.json"),
+    fetchJsonWithFallback("/api/hardware", "/data/hardware.json"),
+    fetchJsonWithFallback("/api/templates", "/data/templates.json")
   ]);
 
   state.topics = topics;
@@ -383,7 +383,7 @@ function renderCover(selectedTopics) {
   sowCoverEl.hidden = false;
   sowCoverEl.innerHTML = `
     <div class="cover-logo-row">
-      <a href="index.html"><img src="assets/matrix%20light.png" alt="Matrix TSL" class="cover-logo"></a>
+      <a href="/"><img src="/assets/matrix%20light.png" alt="Matrix TSL" class="cover-logo"></a>
     </div>
     <h1 class="cover-title">Scheme of Work</h1>
     <p class="cover-subject">${escapeHtml(subjects)}</p>
@@ -843,7 +843,7 @@ function openReviewStep() {
 
   try {
     sessionStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(payload));
-    window.location.href = "review.html";
+    window.location.href = "/sow-generator/review.html";
   } catch (error) {
     console.warn("Could not open review step", error);
     showToast("Could not open review step.");

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eBlocks Online - Curriculum</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-titlebar">
+      <div class="titlebar-icon">
+        <img src="assets/matrix.png" alt="Matrix Logo" class="titlebar-logo">
+      </div>
+      <div class="titlebar-title">E-Blocks 3 Companion</div>
+      <div class="titlebar-menu">
+        <button class="menu-btn" onclick="location.href='index.html'">Code Editor</button>
+        <button class="menu-btn active">Curriculum</button>
+        <button class="menu-btn" onclick="location.href='shop.html'">Shop</button>
+        <button class="menu-btn" onclick="location.href='settings.html'">⚙️ Settings</button>
+      </div>
+    </header>
+
+    <main class="curriculum-container">
+      <aside class="curriculum-sidebar">
+        <h2>Worksheets</h2>
+        <ul id="worksheet-list" class="worksheet-list"></ul>
+      </aside>
+      <section class="curriculum-viewer">
+        <h2 id="worksheet-title">Select a worksheet</h2>
+        <pre id="worksheet-content" class="worksheet-content">Choose a worksheet from the left to view it.</pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/curriculum.js"></script>
+</body>
+</html>
