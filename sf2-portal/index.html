@@ -63,31 +63,13 @@
             </div>
         </header>
 
-        <nav class="product-tabs" role="tablist" aria-label="Select section">
-            <button class="prod-tab active" data-target="section-overview" role="tab" aria-selected="true">Overview</button>
-            <button class="prod-tab" data-target="section-sf2" role="tab">SF2 - Smart Factory 2</button>
-        </nav>
-
         <main class="container">
-            <section class="section" id="section-overview">
-                <h2 class="section-title">Smart Factory 2 Programme</h2>
-                <p class="section-summary">A hands-on Industry 4.0 teaching platform covering conveyors, sensing, pneumatics, robot integration, data logging, communications, and predictive maintenance. Open the Smart Factory 2 section to access the full teaching pack.</p>
-                <div class="product-selector">
-                    <button class="product-card" data-target="section-sf2">
-                        <div class="product-card-img" style="display:flex;align-items:center;justify-content:center;padding:2rem;">
-                            <img src="assets/matrix-logo.png" alt="Smart Factory 2" style="max-width:220px;object-fit:contain;">
-                        </div>
-                        <div class="product-card-info">
-                            <h3>SF2</h3>
-                            <p>Smart Factory 2 and Industry 4.0 teaching resources</p>
-                        </div>
-                    </button>
-                </div>
-            </section>
-
-            <section class="section" id="section-sf2" hidden>
+            <section class="section" id="section-sf2">
                 <h2 class="section-title">SF2 - Smart Factory 2</h2>
                 <p class="section-summary">Smart Factory 2 immerses learners in modern manufacturing systems through conveyors, optical and proximity sensing, colour sorting, pneumatic pick-and-place, stepper positioning, robot integration, and PLC/HMI control.</p>
+                <div class="section-media">
+                    <img src="assets/images/sf2.png" alt="Smart Factory 2 training system" class="section-image">
+                </div>
                 <div class="dashboard-grid">
                     <div class="tile tile-primary" data-resource="specification">
                         <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg></div>
@@ -169,26 +151,5 @@
 
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
-    <script>
-        function switchTab(target) {
-            document.querySelectorAll('.prod-tab').forEach(function(tab) {
-                var isActive = tab.dataset.target === target;
-                tab.classList.toggle('active', isActive);
-                if (isActive) tab.setAttribute('aria-selected', 'true');
-                else tab.removeAttribute('aria-selected');
-            });
-            document.querySelectorAll('main .section').forEach(function(section) {
-                section.hidden = section.id !== target;
-            });
-        }
-
-        document.querySelectorAll('.prod-tab').forEach(function(tab) {
-            tab.addEventListener('click', function() { switchTab(tab.dataset.target); });
-        });
-
-        document.querySelectorAll('.product-card').forEach(function(card) {
-            card.addEventListener('click', function() { switchTab(card.dataset.target); });
-        });
-    </script>
 </body>
 </html>
