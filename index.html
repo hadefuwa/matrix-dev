@@ -64,6 +64,55 @@
     }
     .topnav-links a:hover { color: #fff; }
 
+    /* Hamburger */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    .topnav.open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .topnav.open .nav-toggle span:nth-child(2) { opacity: 0; }
+    .topnav.open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    @media (max-width: 640px) {
+      .nav-toggle { display: flex; }
+      .topnav {
+        flex-wrap: wrap;
+        padding: 1rem 1.25rem;
+      }
+      .topnav-links {
+        display: none;
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        margin-top: 0.75rem;
+        padding-top: 0.5rem;
+      }
+      .topnav.open .topnav-links { display: flex; }
+      .topnav-links li { width: 100%; }
+      .topnav-links a {
+        display: block;
+        padding: 0.65rem 0;
+        font-size: 0.95rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .topnav-links li:last-child a { border-bottom: none; }
+    }
+
     /* ── Hero ────────────────────────────────── */
     .hero {
       min-height: 100vh;
@@ -246,7 +295,8 @@
       padding: 2px;
       background: rgba(255,255,255,0.07);
       position: relative;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.5s cubic-bezier(0.23,1,0.32,1);
+      will-change: transform;
     }
     .app-card-wrap::before {
       content: "";
@@ -277,7 +327,10 @@
     }
 
     .app-card {
-      background: linear-gradient(145deg, #0d2e47 0%, #0a2238 100%);
+      background:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0),
+        linear-gradient(145deg, #0d2e47 0%, #082035 100%);
+      background-size: 28px 28px, 100% 100%;
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 18px;
       padding: 2.25rem 2rem;
@@ -286,25 +339,50 @@
       gap: 1.1rem;
       text-decoration: none;
       color: #fff;
-      transition: transform 0.25s cubic-bezier(.22,.68,0,1.2), border-color 0.25s;
+      transition: border-color 0.25s;
       position: relative;
       overflow: hidden;
       z-index: 1;
-      will-change: transform;
     }
+    /* shimmer sweep */
+    .app-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        transparent 35%,
+        rgba(255,255,255,0.07) 50%,
+        transparent 65%,
+        transparent 100%
+      );
+      background-size: 250% 250%;
+      background-position: 150% 0%;
+      transition: background-position 0s;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .app-card-wrap:hover .app-card::before {
+      background-position: -50% 0%;
+      transition: background-position 0.65s ease;
+    }
+    /* mouse spotlight */
     .app-card::after {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: 18px;
-      background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.04) 0%, transparent 60%);
+      background: radial-gradient(ellipse 55% 45% at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.09) 0%, transparent 70%);
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.35s;
       pointer-events: none;
+      z-index: 2;
     }
     .app-card-wrap:hover .app-card::after { opacity: 1; }
     .app-card-wrap:hover .app-card {
-      border-color: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.18);
     }
 
     .app-icon {
@@ -327,7 +405,11 @@
       opacity: 0;
       transition: opacity 0.3s;
     }
-    .app-card-wrap:hover .app-icon { transform: scale(1.08); box-shadow: 0 0 24px var(--ci-glow, rgba(15,95,140,0.5)); }
+    @keyframes float-icon {
+      0%,100% { transform: scale(1.1) translateY(0px); }
+      50%      { transform: scale(1.1) translateY(-6px); }
+    }
+    .app-card-wrap:hover .app-icon { animation: float-icon 2.2s ease-in-out infinite; box-shadow: 0 0 32px var(--ci-glow, rgba(15,95,140,0.6)); }
     .app-card-wrap:hover .app-icon::before { opacity: 1; }
 
     .app-card-tag {
@@ -513,10 +595,11 @@
     /* ── Fade-in animation ───────────────────── */
     .fade-in {
       opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: translateY(30px) scale(0.97);
+      transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
     }
     .fade-in.visible { opacity: 1; transform: none; }
+    .app-card-wrap.fade-in:nth-child(2) { transition-delay: 0.18s; }
   </style>
 </head>
 <body>
@@ -524,6 +607,9 @@
   <!-- Nav -->
   <nav class="topnav">
     <img src="assets/matrix%20light.png" alt="Matrix TSL" class="topnav-logo">
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <ul class="topnav-links">
       <li><a href="#apps">Apps</a></li>
       <li><a href="#about">About</a></li>
@@ -656,6 +742,20 @@
   </footer>
 
   <script>
+    // Mobile nav toggle
+    const navToggle = document.querySelector(".nav-toggle");
+    const topnav = document.querySelector(".topnav");
+    navToggle.addEventListener("click", () => {
+      const open = topnav.classList.toggle("open");
+      navToggle.setAttribute("aria-expanded", open);
+    });
+    document.querySelectorAll(".topnav-links a").forEach(a => {
+      a.addEventListener("click", () => {
+        topnav.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
+
     // Fade-in on scroll
     const observer = new IntersectionObserver(
       (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("visible"); }),
@@ -663,18 +763,30 @@
     );
     document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
 
-    // Mouse-tracking spotlight on app cards
+    // 3D tilt + mouse spotlight on app cards
     document.querySelectorAll(".app-card-wrap").forEach(wrap => {
+      const card = wrap.querySelector(".app-card");
+      const TILT = 10; // max tilt degrees
+
       wrap.addEventListener("mousemove", e => {
-        const card = wrap.querySelector(".app-card");
-        const rect = card.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-        const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-        card.style.setProperty("--mx", x + "%");
-        card.style.setProperty("--my", y + "%");
+        const rect = wrap.getBoundingClientRect();
+        const nx = (e.clientX - rect.left) / rect.width  - 0.5; // -0.5 → 0.5
+        const ny = (e.clientY - rect.top)  / rect.height - 0.5;
+
+        // 3D tilt on the wrapper
+        wrap.style.transform =
+          `perspective(700px) rotateY(${(nx * TILT * 2).toFixed(2)}deg) rotateX(${(-ny * TILT * 1.5).toFixed(2)}deg) scale(1.03)`;
+
+        // Spotlight relative to card interior
+        const cr = card.getBoundingClientRect();
+        const cx = ((e.clientX - cr.left) / cr.width  * 100).toFixed(1);
+        const cy = ((e.clientY - cr.top)  / cr.height * 100).toFixed(1);
+        card.style.setProperty("--mx", cx + "%");
+        card.style.setProperty("--my", cy + "%");
       });
+
       wrap.addEventListener("mouseleave", () => {
-        const card = wrap.querySelector(".app-card");
+        wrap.style.transform = "";
         card.style.setProperty("--mx", "50%");
         card.style.setProperty("--my", "50%");
       });
