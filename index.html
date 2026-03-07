@@ -124,7 +124,9 @@
       padding: 8rem 1.5rem 5rem;
       position: relative;
       overflow: hidden;
-      background: linear-gradient(150deg, #07334d 0%, #0c4f77 40%, #135e7a 70%, #0d6b68 100%);
+      background:
+        linear-gradient(150deg, rgba(7,51,77,0.88) 0%, rgba(12,79,119,0.84) 40%, rgba(19,94,122,0.82) 70%, rgba(13,107,104,0.88) 100%),
+        url('assets/image2.jpg') center 25% / cover no-repeat;
     }
     .hero::before {
       content: "";
@@ -507,30 +509,26 @@
       margin-bottom: 1rem;
     }
     .about-text p:last-child { margin-bottom: 0; }
-    .about-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
+    .about-photo {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(13,42,62,0.18);
     }
-    .stat-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem 1.25rem;
+    .about-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 16px;
     }
-    .stat-number {
-      font-family: "Space Grotesk", sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--brand);
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 0.3rem;
-    }
-    .stat-label {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.4;
+    .about-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      border: 1px solid rgba(15,95,140,0.2);
+      pointer-events: none;
     }
 
     /* ── Disciplines ─────────────────────────── */
@@ -678,23 +676,8 @@
           <p>Matrix TSL is a global provider of hands-on engineering education and training solutions. We develop and manufacture innovative hardware and software that enables educators to deliver practical, industry-relevant skills.</p>
           <p>Our products are used in schools, colleges, universities, and technical training centres worldwide — equipping the next generation of engineers with the skills industry demands.</p>
         </div>
-        <div class="about-stats fade-in">
-          <div class="stat-card">
-            <div class="stat-number">16+</div>
-            <div class="stat-label">Product families across engineering disciplines</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">6</div>
-            <div class="stat-label">Subject areas from aerospace to skilled trades</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">&#127758;</div>
-            <div class="stat-label">Used by institutions globally</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">&#127979;</div>
-            <div class="stat-label">Schools, colleges, universities &amp; training centres</div>
-          </div>
+        <div class="about-photo fade-in">
+          <img src="assets/image1.jpg" alt="Matrix TSL engineering hardware on display at exhibition">
         </div>
       </div>
     </div>
