@@ -14,6 +14,7 @@ class EblocksApp {
     this.codeRunner = new CodeRunner();
     this.firmataController = new FirmataController();
     this.availablePorts = []; // previously-authorized ports
+    this.serialLineBuffer = ''; // buffer for incomplete serial lines
 
     // Default code template
     this.defaultCode = `// eBlocks Online - Arduino C++ Example
@@ -193,7 +194,17 @@ void loop() {
     });
 
     this.serialManager.on('data', (data) => {
-      this.logToConsole(data);
+      // Buffer incoming chunks into complete lines
+      this.serialLineBuffer += data;
+      const lines = this.serialLineBuffer.split('\n');
+      this.serialLineBuffer = lines.pop(); // keep any incomplete trailing chunk
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        this.logToConsole(trimmed);
+        this.parseComboData(trimmed);
+      });
     });
 
     this.serialManager.on('error', (error) => {
@@ -380,6 +391,46 @@ void loop() {
 
     const boardType = document.getElementById('board-type');
     if (boardType) boardType.textContent = connected ? (portInfo.productName || 'Arduino/ESP32') : 'Unknown';
+  }
+
+  /**
+   * Parse a serial line from the combo-board firmware.
+   * Expected format: "Port A: 1 0 1 1 0 1 0 1 | Port B: 0 0 1 1 0 0 1 1 "
+   */
+  parseComboData(line) {
+    const match = line.match(/Port A:\s*([\d ]+)\|\s*Port B:\s*([\d ]+)/);
+    if (!match) return false;
+
+    const portA = match[1].trim().split(/\s+/).map(Number);
+    const portB = match[2].trim().split(/\s+/).map(Number);
+
+    this.updateComboBoardLEDs('first', portA);
+    this.updateComboBoardLEDs('second', portB);
+
+    const statusEl = document.getElementById('combo-board-status');
+    if (statusEl) {
+      statusEl.classList.add('active');
+      statusEl.classList.remove('inactive');
+      const txt = statusEl.querySelector('.status-text');
+      if (txt) txt.textContent = 'Live';
+    }
+
+    return true;
+  }
+
+  /**
+   * Update one row of combo board LEDs.
+   * @param {string} port  - 'first' (Port A, top row) or 'second' (Port B, bottom row)
+   * @param {number[]} bits - array of 8 values (0 or 1), bit 0 = leftmost LED
+   */
+  updateComboBoardLEDs(port, bits) {
+    bits.forEach((val, i) => {
+      const led = document.querySelector(`.combo-led[data-port="${port}"][data-bit="${i}"]`);
+      if (!led) return;
+      led.classList.toggle('on', val === 1);
+      led.classList.toggle('off', val === 0);
+      led.classList.remove('unknown');
+    });
   }
 
   logToConsole(message, type = 'normal') {
