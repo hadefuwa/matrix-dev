@@ -619,8 +619,10 @@ body {
 
 .sidebar-content {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .sidebar.collapsed .sidebar-content {
@@ -650,6 +652,7 @@ body {
   align-items: center;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .board-image-container::before {
@@ -710,6 +713,10 @@ body {
 /* Setup Page */
 .setup-page {
   padding: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .setup-section {
