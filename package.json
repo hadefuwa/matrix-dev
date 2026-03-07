@@ -1,9 +1,6 @@
 {
-  "name": "matrix-home",
+  "name": "matrix-dev",
   "scripts": {
-    "start": "serve . -p ${PORT:-3000}"
-  },
-  "dependencies": {
-    "serve": "^14.2.6"
+    "start": "node server.js"
   }
 }

@@ -1,0 +1,82 @@
+[
+  {
+    "sku": "LK5000",
+    "name": "Electrical Installation & HVAC 1 Solution",
+    "supports_tags": [
+      "dc_measurement",
+      "ac_theory",
+      "basic_circuits",
+      "electrical_science"
+    ],
+    "learners_per_kit": 4,
+    "notes": "Benchtop kit covering electron flow theory, AC/DC supplies, multimeter use, and simple electrical calculations. Includes printable worksheets and teacher notes. Aligned to City & Guilds 7202 unit 107.",
+    "image": "assets/hardware/LK5000.jpg"
+  },
+  {
+    "sku": "LK4063",
+    "name": "Electrical Installation & HVAC 2 Solution",
+    "supports_tags": [
+      "dc_measurement",
+      "ac_theory",
+      "basic_circuits",
+      "electromagnetism",
+      "fault_finding",
+      "protection_devices"
+    ],
+    "learners_per_kit": 4,
+    "notes": "Level 2 benchtop kit covering AC theory, electromagnetism, RCD operation, and fault diagnosis. Includes all LK5000 components. Aligned to City & Guilds 8202 unit 202.",
+    "image": "assets/hardware/LK4063.jpg"
+  },
+  {
+    "sku": "LK4562",
+    "name": "Level 3 Electrical Installation & HVAC Circuit Principles",
+    "supports_tags": [
+      "ac_theory",
+      "protection_devices",
+      "switching_logic",
+      "safety_practice"
+    ],
+    "learners_per_kit": 4,
+    "notes": "Level 3 Locktronics kit covering inductive/capacitive reactance, impedance, contactors, relays, solenoids, MCBs, and RCDs. Aligned to City & Guilds 8202 Level 3.",
+    "image": "assets/hardware/LK4562.jpg"
+  },
+  {
+    "sku": "IM3490",
+    "name": "Sense and Control – Industrial",
+    "supports_tags": [
+      "sensors",
+      "industrial_control",
+      "instrumentation",
+      "switching_logic"
+    ],
+    "learners_per_kit": 4,
+    "notes": "Industrial maintenance trainer covering sensing technologies, signal conditioning, and control systems. Aligned to industrial maintenance programmes.",
+    "image": "assets/hardware/IM3490.png"
+  },
+  {
+    "sku": "IM6930",
+    "name": "PLC Fundamentals Trainer",
+    "supports_tags": [
+      "plc_programming",
+      "industrial_control",
+      "switching_logic",
+      "instrumentation"
+    ],
+    "learners_per_kit": 4,
+    "notes": "PLC fundamentals trainer for maintenance engineers covering ladder logic, I/O wiring, and fault finding on programmable logic controllers.",
+    "image": "assets/hardware/IM6930.png"
+  },
+  {
+    "sku": "AV5289",
+    "name": "Wind Tunnel",
+    "supports_tags": [
+      "aerodynamics",
+      "fluid_dynamics",
+      "forces",
+      "measurement"
+    ],
+    "learners_per_kit": 4,
+    "notes": "Benchtop wind tunnel for investigating aerodynamic forces, lift, drag, and airflow around aerofoil sections. Covers Bernoulli's principle, Reynolds number, and flight dynamics. Aligned to aerospace and engineering science programmes.",
+    "image": "assets/hardware/AV5289.png"
+  }
+]
