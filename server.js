@@ -489,8 +489,7 @@ function parseCsv(text) {
       continue;
     }
 
-    if (ch === '
-') {
+    if (ch === "\n") {
       row.push(field);
       rows.push(row);
       row = [];
@@ -498,8 +497,7 @@ function parseCsv(text) {
       continue;
     }
 
-    if (ch === '
-') {
+    if (ch === "\r") {
       continue;
     }
 
