@@ -6,6 +6,7 @@
 import { SerialManager } from './serial-manager.js';
 import { CodeRunner } from './code-runner.js';
 import { FirmataController } from './firmata-controller.js';
+import { EB3DisplayRunner } from './eb3display-runner.js';
 
 class EblocksApp {
   constructor() {
@@ -13,6 +14,7 @@ class EblocksApp {
     this.serialManager = new SerialManager();
     this.codeRunner = new CodeRunner();
     this.firmataController = new FirmataController();
+    this.eb3DisplayRunner = new EB3DisplayRunner();
     this.availablePorts = []; // previously-authorized ports
     this.serialLineBuffer = ''; // buffer for incomplete serial lines
     this.serialHistory = [];
@@ -410,46 +412,24 @@ void loop() {
     const runBtn = document.getElementById('run-btn') || document.getElementById('upload-btn');
     const statusBar = document.getElementById('editor-status') || document.getElementById('upload-status');
 
-    const boardSelect = document.getElementById('editor-board-select');
-    const fqbn = boardSelect ? boardSelect.value : 'arduino:avr:mega';
-
     try {
-      if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = '⏳ Uploading...'; }
-      if (statusBar) { statusBar.style.display = ''; statusBar.textContent = 'Uploading to board...'; }
+      if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = '⏳ Sending...'; }
+      if (statusBar) { statusBar.style.display = ''; statusBar.textContent = 'Sending to display...'; }
 
       this.clearConsole();
-      this.logToConsole('🔄 Compiling and uploading to board...', 'success');
+      this.logToConsole('🎨 EB3Display mode — sending commands over serial...', 'success');
 
-      // Disconnect serial so arduino-cli can access the port
-      if (this.serialManager && this.serialManager.isConnected) {
-        this.logToConsole('🔌 Releasing serial port for upload...', 'info');
-        await this.serialManager.disconnect();
-      }
+      const result = await this.eb3DisplayRunner.run(
+        code,
+        this.serialManager,
+        (msg) => this.logToConsole(msg)
+      );
 
-      const response = await fetch('/api/eblocks/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, fqbn })
-      });
-
-      const result = await response.json();
-
-      if (result.output) {
-        this.logToConsole(result.output);
-      }
-
-      if (result.ok) {
-        this.logToConsole('✅ Upload complete! Code is running on the board.', 'success');
-        if (statusBar) statusBar.textContent = 'Upload complete';
-      } else {
-        const errMsg = result.error || 'Upload failed';
-        this.logToConsole(`❌ ${errMsg}`, 'error');
-        if (statusBar) statusBar.textContent = 'Upload failed';
-      }
+      if (statusBar) statusBar.textContent = result.success ? 'Done' : 'Error — see console';
 
     } catch (error) {
-      this.logToConsole(`❌ Upload error: ${error.message}`, 'error');
-      if (statusBar) statusBar.textContent = 'Upload error';
+      this.logToConsole(`❌ Error: ${error.message}`, 'error');
+      if (statusBar) statusBar.textContent = 'Error — see console';
     } finally {
       if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = '▶️ Run Code'; }
     }
