@@ -59,8 +59,7 @@ export class CodeRunner {
           debug: false,
           // Add custom functions for Arduino compatibility
           includes: {
-            'Arduino.h': arduinoEnvironment.header,
-            'EB3Display.h': arduinoEnvironment.eb3DisplayHeader
+            'Arduino.h': arduinoEnvironment.header
           }
         };
 
@@ -105,29 +104,67 @@ export class CodeRunner {
    * Preprocess code to add safety features
    */
   preprocessCode(code) {
-    // For now, return code as-is
-    // In a production version, we would add loop counters and yield points
-    // This is complex and requires proper AST parsing
-    
-    // Basic preprocessing: ensure setup() and loop() exist
     let processedCode = code;
-    
-    // Wrap in minimal Arduino structure if not present
-    if (!code.includes('void setup()') && !code.includes('void loop()')) {
-      processedCode = `
-#include <Arduino.h>
 
-void setup() {
-  ${code}
-}
+    // Inline EB3Display stub — JSCPP's includes config can't load it via lib.load
+    if (processedCode.includes('#include <EB3Display.h>')) {
+      processedCode = processedCode.replace(
+        /\s*#include\s*<EB3Display\.h>\s*/,
+        '\n' + this.eb3DisplayStub() + '\n'
+      );
 
-void loop() {
-  // Empty loop
-}
-`;
+      // JSCPP can't handle const char* — replace string literals inside
+      // display method calls with 0 so they match the int stub signatures
+      processedCode = processedCode.replace(
+        /(display\s*\.\s*\w+\s*\()([^)]*)\)/g,
+        (match, open, args) => open + args.replace(/"[^"]*"/g, '0') + ')'
+      );
     }
-    
+
+    // Wrap bare code that has no setup()/loop() in an Arduino structure
+    if (!processedCode.includes('void setup()') && !processedCode.includes('void loop()')) {
+      processedCode = `#include <Arduino.h>\n\nvoid setup() {\n  ${processedCode}\n}\n\nvoid loop() {}\n`;
+    }
+
     return processedCode;
+  }
+
+  /**
+   * Minimal EB3Display stub for JSCPP — avoids const char* (unsupported)
+   */
+  eb3DisplayStub() {
+    return `
+class HardwareSerial {
+  public:
+    void begin(int baud) {}
+};
+HardwareSerial Serial2;
+HardwareSerial Serial3;
+class EB3Display {
+  public:
+    EB3Display(HardwareSerial s, int b) {}
+    void begin() {}
+    void clearDisplay() {}
+    void setDisplayOrientation(int o) {}
+    void setBacklightBrightness(int b) {}
+    void setForegroundColor(int r, int g, int b) {}
+    void setBackgroundColor(int r, int g, int b) {}
+    void drawPixel(int x, int y) {}
+    void drawLine(int x1, int y1, int x2, int y2) {}
+    void drawRectangle(int x1, int y1, int x2, int y2, int t, int s) {}
+    void drawRoundedRectangle(int x1, int y1, int x2, int y2, int r, int t, int s) {}
+    void drawCircle(int x, int y, int r, int t, int s) {}
+    void drawEllipse(int x, int y, int xr, int yr, int t, int s) {}
+    void drawArc(int x, int y, int r, int sa, int ea, int res, int t, int s) {}
+    void printText(int text, int x, int y, int font, int t) {}
+    void printNumber(int n, int x, int y, int font, int t) {}
+    void printFloat(float n, int dp, int x, int y, int font, int t) {}
+    void setFontScaler(int sx, int sy) {}
+    void drawQRCode(int x, int y, int s, int text) {}
+    int touchCheck() { return 0; }
+    int touchReadX() { return 0; }
+    int touchReadY() { return 0; }
+};`;
   }
 
   /**
@@ -168,46 +205,7 @@ void loop() {
       unsigned long millis() { return 0; }
     `;
     
-    const eb3DisplayHeader = `
-      class HardwareSerial {
-        public:
-          void begin(int baud) {}
-          void print(const char* s) {}
-          void println(const char* s) {}
-          void println(int n) {}
-          void println() {}
-      };
-      HardwareSerial Serial2;
-      HardwareSerial Serial3;
-
-      class EB3Display {
-        public:
-          EB3Display(HardwareSerial serialPort, int baudRate) {}
-          void begin() {}
-          void clearDisplay() {}
-          void setDisplayOrientation(int orientation) {}
-          void setBacklightBrightness(int brightness) {}
-          void setForegroundColor(int r, int g, int b) {}
-          void setBackgroundColor(int r, int g, int b) {}
-          void drawPixel(int x, int y) {}
-          void drawLine(int x1, int y1, int x2, int y2) {}
-          void drawRectangle(int x1, int y1, int x2, int y2, int transparent, int solid) {}
-          void drawRoundedRectangle(int x1, int y1, int x2, int y2, int radius, int transparent, int solid) {}
-          void drawCircle(int x, int y, int radius, int transparent, int solid) {}
-          void drawEllipse(int x, int y, int xRadius, int yRadius, int transparent, int solid) {}
-          void drawArc(int x, int y, int radius, int startAngle, int endAngle, int resolution, int transparent, int solid) {}
-          void printText(const char* text, int x, int y, int font, int transparent) {}
-          void printNumber(int number, int x, int y, int font, int transparent) {}
-          void printFloat(float number, int decimalPlaces, int x, int y, int font, int transparent) {}
-          void setFontScaler(int scaleX, int scaleY) {}
-          void drawQRCode(int x, int y, int scaler, const char* text) {}
-          int touchCheck() { return 0; }
-          int touchReadX() { return 0; }
-          int touchReadY() { return 0; }
-      };
-    `;
-
-    return { header, eb3DisplayHeader };
+    return { header };
   }
 
   /**
