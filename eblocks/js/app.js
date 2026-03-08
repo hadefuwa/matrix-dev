@@ -15,6 +15,11 @@ class EblocksApp {
     this.firmataController = new FirmataController();
     this.availablePorts = []; // previously-authorized ports
     this.serialLineBuffer = ''; // buffer for incomplete serial lines
+    this.serialHistory = [];
+    this.currentWorksheet = null;
+    this.chatHistory = [];
+    this.maxChatHistory = 12;
+    this.chatStorageKey = 'eblocks-chat-history';
 
     // Default code template
     this.defaultCode = `// eBlocks Online - Arduino C++ Example
@@ -63,6 +68,9 @@ void loop() {
 
     // Curriculum / worksheets
     this.initCurriculum();
+
+    // AI assistant
+    this.initChat();
 
     // Populate COM port list from previously-authorized ports
     await this.refreshPortList();
@@ -166,11 +174,48 @@ void loop() {
       if (modal) modal.style.display = 'none';
     });
 
+    // Driver banner
+    on('driver-banner-install-btn', 'click', () => {
+      const modal = document.getElementById('driver-modal');
+      if (modal) modal.style.display = 'flex';
+    });
+    on('driver-banner-dismiss-btn', 'click', () => {
+      const banner = document.getElementById('driver-banner');
+      if (banner) banner.style.display = 'none';
+    });
+    on('driver-modal-close', 'click', () => {
+      const modal = document.getElementById('driver-modal');
+      if (modal) modal.style.display = 'none';
+    });
+    document.getElementById('driver-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'driver-modal') e.target.style.display = 'none';
+    });
+
     // About link
     on('about-link', 'click', (e) => { e.preventDefault(); this.showAbout(); });
 
     // Refresh ports button — scan authorized ports, don't open Chrome picker
     on('refresh-ports-btn', 'click', () => this.refreshPortList());
+
+    const chatForm = document.getElementById('chat-form');
+    if (chatForm) {
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.sendChatMessage();
+      });
+    }
+
+    on('chat-clear-btn', 'click', () => this.clearChatHistory());
+
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          this.sendChatMessage();
+        }
+      });
+    }
   }
 
   setupSerialListeners() {
@@ -444,6 +489,7 @@ void loop() {
     line.textContent = `[${timestamp}] ${message}`;
 
     consoleOutput.appendChild(line);
+    this.appendSerialHistory(`[${timestamp}] ${message}`);
 
     const autoScrollEl = document.getElementById('autoscroll-checkbox');
     if (!autoScrollEl || autoScrollEl.checked) {
@@ -454,6 +500,7 @@ void loop() {
   clearConsole() {
     const consoleOutput = document.getElementById('monitor-content') || document.getElementById('console-output');
     if (consoleOutput) consoleOutput.innerHTML = '';
+    this.serialHistory = [];
   }
 
   async sendToBoard() {
@@ -567,6 +614,7 @@ void loop() {
       if (curriculumListEl) curriculumListEl.style.display = 'flex';
       if (curriculumHeader) curriculumHeader.textContent = 'E-Blocks Curriculum';
       currentModule = null;
+      this.currentWorksheet = null;
       curriculumContent.innerHTML = '';
       modules.forEach(mod => {
         const div = document.createElement('div');
@@ -585,6 +633,7 @@ void loop() {
 
     const showWorksheetList = async (mod) => {
       currentModule = mod;
+      this.currentWorksheet = null;
       if (worksheetViewer) worksheetViewer.style.display = 'none';
       if (curriculumListEl) curriculumListEl.style.display = 'flex';
       if (curriculumHeader) curriculumHeader.textContent = mod.title;
@@ -614,6 +663,7 @@ void loop() {
           curriculumContent.appendChild(div);
         });
       } catch (e) {
+        this.currentWorksheet = null;
         curriculumContent.innerHTML = '<div class="curriculum-loading">Failed to load module.</div>';
       }
     };
@@ -625,6 +675,11 @@ void loop() {
       if (worksheetCode) worksheetCode.textContent = mod.code + '-' + ws.num;
       if (worksheetContent) worksheetContent.innerHTML = this.textToHTML(ws.lines.join('\n'));
       if (worksheetContent) worksheetContent.scrollTop = 0;
+      this.currentWorksheet = {
+        code: mod.code + '-' + ws.num,
+        title: ws.subtitle || 'Worksheet ' + ws.num,
+        text: ws.lines.join('\n')
+      };
     };
 
     if (closeBtn) closeBtn.addEventListener('click', () => {
@@ -633,6 +688,166 @@ void loop() {
     });
 
     showModuleList();
+  }
+
+  initChat() {
+    this.chatHistory = this.loadChatHistory();
+    this.renderChatHistory();
+    this.setChatStatus('Ready');
+  }
+
+  loadChatHistory() {
+    try {
+      const raw = sessionStorage.getItem(this.chatStorageKey);
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(parsed)) return [];
+
+      return parsed
+        .filter((entry) => entry && (entry.role === 'user' || entry.role === 'assistant') && typeof entry.content === 'string')
+        .slice(-this.maxChatHistory);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  saveChatHistory() {
+    sessionStorage.setItem(this.chatStorageKey, JSON.stringify(this.chatHistory.slice(-this.maxChatHistory)));
+  }
+
+  renderChatHistory() {
+    const messagesEl = document.getElementById('chat-messages');
+    if (!messagesEl) return;
+
+    messagesEl.innerHTML = '';
+
+    if (!this.chatHistory.length) {
+      const empty = document.createElement('div');
+      empty.className = 'chat-empty';
+      empty.textContent = 'Ask about your code, board behavior, or the open worksheet.';
+      messagesEl.appendChild(empty);
+      return;
+    }
+
+    this.chatHistory.forEach((entry) => {
+      const item = document.createElement('div');
+      item.className = `chat-message ${entry.role}`;
+
+      const role = document.createElement('span');
+      role.className = 'chat-message-role';
+      role.textContent = entry.role === 'assistant' ? 'Assistant' : 'You';
+
+      const body = document.createElement('div');
+      body.textContent = entry.content;
+
+      item.appendChild(role);
+      item.appendChild(body);
+      messagesEl.appendChild(item);
+    });
+
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  clearChatHistory() {
+    this.chatHistory = [];
+    this.saveChatHistory();
+    this.renderChatHistory();
+    this.setChatStatus('Conversation cleared.', 'success');
+  }
+
+  appendChatEntry(role, content) {
+    this.chatHistory.push({ role, content });
+    this.chatHistory = this.chatHistory.slice(-this.maxChatHistory);
+    this.saveChatHistory();
+    this.renderChatHistory();
+  }
+
+  setChatStatus(message, type = '') {
+    const statusEl = document.getElementById('chat-status');
+    if (!statusEl) return;
+
+    statusEl.textContent = message;
+    statusEl.classList.remove('error', 'success');
+    if (type) statusEl.classList.add(type);
+  }
+
+  appendSerialHistory(line) {
+    this.serialHistory.push(line);
+    this.serialHistory = this.serialHistory.slice(-40);
+  }
+
+  getBoardTypeLabel() {
+    const boardSelect = document.getElementById('editor-board-select');
+    if (!boardSelect) return '';
+    const selected = boardSelect.options[boardSelect.selectedIndex];
+    return selected ? `${selected.text} (${selected.value})` : boardSelect.value;
+  }
+
+  getWorksheetContext() {
+    if (!this.currentWorksheet) return null;
+
+    return {
+      code: this.currentWorksheet.code || '',
+      title: this.currentWorksheet.title || '',
+      text: this.currentWorksheet.text || ''
+    };
+  }
+
+  async sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const includeCode = document.getElementById('chat-include-code');
+    const includeSerial = document.getElementById('chat-include-serial');
+
+    if (!input || !sendBtn) return;
+
+    const message = input.value.trim();
+    if (!message) {
+      this.setChatStatus('Enter a message to start chatting.', 'error');
+      return;
+    }
+
+    const payload = {
+      message,
+      boardType: this.getBoardTypeLabel(),
+      editorCode: includeCode && includeCode.checked && this.editor ? this.editor.getValue() : '',
+      worksheet: this.getWorksheetContext(),
+      serialContext: includeSerial && includeSerial.checked ? this.serialHistory.join('\n') : '',
+      conversation: this.chatHistory
+    };
+
+    this.appendChatEntry('user', message);
+    input.value = '';
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending...';
+    this.setChatStatus('Waiting for Gemini...');
+
+    try {
+      const response = await fetch('/api/eblocks/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || 'Chat request failed');
+      }
+
+      this.appendChatEntry('assistant', data.reply || 'No reply received.');
+      this.setChatStatus(
+        Array.isArray(data.warnings) && data.warnings.length
+          ? data.warnings.join(' ')
+          : 'Reply received.',
+        Array.isArray(data.warnings) && data.warnings.length ? '' : 'success'
+      );
+    } catch (error) {
+      this.appendChatEntry('assistant', `I couldn't complete that request: ${error.message}`);
+      this.setChatStatus(error.message, 'error');
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Send';
+      input.focus();
+    }
   }
 
   parseWorksheets(text) {

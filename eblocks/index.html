@@ -58,13 +58,48 @@
     </script>
 
     <!-- Driver Installation Banner -->
-    <div id="driver-banner" class="driver-banner" style="display: none;">
+    <div id="driver-banner" class="driver-banner">
       <div class="driver-banner-content">
         <div class="driver-banner-icon">⚠️</div>
         <div class="driver-banner-text">
-          <strong>E-Blocks USB drivers are not installed.</strong> Install drivers to connect your E-Blocks board.
+          <strong>First time?</strong> Install the E-Blocks USB drivers so Windows can recognise your board.
         </div>
         <button id="driver-banner-install-btn" class="driver-banner-btn">Install Drivers</button>
+        <button id="driver-banner-dismiss-btn" class="driver-banner-dismiss" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <!-- Driver Install Modal -->
+    <div id="driver-modal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Install E-Blocks USB Drivers</h3>
+          <button id="driver-modal-close" class="modal-close-btn">✕</button>
+        </div>
+        <div class="modal-body">
+          <p>Download and run the installer for your version of Windows. You only need to do this once.</p>
+          <div class="driver-download-list">
+            <a href="drivers/E-blocks2_64bit_installer.exe" download class="driver-download-btn">
+              <span class="driver-dl-icon">⬇</span>
+              <div>
+                <strong>64-bit Windows</strong>
+                <span>E-blocks2_64bit_installer.exe</span>
+              </div>
+            </a>
+            <a href="drivers/E-blocks2_32bit_installer.exe" download class="driver-download-btn">
+              <span class="driver-dl-icon">⬇</span>
+              <div>
+                <strong>32-bit Windows</strong>
+                <span>E-blocks2_32bit_installer.exe</span>
+              </div>
+            </a>
+          </div>
+          <ol class="driver-steps">
+            <li>Download the installer for your Windows version.</li>
+            <li>Run the downloaded <code>.exe</code> file and follow the prompts.</li>
+            <li>Plug in your E-Blocks board via USB and click <strong>Refresh</strong> in the app.</li>
+          </ol>
+        </div>
       </div>
     </div>
 
@@ -212,6 +247,39 @@
         <div class="sidebar-content">
           <!-- Curriculum Page -->
           <div class="curriculum-page">
+            <section class="assistant-panel" aria-label="AI Assistant">
+              <div class="assistant-header">
+                <div>
+                  <h3>AI Assistant</h3>
+                  <p>Gemini support for debugging, hardware logic, and worksheet help.</p>
+                </div>
+                <button id="chat-clear-btn" class="btn-sm btn-outline" type="button">Clear</button>
+              </div>
+              <div id="chat-status" class="chat-status" aria-live="polite">Ready</div>
+              <div id="chat-messages" class="chat-messages">
+                <div class="chat-empty">Ask about your code, board behavior, or the open worksheet.</div>
+              </div>
+              <div class="chat-options">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="chat-include-code" checked>
+                  Include code
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="chat-include-serial" checked>
+                  Include serial output
+                </label>
+              </div>
+              <form id="chat-form" class="chat-form">
+                <textarea
+                  id="chat-input"
+                  class="chat-input"
+                  rows="4"
+                  placeholder="Ask for debugging help, worksheet support, or hardware logic guidance..."
+                ></textarea>
+                <button id="chat-send-btn" class="btn-upload chat-send-btn" type="submit">Send</button>
+              </form>
+            </section>
+
             <!-- Worksheet Viewer (shown when worksheet is selected) -->
             <div id="worksheet-viewer" class="worksheet-viewer" style="display: none;">
               <div class="worksheet-header">
