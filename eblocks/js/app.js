@@ -570,6 +570,14 @@ void loop() {
   }
 
   loadSavedCode() {
+    // Code passed from Graphics Editor takes priority
+    const generated = localStorage.getItem('eb3_generated_code');
+    if (generated) {
+      localStorage.removeItem('eb3_generated_code');
+      this.editor.setValue(generated);
+      this.logToConsole('🎨 Loaded code from Graphics Editor', 'success');
+      return;
+    }
     const saved = localStorage.getItem('eblocks-code');
     if (saved) {
       this.editor.setValue(saved);

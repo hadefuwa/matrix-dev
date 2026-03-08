@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graphics Editor - E-Blocks 3 Companion</title>
+  <link rel="icon" type="image/x-icon" href="/assets/matrix-icon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .graphics-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* ── Tool Palette ── */
+    .tool-palette {
+      width: 62px;
+      flex-shrink: 0;
+      background: var(--vscode-sidebar-bg);
+      border-right: 1px solid var(--vscode-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 0;
+      gap: 2px;
+      overflow-y: auto;
+    }
+
+    .tool-btn {
+      width: 48px;
+      height: 48px;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--vscode-text-secondary);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: all 0.1s;
+      flex-shrink: 0;
+    }
+    .tool-btn:hover {
+      background: var(--vscode-input-bg);
+      color: var(--vscode-text);
+    }
+    .tool-btn.active {
+      background: rgba(88, 166, 255, 0.15);
+      border-color: var(--vscode-accent);
+      color: var(--vscode-accent);
+    }
+    .tool-btn span {
+      font-size: 9px;
+      font-family: monospace;
+      letter-spacing: 0;
+      pointer-events: none;
+    }
+    .tool-sep {
+      width: 34px;
+      height: 1px;
+      background: var(--vscode-border);
+      margin: 3px 0;
+      flex-shrink: 0;
+    }
+
+    /* ── Canvas Area ── */
+    .canvas-area {
+      flex: 1;
+      background: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .canvas-container {
+      position: relative;
+    }
+    .canvas-badge {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      font-size: 10px;
+      font-family: monospace;
+      color: var(--vscode-text-secondary);
+      white-space: nowrap;
+    }
+    #display-canvas {
+      display: block;
+      cursor: crosshair;
+      image-rendering: pixelated;
+      box-shadow: 0 0 0 1px #374151, 0 8px 32px rgba(0,0,0,0.7);
+    }
+    .canvas-footer {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: var(--vscode-text-secondary);
+      font-family: monospace;
+      font-size: 11px;
+      padding: 3px 12px;
+      border-radius: 4px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 268px;
+      flex-shrink: 0;
+      background: var(--vscode-sidebar-bg);
+      border-left: 1px solid var(--vscode-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .rp-section {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--vscode-border);
+      flex-shrink: 0;
+    }
+    .rp-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--vscode-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    /* Color pickers */
+    .color-row { display: flex; gap: 8px; }
+    .color-group { flex: 1; }
+    .color-group label {
+      display: block;
+      font-size: 11px;
+      color: var(--vscode-text-secondary);
+      margin-bottom: 4px;
+    }
+    .color-input-wrap { display: flex; align-items: center; gap: 5px; }
+    input[type="color"] {
+      width: 28px;
+      height: 26px;
+      padding: 1px;
+      border: 1px solid var(--vscode-border);
+      border-radius: 4px;
+      background: none;
+      cursor: pointer;
+    }
+    .hex-input {
+      flex: 1;
+      width: 0;
+      background: var(--vscode-input-bg);
+      border: 1px solid var(--vscode-border);
+      border-radius: 4px;
+      color: var(--vscode-text);
+      font-family: monospace;
+      font-size: 11px;
+      padding: 3px 5px;
+    }
+    .hex-input:focus { outline: none; border-color: var(--vscode-accent); }
+
+    /* Props */
+    .prop-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+    .prop-row:last-child { margin-bottom: 0; }
+    .prop-row label {
+      font-size: 11px;
+      color: var(--vscode-text-secondary);
+      width: 54px;
+      flex-shrink: 0;
+    }
+    .num-input, .sel-input {
+      flex: 1;
+      background: var(--vscode-input-bg);
+      border: 1px solid var(--vscode-border);
+      border-radius: 4px;
+      color: var(--vscode-text);
+      font-size: 11px;
+      padding: 3px 6px;
+    }
+    .num-input:focus, .sel-input:focus { outline: none; border-color: var(--vscode-accent); }
+    .sel-input { cursor: pointer; }
+    .txt-full {
+      width: 100%;
+      background: var(--vscode-input-bg);
+      border: 1px solid var(--vscode-border);
+      border-radius: 4px;
+      color: var(--vscode-text);
+      font-size: 11px;
+      padding: 4px 6px;
+      margin-bottom: 7px;
+      box-sizing: border-box;
+    }
+    .txt-full:focus { outline: none; border-color: var(--vscode-accent); }
+
+    .seg-btns {
+      display: flex;
+      background: var(--vscode-input-bg);
+      border: 1px solid var(--vscode-border);
+      border-radius: 4px;
+      overflow: hidden;
+      flex: 1;
+    }
+    .seg-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--vscode-text-secondary);
+      font-size: 11px;
+      padding: 4px 2px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    .seg-btn.active { background: var(--vscode-accent); color: white; }
+
+    /* Shape list */
+    .shape-list-scroll {
+      max-height: 130px;
+      overflow-y: auto;
+    }
+    .shape-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--vscode-text-secondary);
+      transition: all 0.1s;
+    }
+    .shape-item:hover { background: var(--vscode-input-bg); color: var(--vscode-text); }
+    .shape-item.selected {
+      background: rgba(88,166,255,0.08);
+      border-left-color: var(--vscode-accent);
+      color: var(--vscode-text);
+    }
+    .shape-dot {
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .shape-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .shape-del {
+      background: none; border: none;
+      color: var(--vscode-error);
+      cursor: pointer; opacity: 0;
+      font-size: 13px; padding: 0;
+      line-height: 1;
+    }
+    .shape-item:hover .shape-del { opacity: 1; }
+
+    /* Code section */
+    .code-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 10px 12px 12px;
+      min-height: 0;
+    }
+    .code-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .code-actions { display: flex; gap: 4px; }
+    .btn-xs {
+      background: var(--vscode-input-bg);
+      border: 1px solid var(--vscode-border);
+      border-radius: 4px;
+      color: var(--vscode-text-secondary);
+      font-size: 10px;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    .btn-xs:hover { color: var(--vscode-text); border-color: var(--vscode-accent); }
+    .btn-xs.primary {
+      background: var(--vscode-button-bg);
+      border-color: var(--vscode-button-bg);
+      color: white;
+    }
+    .btn-xs.primary:hover { background: var(--vscode-button-hover-bg); }
+
+    #code-output {
+      flex: 1;
+      background: var(--vscode-editor-bg);
+      border: 1px solid var(--vscode-border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      overflow: auto;
+      font-family: 'Consolas', 'Fira Code', monospace;
+      font-size: 10px;
+      line-height: 1.65;
+      color: var(--vscode-text);
+      white-space: pre;
+      tab-size: 2;
+      min-height: 0;
+      margin: 0;
+    }
+
+    /* Mobile: hide editor, show warning */
+    @media (max-width: 700px) {
+      .graphics-layout { display: none; }
+      .mobile-msg {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--vscode-text-secondary);
+        font-size: 14px;
+        text-align: center;
+        padding: 32px;
+      }
+    }
+    @media (min-width: 701px) {
+      .mobile-msg { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Titlebar -->
+    <header class="app-titlebar">
+      <div class="titlebar-icon">
+        <img src="assets/matrix.png" alt="Matrix Logo" class="titlebar-logo">
+      </div>
+      <div class="titlebar-title">E-Blocks 3 Companion</div>
+      <div class="titlebar-menu">
+        <button class="menu-btn" onclick="location.href='index.html'">Code Editor</button>
+        <button class="menu-btn active">Graphical</button>
+        <button class="menu-btn" onclick="window.open('https://www.matrixtsl.com/eblocks3/','_blank')">Shop</button>
+        <button class="menu-btn" onclick="location.href='settings.html'">⚙️ Settings</button>
+      </div>
+    </header>
+
+    <!-- Mobile fallback -->
+    <div class="mobile-msg">
+      The Graphics Editor requires a desktop browser.
+    </div>
+
+    <!-- Main Editor Layout -->
+    <div class="graphics-layout">
+
+      <!-- ── Tool Palette ── -->
+      <div class="tool-palette">
+        <button class="tool-btn active" data-tool="rect" title="Rectangle (R)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="2" y="4" width="16" height="12"/>
+          </svg>
+          <span>Rect</span>
+        </button>
+
+        <button class="tool-btn" data-tool="rrect" title="Rounded Rectangle (U)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="2" y="4" width="16" height="12" rx="4"/>
+          </svg>
+          <span>RRect</span>
+        </button>
+
+        <button class="tool-btn" data-tool="circle" title="Circle (C)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="10" cy="10" r="8"/>
+          </svg>
+          <span>Circle</span>
+        </button>
+
+        <button class="tool-btn" data-tool="ellipse" title="Ellipse (E)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <ellipse cx="10" cy="10" rx="9" ry="6"/>
+          </svg>
+          <span>Ellipse</span>
+        </button>
+
+        <button class="tool-btn" data-tool="line" title="Line (L)">
+          <svg width="18" height="18" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.8">
+            <line x1="2" y1="18" x2="18" y2="2"/>
+          </svg>
+          <span>Line</span>
+        </button>
+
+        <button class="tool-btn" data-tool="arc" title="Arc (A)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M 3 17 A 10 10 0 0 1 17 3"/>
+          </svg>
+          <span>Arc</span>
+        </button>
+
+        <button class="tool-btn" data-tool="text" title="Text (T)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+            <text x="3" y="16" font-size="15" font-weight="bold" font-family="serif">T</text>
+          </svg>
+          <span>Text</span>
+        </button>
+
+        <button class="tool-btn" data-tool="pixel" title="Pixel (P)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+            <rect x="6" y="6" width="8" height="8"/>
+          </svg>
+          <span>Pixel</span>
+        </button>
+
+        <div class="tool-sep"></div>
+
+        <button class="tool-btn" id="undo-btn" title="Undo (Ctrl+Z)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <polyline points="8,4 3,8 8,12"/>
+            <path d="M3 8 A8 8 0 0 1 17 14"/>
+          </svg>
+          <span>Undo</span>
+        </button>
+
+        <button class="tool-btn" id="clear-btn" title="Clear All" style="color:var(--vscode-error)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M4 4l12 12M16 4L4 16"/>
+          </svg>
+          <span>Clear</span>
+        </button>
+      </div>
+
+      <!-- ── Canvas Area ── -->
+      <div class="canvas-area" id="canvas-area">
+        <div class="canvas-container" id="canvas-container">
+          <div class="canvas-badge" id="canvas-badge">800 × 480 px</div>
+          <canvas id="display-canvas" width="800" height="480"></canvas>
+        </div>
+        <div class="canvas-footer" id="canvas-footer">x: 0, y: 0</div>
+      </div>
+
+      <!-- ── Right Panel ── -->
+      <div class="right-panel">
+
+        <!-- Colors -->
+        <div class="rp-section">
+          <div class="rp-title">Colors</div>
+          <div class="color-row">
+            <div class="color-group">
+              <label>Foreground</label>
+              <div class="color-input-wrap">
+                <input type="color" id="fg-picker" value="#ffffff">
+                <input type="text" class="hex-input" id="fg-hex" value="#ffffff" maxlength="7" spellcheck="false">
+              </div>
+            </div>
+            <div class="color-group">
+              <label>Background</label>
+              <div class="color-input-wrap">
+                <input type="color" id="bg-picker" value="#000000">
+                <input type="text" class="hex-input" id="bg-hex" value="#000000" maxlength="7" spellcheck="false">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Properties -->
+        <div class="rp-section" id="props-section">
+          <div class="rp-title">Properties</div>
+
+          <div class="prop-row" id="prop-fill">
+            <label>Fill</label>
+            <div class="seg-btns">
+              <button class="seg-btn active" id="btn-solid">Solid</button>
+              <button class="seg-btn" id="btn-outline">Outline</button>
+            </div>
+          </div>
+
+          <div class="prop-row" id="prop-radius" style="display:none">
+            <label for="inp-radius">Radius</label>
+            <input type="number" class="num-input" id="inp-radius" value="10" min="1" max="200">
+          </div>
+
+          <!-- Text props -->
+          <div id="prop-text-group" style="display:none">
+            <input type="text" class="txt-full" id="inp-text" value="Hello World" placeholder="Text content">
+            <div class="prop-row">
+              <label for="inp-font">Font</label>
+              <select class="sel-input" id="inp-font">
+                <option value="0">0 — Small</option>
+                <option value="1">1 — Medium</option>
+                <option value="2">2 — Large</option>
+                <option value="3">3 — XLarge</option>
+              </select>
+            </div>
+            <div class="prop-row">
+              <label>Scale X/Y</label>
+              <div style="display:flex;gap:4px;flex:1">
+                <input type="number" class="num-input" id="inp-sx" value="1" min="1" max="8" title="X scale">
+                <input type="number" class="num-input" id="inp-sy" value="1" min="1" max="8" title="Y scale">
+              </div>
+            </div>
+          </div>
+
+          <!-- Arc props -->
+          <div id="prop-arc-group" style="display:none">
+            <div class="prop-row">
+              <label for="inp-arc-s">Start°</label>
+              <input type="number" class="num-input" id="inp-arc-s" value="0" min="0" max="360">
+            </div>
+            <div class="prop-row">
+              <label for="inp-arc-e">End°</label>
+              <input type="number" class="num-input" id="inp-arc-e" value="90" min="0" max="360">
+            </div>
+            <div class="prop-row">
+              <label for="inp-arc-res">Steps</label>
+              <input type="number" class="num-input" id="inp-arc-res" value="10" min="2" max="100" title="Resolution">
+            </div>
+          </div>
+
+          <div id="prop-none" style="display:none; font-size:11px; color:var(--vscode-text-secondary);">
+            No extra options for this tool.
+          </div>
+        </div>
+
+        <!-- Shape List -->
+        <div class="rp-section" style="padding-bottom:6px;">
+          <div class="rp-title">Shapes (<span id="shape-count">0</span>)</div>
+          <div class="shape-list-scroll" id="shape-list">
+            <div id="shape-empty" style="padding:8px 0;text-align:center;font-size:11px;color:var(--vscode-text-secondary);">
+              Draw on the canvas to add shapes.
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Output -->
+        <div class="code-section">
+          <div class="code-top">
+            <div class="rp-title" style="margin-bottom:0">Arduino Code</div>
+            <div class="code-actions">
+              <button class="btn-xs" id="btn-copy">Copy</button>
+              <button class="btn-xs primary" id="btn-open">Open in Editor</button>
+            </div>
+          </div>
+          <pre id="code-output">// Add shapes to generate code</pre>
+        </div>
+
+      </div><!-- end right-panel -->
+    </div><!-- end graphics-layout -->
+  </div><!-- end app -->
+
+  <script>
+    // ================================================================
+    // Constants
+    // ================================================================
+    const DISPLAY_W = 800;
+    const DISPLAY_H = 480;
+
+    // Font size approximations for canvas preview (pixels)
+    const FONT_SIZES = [10, 14, 20, 28];
+
+    // ================================================================
+    // State
+    // ================================================================
+    let shapes = [];
+    let shapeIdCounter = 0;
+    let currentTool = 'rect';
+    let isSolid = true;
+    let fgColor = '#ffffff';
+    let bgColor = '#000000';
+    let isDrawing = false;
+    let dragStart = { x: 0, y: 0 };
+    let dragCurrent = { x: 0, y: 0 };
+    let selectedId = null;
+
+    // ================================================================
+    // Canvas setup
+    // ================================================================
+    const canvas = document.getElementById('display-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Polyfill for roundRect (older browsers)
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.lineTo(x + w - r, y);
+        this.arcTo(x + w, y, x + w, y + r, r);
+        this.lineTo(x + w, y + h - r);
+        this.arcTo(x + w, y + h, x + w - r, y + h, r);
+        this.lineTo(x + r, y + h);
+        this.arcTo(x, y + h, x, y + h - r, r);
+        this.lineTo(x, y + r);
+        this.arcTo(x, y, x + r, y, r);
+        this.closePath();
+      };
+    }
+
+    function scaleCanvas() {
+      const area = document.getElementById('canvas-area');
+      const aw = area.clientWidth - 40;
+      const ah = area.clientHeight - 50;
+      const scale = Math.min(aw / DISPLAY_W, ah / DISPLAY_H, 1.5);
+      const cssW = Math.round(DISPLAY_W * scale);
+      const cssH = Math.round(DISPLAY_H * scale);
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
+      document.getElementById('canvas-badge').textContent =
+        `800 × 480 px  (${Math.round(scale * 100)}%)`;
+    }
+
+    window.addEventListener('resize', scaleCanvas);
+    scaleCanvas();
+
+    // ================================================================
+    // Coordinate helpers
+    // ================================================================
+    function canvasCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: Math.max(0, Math.min(DISPLAY_W - 1, Math.round((e.clientX - rect.left) * (DISPLAY_W / rect.width)))),
+        y: Math.max(0, Math.min(DISPLAY_H - 1, Math.round((e.clientY - rect.top) * (DISPLAY_H / rect.height))))
+      };
+    }
+
+    // ================================================================
+    // Color helpers
+    // ================================================================
+    function hexToRgb(hex) {
+      hex = hex.replace(/^#/, '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      const n = parseInt(hex, 16) || 0;
+      return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+    }
+
+    function rgbCss(hex) {
+      const { r, g, b } = hexToRgb(hex);
+      return `rgb(${r},${g},${b})`;
+    }
+
+    // ================================================================
+    // Colour pickers
+    // ================================================================
+    function initColors() {
+      const fgPicker = document.getElementById('fg-picker');
+      const fgHex    = document.getElementById('fg-hex');
+      const bgPicker = document.getElementById('bg-picker');
+      const bgHex    = document.getElementById('bg-hex');
+
+      fgPicker.addEventListener('input', () => { fgColor = fgPicker.value; fgHex.value = fgColor; });
+      fgHex.addEventListener('change', () => {
+        if (/^#[0-9a-f]{6}$/i.test(fgHex.value)) { fgColor = fgHex.value; fgPicker.value = fgColor; }
+      });
+
+      bgPicker.addEventListener('input', () => {
+        bgColor = bgPicker.value; bgHex.value = bgColor; render(); updateCode();
+      });
+      bgHex.addEventListener('change', () => {
+        if (/^#[0-9a-f]{6}$/i.test(bgHex.value)) {
+          bgColor = bgHex.value; bgPicker.value = bgColor; render(); updateCode();
+        }
+      });
+    }
+
+    // ================================================================
+    // Tool palette
+    // ================================================================
+    function initTools() {
+      document.querySelectorAll('[data-tool]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTool = btn.dataset.tool;
+          canvas.style.cursor = 'crosshair';
+          updatePropsPanel();
+        });
+      });
+
+      document.getElementById('btn-solid').addEventListener('click', () => {
+        isSolid = true;
+        document.getElementById('btn-solid').classList.add('active');
+        document.getElementById('btn-outline').classList.remove('active');
+      });
+      document.getElementById('btn-outline').addEventListener('click', () => {
+        isSolid = false;
+        document.getElementById('btn-outline').classList.add('active');
+        document.getElementById('btn-solid').classList.remove('active');
+      });
+    }
+
+    function updatePropsPanel() {
+      const fillTools    = ['rect', 'rrect', 'circle', 'ellipse', 'arc'];
+      const radiusTools  = ['rrect'];
+      const textTools    = ['text'];
+      const arcTools     = ['arc'];
+      const noneTools    = ['pixel', 'line'];
+
+      const hasFill  = fillTools.includes(currentTool);
+      const hasRadius = radiusTools.includes(currentTool);
+      const hasText  = textTools.includes(currentTool);
+      const hasArc   = arcTools.includes(currentTool);
+      const hasNone  = noneTools.includes(currentTool);
+
+      document.getElementById('prop-fill').style.display      = hasFill  ? '' : 'none';
+      document.getElementById('prop-radius').style.display    = hasRadius ? '' : 'none';
+      document.getElementById('prop-text-group').style.display = hasText  ? '' : 'none';
+      document.getElementById('prop-arc-group').style.display  = hasArc   ? '' : 'none';
+      document.getElementById('prop-none').style.display       = hasNone  ? '' : 'none';
+    }
+
+    // ================================================================
+    // Rendering
+    // ================================================================
+    function render(previewShape) {
+      ctx.fillStyle = rgbCss(bgColor);
+      ctx.fillRect(0, 0, DISPLAY_W, DISPLAY_H);
+      shapes.forEach(s => drawShape(s, s.id === selectedId));
+      if (previewShape) drawShape(previewShape, false, true);
+    }
+
+    function drawShape(shape, isSelected, isPreview) {
+      const fg = rgbCss(shape.fgColor || '#ffffff');
+      ctx.strokeStyle = fg;
+      ctx.fillStyle   = fg;
+      ctx.lineWidth   = 1;
+
+      switch (shape.type) {
+        case 'pixel':
+          ctx.fillRect(shape.x, shape.y, 1, 1);
+          break;
+
+        case 'line':
+          ctx.beginPath();
+          ctx.moveTo(shape.x1, shape.y1);
+          ctx.lineTo(shape.x2, shape.y2);
+          ctx.stroke();
+          break;
+
+        case 'rect': {
+          const [x, y, w, h] = normRect(shape);
+          if (shape.solid) ctx.fillRect(x, y, w, h);
+          else ctx.strokeRect(x, y, w, h);
+          break;
+        }
+
+        case 'rrect': {
+          const [x, y, w, h] = normRect(shape);
+          const r = Math.min(shape.radius || 10, w / 2, h / 2);
+          ctx.roundRect(x, y, w, h, r);
+          if (shape.solid) ctx.fill(); else ctx.stroke();
+          break;
+        }
+
+        case 'circle':
+          ctx.beginPath();
+          ctx.arc(shape.cx, shape.cy, Math.max(1, shape.radius), 0, Math.PI * 2);
+          if (shape.solid) ctx.fill(); else ctx.stroke();
+          break;
+
+        case 'ellipse': {
+          const rx = Math.max(1, shape.rx);
+          const ry = Math.max(1, shape.ry);
+          ctx.beginPath();
+          ctx.ellipse(shape.cx, shape.cy, rx, ry, 0, 0, Math.PI * 2);
+          if (shape.solid) ctx.fill(); else ctx.stroke();
+          break;
+        }
+
+        case 'arc': {
+          // 0° = 12 o'clock, clockwise (matches EB3Display convention)
+          const sa = (shape.startAngle - 90) * Math.PI / 180;
+          const ea = (shape.endAngle   - 90) * Math.PI / 180;
+          ctx.beginPath();
+          ctx.arc(shape.cx, shape.cy, Math.max(1, shape.radius), sa, ea);
+          ctx.stroke();
+          break;
+        }
+
+        case 'text': {
+          const sz = FONT_SIZES[shape.font] || 12;
+          const scale = shape.scaleX || 1;
+          ctx.font = `${Math.round(sz * scale)}px monospace`;
+          ctx.fillText(shape.text || '', shape.x, shape.y + Math.round(sz * scale));
+          break;
+        }
+      }
+
+      // Selection highlight
+      if (isSelected && !isPreview) {
+        ctx.save();
+        ctx.strokeStyle = '#58a6ff';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 3]);
+        const bb = getBoundingBox(shape);
+        if (bb) ctx.strokeRect(bb.x - 3, bb.y - 3, bb.w + 6, bb.h + 6);
+        ctx.restore();
+      }
+    }
+
+    function normRect(s) {
+      const x = Math.min(s.x1, s.x2);
+      const y = Math.min(s.y1, s.y2);
+      return [x, y, Math.abs(s.x2 - s.x1), Math.abs(s.y2 - s.y1)];
+    }
+
+    function getBoundingBox(shape) {
+      switch (shape.type) {
+        case 'rect':
+        case 'rrect': {
+          const [x, y, w, h] = normRect(shape);
+          return { x, y, w, h };
+        }
+        case 'circle': return { x: shape.cx - shape.radius, y: shape.cy - shape.radius, w: shape.radius * 2, h: shape.radius * 2 };
+        case 'ellipse': return { x: shape.cx - shape.rx, y: shape.cy - shape.ry, w: shape.rx * 2, h: shape.ry * 2 };
+        case 'line':    return { x: Math.min(shape.x1,shape.x2), y: Math.min(shape.y1,shape.y2), w: Math.abs(shape.x2-shape.x1), h: Math.abs(shape.y2-shape.y1) };
+        case 'arc':     return { x: shape.cx - shape.radius, y: shape.cy - shape.radius, w: shape.radius * 2, h: shape.radius * 2 };
+        case 'text':    return { x: shape.x, y: shape.y, w: 80, h: 20 };
+        case 'pixel':   return { x: shape.x, y: shape.y, w: 1, h: 1 };
+        default:        return null;
+      }
+    }
+
+    // ================================================================
+    // Mouse events
+    // ================================================================
+    canvas.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      const pos = canvasCoords(e);
+      dragStart = pos;
+      dragCurrent = pos;
+      isDrawing = true;
+
+      if (currentTool === 'pixel') {
+        commit({ type: 'pixel', x: pos.x, y: pos.y, fgColor });
+        isDrawing = false;
+      } else if (currentTool === 'text') {
+        commit({
+          type: 'text', x: pos.x, y: pos.y,
+          text:   document.getElementById('inp-text').value || 'Text',
+          font:   parseInt(document.getElementById('inp-font').value) || 0,
+          scaleX: parseInt(document.getElementById('inp-sx').value) || 1,
+          scaleY: parseInt(document.getElementById('inp-sy').value) || 1,
+          fgColor
+        });
+        isDrawing = false;
+      }
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      const pos = canvasCoords(e);
+      document.getElementById('canvas-footer').textContent = `x: ${pos.x},  y: ${pos.y}`;
+      if (!isDrawing || currentTool === 'pixel' || currentTool === 'text') return;
+      dragCurrent = pos;
+      render(buildPreview(dragStart, dragCurrent));
+    });
+
+    canvas.addEventListener('mouseup', e => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      const pos = canvasCoords(e);
+      dragCurrent = pos;
+      if (currentTool === 'pixel' || currentTool === 'text') return;
+      const shape = buildPreview(dragStart, dragCurrent);
+      if (shape) commit(shape);
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      document.getElementById('canvas-footer').textContent = '';
+      if (isDrawing) { isDrawing = false; render(); }
+    });
+
+    function buildPreview(start, end) {
+      const base = { fgColor, solid: isSolid };
+      switch (currentTool) {
+        case 'line':
+          return { ...base, type: 'line', x1: start.x, y1: start.y, x2: end.x, y2: end.y };
+        case 'rect':
+          return { ...base, type: 'rect', x1: start.x, y1: start.y, x2: end.x, y2: end.y };
+        case 'rrect':
+          return { ...base, type: 'rrect', x1: start.x, y1: start.y, x2: end.x, y2: end.y,
+                   radius: parseInt(document.getElementById('inp-radius').value) || 10 };
+        case 'circle': {
+          const dx = end.x - start.x, dy = end.y - start.y;
+          return { ...base, type: 'circle', cx: start.x, cy: start.y,
+                   radius: Math.round(Math.sqrt(dx * dx + dy * dy)) };
+        }
+        case 'ellipse': {
+          const cx = Math.round((start.x + end.x) / 2);
+          const cy = Math.round((start.y + end.y) / 2);
+          return { ...base, type: 'ellipse', cx, cy,
+                   rx: Math.round(Math.abs(end.x - start.x) / 2),
+                   ry: Math.round(Math.abs(end.y - start.y) / 2) };
+        }
+        case 'arc': {
+          const dx = end.x - start.x, dy = end.y - start.y;
+          return { ...base, type: 'arc', cx: start.x, cy: start.y,
+                   radius: Math.round(Math.sqrt(dx * dx + dy * dy)),
+                   startAngle: parseInt(document.getElementById('inp-arc-s').value) || 0,
+                   endAngle:   parseInt(document.getElementById('inp-arc-e').value) || 90,
+                   resolution: parseInt(document.getElementById('inp-arc-res').value) || 10 };
+        }
+        default: return null;
+      }
+    }
+
+    function commit(shape) {
+      shape.id = ++shapeIdCounter;
+      shapes.push(shape);
+      selectedId = shape.id;
+      render();
+      refreshShapeList();
+      updateCode();
+    }
+
+    // ================================================================
+    // Shape list
+    // ================================================================
+    function shapeLabel(s) {
+      switch (s.type) {
+        case 'rect':    return `rect (${s.x1},${s.y1})→(${s.x2},${s.y2})`;
+        case 'rrect':   return `rRect r=${s.radius}`;
+        case 'circle':  return `circle (${s.cx},${s.cy}) r=${s.radius}`;
+        case 'ellipse': return `ellipse (${s.cx},${s.cy})`;
+        case 'line':    return `line (${s.x1},${s.y1})→(${s.x2},${s.y2})`;
+        case 'arc':     return `arc ${s.startAngle}°→${s.endAngle}°`;
+        case 'pixel':   return `pixel (${s.x},${s.y})`;
+        case 'text':    return `"${s.text}"`;
+        default:        return s.type;
+      }
+    }
+
+    function refreshShapeList() {
+      const list  = document.getElementById('shape-list');
+      const empty = document.getElementById('shape-empty');
+      document.getElementById('shape-count').textContent = shapes.length;
+
+      list.innerHTML = '';
+      if (shapes.length === 0) {
+        list.appendChild(empty || makeEmptyMsg());
+        return;
+      }
+
+      shapes.forEach(shape => {
+        const item = document.createElement('div');
+        item.className = 'shape-item' + (shape.id === selectedId ? ' selected' : '');
+        item.dataset.id = shape.id;
+        item.innerHTML = `
+          <div class="shape-dot" style="background:${shape.fgColor}"></div>
+          <span class="shape-item-name">${shapeLabel(shape)}</span>
+          <button class="shape-del" title="Delete">✕</button>
+        `;
+        item.querySelector('.shape-del').addEventListener('click', e => {
+          e.stopPropagation();
+          shapes = shapes.filter(s => s.id !== shape.id);
+          if (selectedId === shape.id) selectedId = null;
+          render(); refreshShapeList(); updateCode();
+        });
+        item.addEventListener('click', () => {
+          selectedId = shape.id;
+          document.querySelectorAll('.shape-item').forEach(el => el.classList.remove('selected'));
+          item.classList.add('selected');
+          render();
+        });
+        list.appendChild(item);
+      });
+    }
+
+    function makeEmptyMsg() {
+      const d = document.createElement('div');
+      d.id = 'shape-empty';
+      d.style.cssText = 'padding:8px 0;text-align:center;font-size:11px;color:var(--vscode-text-secondary)';
+      d.textContent = 'Draw on the canvas to add shapes.';
+      return d;
+    }
+
+    // ================================================================
+    // Code generation
+    // ================================================================
+    function updateCode() {
+      document.getElementById('code-output').textContent = generateCode();
+    }
+
+    function generateCode() {
+      const bg = hexToRgb(bgColor);
+      const lines = [
+        '#include <EB3Display.h>',
+        '',
+        '// Arduino Mega 2560 — change Serial3 → Serial2 for ESP32S3',
+        'EB3Display display(Serial3, 115200);',
+        '',
+        'void setup() {',
+        '  display.begin();',
+        `  display.setBackgroundColor(${bg.r}, ${bg.g}, ${bg.b});`,
+        '  display.clearDisplay();',
+        '',
+      ];
+
+      let lastFg = null;
+      shapes.forEach(shape => {
+        const fg = shape.fgColor || '#ffffff';
+        if (fg !== lastFg) {
+          const { r, g, b } = hexToRgb(fg);
+          lines.push(`  display.setForegroundColor(${r}, ${g}, ${b});`);
+          lastFg = fg;
+        }
+
+        switch (shape.type) {
+          case 'pixel':
+            lines.push(`  display.drawPixel(${shape.x}, ${shape.y});`);
+            break;
+
+          case 'line':
+            lines.push(`  display.drawLine(${shape.x1}, ${shape.y1}, ${shape.x2}, ${shape.y2});`);
+            break;
+
+          case 'rect': {
+            const x1 = Math.min(shape.x1, shape.x2), y1 = Math.min(shape.y1, shape.y2);
+            const x2 = Math.max(shape.x1, shape.x2), y2 = Math.max(shape.y1, shape.y2);
+            lines.push(`  display.drawRectangle(${x1}, ${y1}, ${x2}, ${y2}, ${!shape.solid}, ${shape.solid});`);
+            break;
+          }
+
+          case 'rrect': {
+            const x1 = Math.min(shape.x1, shape.x2), y1 = Math.min(shape.y1, shape.y2);
+            const x2 = Math.max(shape.x1, shape.x2), y2 = Math.max(shape.y1, shape.y2);
+            lines.push(`  display.drawRoundedRectangle(${x1}, ${y1}, ${x2}, ${y2}, ${shape.radius}, ${!shape.solid}, ${shape.solid});`);
+            break;
+          }
+
+          case 'circle':
+            lines.push(`  display.drawCircle(${shape.cx}, ${shape.cy}, ${shape.radius}, ${!shape.solid}, ${shape.solid});`);
+            break;
+
+          case 'ellipse':
+            lines.push(`  display.drawEllipse(${shape.cx}, ${shape.cy}, ${shape.rx}, ${shape.ry}, ${!shape.solid}, ${shape.solid});`);
+            break;
+
+          case 'arc':
+            lines.push(`  display.drawArc(${shape.cx}, ${shape.cy}, ${shape.radius}, ${shape.startAngle}, ${shape.endAngle}, ${shape.resolution || 10}, true, false);`);
+            break;
+
+          case 'text': {
+            const esc = (shape.text || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            if (shape.scaleX !== 1 || shape.scaleY !== 1) {
+              lines.push(`  display.setFontScaler(${shape.scaleX}, ${shape.scaleY});`);
+            }
+            lines.push(`  display.printText("${esc}", ${shape.x}, ${shape.y}, ${shape.font}, true);`);
+            if (shape.scaleX !== 1 || shape.scaleY !== 1) {
+              lines.push(`  display.setFontScaler(1, 1);`);
+            }
+            break;
+          }
+        }
+      });
+
+      lines.push('}', '', 'void loop() {', '  // Your code here', '}');
+      return lines.join('\n');
+    }
+
+    // ================================================================
+    // Undo / Clear
+    // ================================================================
+    document.getElementById('undo-btn').addEventListener('click', undo);
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      if (shapes.length === 0) return;
+      if (confirm('Clear all shapes?')) {
+        shapes = []; selectedId = null;
+        render(); refreshShapeList(); updateCode();
+      }
+    });
+
+    function undo() {
+      if (shapes.length === 0) return;
+      const removed = shapes.pop();
+      if (selectedId === removed.id) selectedId = null;
+      render(); refreshShapeList(); updateCode();
+    }
+
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+
+      // Keyboard shortcuts for tools
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+      const map = { r: 'rect', u: 'rrect', c: 'circle', e: 'ellipse', l: 'line', a: 'arc', t: 'text', p: 'pixel' };
+      if (map[e.key.toLowerCase()]) {
+        const btn = document.querySelector(`[data-tool="${map[e.key.toLowerCase()]}"]`);
+        if (btn) btn.click();
+      }
+    });
+
+    // ================================================================
+    // Copy / Open in editor
+    // ================================================================
+    document.getElementById('btn-copy').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-copy');
+      try {
+        await navigator.clipboard.writeText(generateCode());
+        btn.textContent = 'Copied!';
+      } catch {
+        const pre = document.getElementById('code-output');
+        const sel = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        sel.removeAllRanges(); sel.addRange(range);
+        btn.textContent = 'Selected!';
+      }
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+
+    document.getElementById('btn-open').addEventListener('click', () => {
+      localStorage.setItem('eb3_generated_code', generateCode());
+      window.location.href = 'index.html';
+    });
+
+    // ================================================================
+    // Init
+    // ================================================================
+    initColors();
+    initTools();
+    updatePropsPanel();
+    render();
+    updateCode();
+  </script>
+</body>
+</html>
