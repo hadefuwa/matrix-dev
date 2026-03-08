@@ -420,9 +420,7 @@ const CSV_SCHEMAS = {
 function buildCsvForKey(key, data) {
   const schema = CSV_SCHEMAS[key];
   const rows = [schema.headers, ...data.map(schema.toRow)];
-  return rows.map((row) => row.map(csvEscape).join(",")).join("
-") + "
-";
+  return rows.map((row) => row.map(csvEscape).join(",")).join("\n") + "\n";
 }
 
 function parseCsvForKey(key, records) {
@@ -451,9 +449,7 @@ function parseJsonList(value) {
 
 function csvEscape(value) {
   const str = value === null || value === undefined ? "" : String(value);
-  if (/["
-
-,]/.test(str)) {
+  if (/["\n\r,]/.test(str)) {
     return '"' + str.replace(/"/g, '""') + '"';
   }
   return str;
