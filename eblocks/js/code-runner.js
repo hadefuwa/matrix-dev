@@ -33,16 +33,6 @@ export class CodeRunner {
       let loopIterations = 0;
 
       try {
-        // EB3Display code targets the physical board — JSCPP can't simulate it
-        if (code.includes('#include <EB3Display.h>') || code.includes('EB3Display')) {
-          onOutput('ℹ️  EB3Display code runs on the physical EB3 board.\n');
-          onOutput('    Connect your board via USB and use the Upload button to program it.\n');
-          onOutput('    The display commands will execute on the board once uploaded.\n');
-          this.isRunning = false;
-          resolve({ success: true });
-          return;
-        }
-
         // Ensure JSCPP is available (load dynamically if needed)
         if (typeof JSCPP === 'undefined') {
           await this.loadJSCPP();

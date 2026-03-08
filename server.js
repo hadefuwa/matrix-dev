@@ -1,6 +1,8 @@
 const http = require("http");
 const fs = require("fs/promises");
 const path = require("path");
+const os = require("os");
+const { execFile } = require("child_process");
 
 const PORT = Number(process.env.PORT || 3000);
 const ROOT_DIR = __dirname;
@@ -59,6 +61,11 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === "/api/eblocks/chat") {
       if (req.method === "POST") return handleEblocksChat(req, res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+
+    if (pathname === "/api/eblocks/upload") {
+      if (req.method === "POST") return handleArduinoUpload(req, res);
       return sendJson(res, 405, { error: "Method not allowed" });
     }
 
@@ -284,6 +291,128 @@ async function handleEblocksChat(req, res) {
     console.error("Gemini chat error:", error);
     return sendJson(res, 500, { error: "AI assistant request failed" });
   }
+}
+
+async function handleArduinoUpload(req, res) {
+  let body;
+  try {
+    body = await readJsonBody(req, { maxBytes: 256 * 1024 });
+  } catch (e) {
+    return sendJson(res, 400, { error: e.message || "Invalid body" });
+  }
+
+  const code = typeof body.code === "string" ? body.code : "";
+  const fqbn = typeof body.fqbn === "string" ? body.fqbn.trim() : "";
+  const port = typeof body.port === "string" ? body.port.trim() : "";
+
+  if (!code) return sendJson(res, 400, { error: "code is required" });
+  if (!fqbn) return sendJson(res, 400, { error: "fqbn is required" });
+
+  const sketchName = `eb3sketch_${Date.now()}`;
+  const sketchDir = path.join(os.tmpdir(), sketchName);
+  const sketchFile = path.join(sketchDir, `${sketchName}.ino`);
+
+  try {
+    await fs.mkdir(sketchDir, { recursive: true });
+    await fs.writeFile(sketchFile, code, "utf8");
+
+    const outputLines = [];
+
+    // Compile
+    outputLines.push("[Compile] Compiling sketch...\n");
+    const compileResult = await runArduinoCli(["compile", "--fqbn", fqbn, sketchDir]);
+    outputLines.push(compileResult.output);
+
+    if (compileResult.exitCode !== 0) {
+      return sendJson(res, 200, {
+        ok: false,
+        output: outputLines.join(""),
+        error: "Compilation failed"
+      });
+    }
+
+    outputLines.push("[Upload] Uploading to board...\n");
+
+    // Auto-detect port if not provided
+    let uploadPort = port;
+    if (!uploadPort) {
+      const listResult = await runArduinoCli(["board", "list", "--format", "json"]);
+      try {
+        const boards = JSON.parse(listResult.stdout);
+        const ports = Array.isArray(boards.detected_ports) ? boards.detected_ports
+          : Array.isArray(boards) ? boards : [];
+        const match = ports.find((b) => b.matching_boards && b.matching_boards.length > 0)
+          || ports[0];
+        if (match && match.port && match.port.address) {
+          uploadPort = match.port.address;
+          outputLines.push(`[Upload] Detected port: ${uploadPort}\n`);
+        }
+      } catch (_) {}
+    }
+
+    if (!uploadPort) {
+      return sendJson(res, 200, {
+        ok: false,
+        output: outputLines.join(""),
+        error: "No board port found. Connect the board and try again."
+      });
+    }
+
+    const uploadResult = await runArduinoCli(["upload", "-p", uploadPort, "--fqbn", fqbn, sketchDir]);
+    outputLines.push(uploadResult.output);
+
+    const ok = uploadResult.exitCode === 0;
+    return sendJson(res, 200, {
+      ok,
+      output: outputLines.join(""),
+      error: ok ? null : "Upload failed"
+    });
+
+  } catch (e) {
+    return sendJson(res, 500, { error: e.message || "Upload error" });
+  } finally {
+    fs.rm(sketchDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+function runArduinoCli(args, timeoutMs = 120000) {
+  return new Promise((resolve) => {
+    let proc;
+    try {
+      proc = execFile("arduino-cli", args);
+    } catch (e) {
+      resolve({ exitCode: 1, output: e.message, stdout: "" });
+      return;
+    }
+
+    const lines = [];
+    let stdout = "";
+
+    proc.stdout.on("data", (d) => {
+      const s = d.toString();
+      lines.push(s);
+      stdout += s;
+    });
+    proc.stderr.on("data", (d) => lines.push(d.toString()));
+
+    const timer = setTimeout(() => {
+      proc.kill();
+      resolve({ exitCode: 1, output: lines.join("") + "\n[Timed out after 120s]", stdout });
+    }, timeoutMs);
+
+    proc.on("close", (code) => {
+      clearTimeout(timer);
+      resolve({ exitCode: code ?? 1, output: lines.join(""), stdout });
+    });
+
+    proc.on("error", (e) => {
+      clearTimeout(timer);
+      const msg = e.code === "ENOENT"
+        ? "arduino-cli not found. Please install it and ensure it is in your PATH."
+        : e.message;
+      resolve({ exitCode: 1, output: msg, stdout: "" });
+    });
+  });
 }
 
 function isAuthorized(req) {

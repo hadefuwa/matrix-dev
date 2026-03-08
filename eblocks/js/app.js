@@ -367,6 +367,12 @@ void loop() {
 
   async handleRunCode() {
     const code = this.editor.getValue();
+
+    // EB3Display code must be compiled and uploaded via arduino-cli — JSCPP can't run it
+    if (code.includes('#include <EB3Display.h>') || code.includes('EB3Display')) {
+      return this.handleArduinoUpload(code);
+    }
+
     const runBtn = document.getElementById('run-btn') || document.getElementById('upload-btn');
     const statusBar = document.getElementById('editor-status') || document.getElementById('upload-status');
 
@@ -395,6 +401,55 @@ void loop() {
       this.logToConsole(`❌ Execution error: ${error.message}`, 'error');
       if (statusBar) statusBar.textContent = 'Error - See console';
       console.error('Code execution error:', error);
+    } finally {
+      if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = '▶️ Run Code'; }
+    }
+  }
+
+  async handleArduinoUpload(code) {
+    const runBtn = document.getElementById('run-btn') || document.getElementById('upload-btn');
+    const statusBar = document.getElementById('editor-status') || document.getElementById('upload-status');
+
+    const boardSelect = document.getElementById('editor-board-select');
+    const fqbn = boardSelect ? boardSelect.value : 'arduino:avr:mega';
+
+    try {
+      if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = '⏳ Uploading...'; }
+      if (statusBar) { statusBar.style.display = ''; statusBar.textContent = 'Uploading to board...'; }
+
+      this.clearConsole();
+      this.logToConsole('🔄 Compiling and uploading to board...', 'success');
+
+      // Disconnect serial so arduino-cli can access the port
+      if (this.serialManager && this.serialManager.isConnected) {
+        this.logToConsole('🔌 Releasing serial port for upload...', 'info');
+        await this.serialManager.disconnect();
+      }
+
+      const response = await fetch('/api/eblocks/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, fqbn })
+      });
+
+      const result = await response.json();
+
+      if (result.output) {
+        this.logToConsole(result.output);
+      }
+
+      if (result.ok) {
+        this.logToConsole('✅ Upload complete! Code is running on the board.', 'success');
+        if (statusBar) statusBar.textContent = 'Upload complete';
+      } else {
+        const errMsg = result.error || 'Upload failed';
+        this.logToConsole(`❌ ${errMsg}`, 'error');
+        if (statusBar) statusBar.textContent = 'Upload failed';
+      }
+
+    } catch (error) {
+      this.logToConsole(`❌ Upload error: ${error.message}`, 'error');
+      if (statusBar) statusBar.textContent = 'Upload error';
     } finally {
       if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = '▶️ Run Code'; }
     }
