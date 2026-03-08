@@ -549,53 +549,111 @@ void loop() {
     const worksheetCode = document.getElementById('worksheet-viewer-code');
     const worksheetContent = document.getElementById('worksheet-content');
     const closeBtn = document.getElementById('worksheet-close-btn');
+    const curriculumHeader = curriculumListEl ? curriculumListEl.querySelector('.curriculum-header h3') : null;
 
     if (!curriculumContent) return;
 
-    const list = [
-      { code: 'CP4807', title: 'Curriculum Overview', file: 'assets/curriculum1.txt' },
+    const modules = [
+      { code: 'CP4807', title: 'Introduction to Microcontrollers', file: 'assets/curriculum1.txt' },
       { code: 'CP0507', title: 'Motors and Microcontrollers', file: 'assets/CP0507 - Motors and microconrtollers.txt' },
       { code: 'CP1972', title: 'Sensors and Microcontrollers', file: 'assets/CP1972 - Sensors and microcontrollers.txt' },
       { code: 'CP4436', title: 'PC and Web Interfacing', file: 'assets/CP4436 - PC and web interfacing.txt' }
     ];
 
-    const showList = () => {
+    let currentModule = null;
+
+    const showModuleList = () => {
       if (worksheetViewer) worksheetViewer.style.display = 'none';
       if (curriculumListEl) curriculumListEl.style.display = 'flex';
+      if (curriculumHeader) curriculumHeader.textContent = 'E-Blocks Curriculum';
+      currentModule = null;
+      curriculumContent.innerHTML = '';
+      modules.forEach(mod => {
+        const div = document.createElement('div');
+        div.className = 'curriculum-item';
+        div.innerHTML = `
+          <div class="curriculum-item-icon">📚</div>
+          <div class="curriculum-item-info">
+            <div class="curriculum-item-code">${mod.code}</div>
+            <div class="curriculum-item-title">${mod.title}</div>
+          </div>
+        `;
+        div.addEventListener('click', () => showWorksheetList(mod));
+        curriculumContent.appendChild(div);
+      });
     };
 
-    const showWorksheet = async (item) => {
-      if (curriculumListEl) curriculumListEl.style.display = 'none';
-      if (worksheetViewer) worksheetViewer.style.display = 'flex';
-      if (worksheetTitle) worksheetTitle.textContent = item.title;
-      if (worksheetCode) worksheetCode.textContent = item.code;
-      if (worksheetContent) worksheetContent.innerHTML = '<p class="worksheet-description">Loading...</p>';
+    const showWorksheetList = async (mod) => {
+      currentModule = mod;
+      if (worksheetViewer) worksheetViewer.style.display = 'none';
+      if (curriculumListEl) curriculumListEl.style.display = 'flex';
+      if (curriculumHeader) curriculumHeader.textContent = mod.title;
+      curriculumContent.innerHTML = '<div class="curriculum-loading">Loading...</div>';
       try {
-        const res = await fetch(item.file);
+        const res = await fetch(mod.file);
         const text = await res.text();
-        if (worksheetContent) worksheetContent.innerHTML = this.textToHTML(text);
+        const worksheets = this.parseWorksheets(text);
+        curriculumContent.innerHTML = '';
+        const backDiv = document.createElement('div');
+        backDiv.className = 'curriculum-back-button';
+        backDiv.textContent = '← All Modules';
+        backDiv.addEventListener('click', showModuleList);
+        curriculumContent.appendChild(backDiv);
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'curriculum-selected-header';
+        headerDiv.innerHTML = `<div class="curriculum-selected-code">${mod.code}</div><div class="curriculum-selected-title">${mod.title}</div>`;
+        curriculumContent.appendChild(headerDiv);
+        worksheets.forEach(ws => {
+          const div = document.createElement('div');
+          div.className = 'curriculum-lesson';
+          div.innerHTML = `
+            <span class="curriculum-lesson-number">${ws.num}</span>
+            <span class="curriculum-lesson-title">${ws.subtitle || 'Worksheet ' + ws.num}</span>
+          `;
+          div.addEventListener('click', () => showSingleWorksheet(ws, mod));
+          curriculumContent.appendChild(div);
+        });
       } catch (e) {
-        if (worksheetContent) worksheetContent.innerHTML = '<p class="worksheet-description">Failed to load worksheet.</p>';
+        curriculumContent.innerHTML = '<div class="curriculum-loading">Failed to load module.</div>';
       }
     };
 
-    curriculumContent.innerHTML = '';
-    list.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'curriculum-item';
-      div.innerHTML = `
-        <div class="curriculum-item-icon">📚</div>
-        <div class="curriculum-item-info">
-          <div class="curriculum-item-code">${item.code}</div>
-          <div class="curriculum-item-title">${item.title}</div>
-        </div>
-      `;
-      div.addEventListener('click', () => showWorksheet(item));
-      curriculumContent.appendChild(div);
+    const showSingleWorksheet = (ws, mod) => {
+      if (curriculumListEl) curriculumListEl.style.display = 'none';
+      if (worksheetViewer) worksheetViewer.style.display = 'flex';
+      if (worksheetTitle) worksheetTitle.textContent = ws.subtitle || 'Worksheet ' + ws.num;
+      if (worksheetCode) worksheetCode.textContent = mod.code + '-' + ws.num;
+      if (worksheetContent) worksheetContent.innerHTML = this.textToHTML(ws.lines.join('\n'));
+      if (worksheetContent) worksheetContent.scrollTop = 0;
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', () => {
+      if (currentModule) showWorksheetList(currentModule);
+      else showModuleList();
     });
 
-    if (closeBtn) closeBtn.addEventListener('click', showList);
-    showList();
+    showModuleList();
+  }
+
+  parseWorksheets(text) {
+    const lines = text.split('\n');
+    const worksheets = [];
+    let current = null;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (/^Worksheet \d+$/.test(trimmed)) {
+        if (current) worksheets.push(current);
+        const num = parseInt(trimmed.split(' ')[1]);
+        current = { num, subtitle: '', lines: [line] };
+      } else if (current) {
+        if (!current.subtitle && trimmed && !/^CP\d+/.test(trimmed) && !/^https/.test(trimmed) && trimmed.length < 80) {
+          current.subtitle = trimmed;
+        }
+        current.lines.push(line);
+      }
+    }
+    if (current) worksheets.push(current);
+    return worksheets;
   }
 
   escapeHtml(str) {
