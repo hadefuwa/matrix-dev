@@ -210,6 +210,10 @@ async function handleEblocksChat(req, res) {
       return sendJson(res, 504, { error: "AI assistant timed out. Please try again." });
     }
     if (error && error.code === "GEMINI_UPSTREAM") {
+      console.error("Gemini upstream error:", {
+        status: error.status || null,
+        details: error.details || null
+      });
       return sendJson(res, 502, { error: "AI assistant is temporarily unavailable. Please try again." });
     }
     console.error("Gemini chat error:", error);
@@ -422,7 +426,7 @@ function buildGeminiChatRequest(payload) {
   return {
     warnings,
     requestBody: {
-      system_instruction: {
+      systemInstruction: {
         parts: [
           {
             text:
