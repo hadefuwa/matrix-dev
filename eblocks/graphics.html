@@ -360,6 +360,15 @@
 
       <!-- ── Tool Palette ── -->
       <div class="tool-palette">
+        <button class="tool-btn" data-tool="select" title="Select / Move (V)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4 2 L4 16 L8 12 L11 18 L13 17 L10 11 L16 11 Z"/>
+          </svg>
+          <span>Select</span>
+        </button>
+
+        <div class="tool-sep"></div>
+
         <button class="tool-btn active" data-tool="rect" title="Rectangle (R)">
           <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
             <rect x="2" y="4" width="16" height="12"/>
@@ -521,8 +530,10 @@
             </div>
           </div>
 
-          <div id="prop-none" style="display:none; font-size:11px; color:var(--vscode-text-secondary);">
-            No extra options for this tool.
+          <div id="prop-none" style="display:none; font-size:11px; color:var(--vscode-text-secondary); line-height:1.6;">
+            Click a shape to select it.<br>
+            Drag to move it.<br>
+            Delete / Backspace to remove it.
           </div>
         </div>
 
@@ -675,7 +686,7 @@
           document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           currentTool = btn.dataset.tool;
-          canvas.style.cursor = 'crosshair';
+          canvas.style.cursor = currentTool === 'select' ? 'default' : 'crosshair';
           updatePropsPanel();
         });
       });
@@ -693,23 +704,17 @@
     }
 
     function updatePropsPanel() {
-      const fillTools    = ['rect', 'rrect', 'circle', 'ellipse', 'arc'];
-      const radiusTools  = ['rrect'];
-      const textTools    = ['text'];
-      const arcTools     = ['arc'];
-      const noneTools    = ['pixel', 'line'];
+      const fillTools   = ['rect', 'rrect', 'circle', 'ellipse', 'arc'];
+      const radiusTools = ['rrect'];
+      const textTools   = ['text'];
+      const arcTools    = ['arc'];
+      const noneTools   = ['pixel', 'line', 'select'];
 
-      const hasFill  = fillTools.includes(currentTool);
-      const hasRadius = radiusTools.includes(currentTool);
-      const hasText  = textTools.includes(currentTool);
-      const hasArc   = arcTools.includes(currentTool);
-      const hasNone  = noneTools.includes(currentTool);
-
-      document.getElementById('prop-fill').style.display      = hasFill  ? '' : 'none';
-      document.getElementById('prop-radius').style.display    = hasRadius ? '' : 'none';
-      document.getElementById('prop-text-group').style.display = hasText  ? '' : 'none';
-      document.getElementById('prop-arc-group').style.display  = hasArc   ? '' : 'none';
-      document.getElementById('prop-none').style.display       = hasNone  ? '' : 'none';
+      document.getElementById('prop-fill').style.display       = fillTools.includes(currentTool)   ? '' : 'none';
+      document.getElementById('prop-radius').style.display     = radiusTools.includes(currentTool) ? '' : 'none';
+      document.getElementById('prop-text-group').style.display = textTools.includes(currentTool)   ? '' : 'none';
+      document.getElementById('prop-arc-group').style.display  = arcTools.includes(currentTool)    ? '' : 'none';
+      document.getElementById('prop-none').style.display       = noneTools.includes(currentTool)   ? '' : 'none';
     }
 
     // ================================================================
@@ -825,6 +830,51 @@
     }
 
     // ================================================================
+    // Hit testing & moving (Select tool)
+    // ================================================================
+    function hitTest(x, y) {
+      // Top-most shape first (reverse order)
+      for (let i = shapes.length - 1; i >= 0; i--) {
+        const s = shapes[i];
+        const bb = getBoundingBox(s);
+        if (!bb) continue;
+        const pad = Math.max(6, Math.min(12, bb.w * 0.1, bb.h * 0.1));
+        if (x >= bb.x - pad && x <= bb.x + bb.w + pad &&
+            y >= bb.y - pad && y <= bb.y + bb.h + pad) {
+          return s;
+        }
+      }
+      return null;
+    }
+
+    function moveShape(shape, dx, dy) {
+      switch (shape.type) {
+        case 'rect':
+        case 'rrect':
+        case 'line':
+          shape.x1 = Math.round(shape.x1 + dx);
+          shape.y1 = Math.round(shape.y1 + dy);
+          shape.x2 = Math.round(shape.x2 + dx);
+          shape.y2 = Math.round(shape.y2 + dy);
+          break;
+        case 'circle':
+        case 'ellipse':
+        case 'arc':
+          shape.cx = Math.round(shape.cx + dx);
+          shape.cy = Math.round(shape.cy + dy);
+          break;
+        case 'pixel':
+          shape.x = Math.round(shape.x + dx);
+          shape.y = Math.round(shape.y + dy);
+          break;
+        case 'text':
+          shape.x = Math.round(shape.x + dx);
+          shape.y = Math.round(shape.y + dy);
+          break;
+      }
+    }
+
+    // ================================================================
     // Mouse events
     // ================================================================
     canvas.addEventListener('mousedown', e => {
@@ -832,6 +882,22 @@
       const pos = canvasCoords(e);
       dragStart = pos;
       dragCurrent = pos;
+
+      if (currentTool === 'select') {
+        const hit = hitTest(pos.x, pos.y);
+        if (hit) {
+          selectedId = hit.id;
+          isDrawing = true; // reused as "is dragging"
+          canvas.style.cursor = 'grabbing';
+        } else {
+          selectedId = null;
+          isDrawing = false;
+        }
+        render();
+        refreshShapeList();
+        return;
+      }
+
       isDrawing = true;
 
       if (currentTool === 'pixel') {
@@ -853,6 +919,19 @@
     canvas.addEventListener('mousemove', e => {
       const pos = canvasCoords(e);
       document.getElementById('canvas-footer').textContent = `x: ${pos.x},  y: ${pos.y}`;
+
+      if (currentTool === 'select') {
+        if (isDrawing && selectedId !== null) {
+          const dx = pos.x - dragStart.x;
+          const dy = pos.y - dragStart.y;
+          const shape = shapes.find(s => s.id === selectedId);
+          if (shape) { moveShape(shape, dx, dy); dragStart = pos; render(); }
+        } else {
+          canvas.style.cursor = hitTest(pos.x, pos.y) ? 'move' : 'default';
+        }
+        return;
+      }
+
       if (!isDrawing || currentTool === 'pixel' || currentTool === 'text') return;
       dragCurrent = pos;
       render(buildPreview(dragStart, dragCurrent));
@@ -860,6 +939,15 @@
 
     canvas.addEventListener('mouseup', e => {
       if (!isDrawing) return;
+
+      if (currentTool === 'select') {
+        isDrawing = false;
+        canvas.style.cursor = hitTest(canvasCoords(e).x, canvasCoords(e).y) ? 'move' : 'default';
+        refreshShapeList();
+        updateCode();
+        return;
+      }
+
       isDrawing = false;
       const pos = canvasCoords(e);
       dragCurrent = pos;
@@ -870,7 +958,11 @@
 
     canvas.addEventListener('mouseleave', () => {
       document.getElementById('canvas-footer').textContent = '';
-      if (isDrawing) { isDrawing = false; render(); }
+      if (isDrawing) {
+        isDrawing = false;
+        if (currentTool === 'select') { refreshShapeList(); updateCode(); }
+        else render();
+      }
     });
 
     function buildPreview(start, end) {
@@ -1081,11 +1173,21 @@
     }
 
     document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); return; }
+
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+
+      // Delete selected shape
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId !== null) {
+        e.preventDefault();
+        shapes = shapes.filter(s => s.id !== selectedId);
+        selectedId = null;
+        render(); refreshShapeList(); updateCode();
+        return;
+      }
 
       // Keyboard shortcuts for tools
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
-      const map = { r: 'rect', u: 'rrect', c: 'circle', e: 'ellipse', l: 'line', a: 'arc', t: 'text', p: 'pixel' };
+      const map = { v: 'select', r: 'rect', u: 'rrect', c: 'circle', e: 'ellipse', l: 'line', a: 'arc', t: 'text', p: 'pixel' };
       if (map[e.key.toLowerCase()]) {
         const btn = document.querySelector(`[data-tool="${map[e.key.toLowerCase()]}"]`);
         if (btn) btn.click();
