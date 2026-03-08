@@ -561,21 +561,21 @@ void loop() {
 
     const showList = () => {
       if (worksheetViewer) worksheetViewer.style.display = 'none';
-      if (curriculumListEl) curriculumListEl.style.display = 'block';
+      if (curriculumListEl) curriculumListEl.style.display = 'flex';
     };
 
     const showWorksheet = async (item) => {
       if (curriculumListEl) curriculumListEl.style.display = 'none';
-      if (worksheetViewer) worksheetViewer.style.display = 'block';
+      if (worksheetViewer) worksheetViewer.style.display = 'flex';
       if (worksheetTitle) worksheetTitle.textContent = item.title;
       if (worksheetCode) worksheetCode.textContent = item.code;
-      if (worksheetContent) worksheetContent.textContent = 'Loading...';
+      if (worksheetContent) worksheetContent.innerHTML = '<p class="worksheet-description">Loading...</p>';
       try {
         const res = await fetch(item.file);
         const text = await res.text();
-        if (worksheetContent) worksheetContent.textContent = text;
+        if (worksheetContent) worksheetContent.innerHTML = this.textToHTML(text);
       } catch (e) {
-        if (worksheetContent) worksheetContent.textContent = 'Failed to load worksheet.';
+        if (worksheetContent) worksheetContent.innerHTML = '<p class="worksheet-description">Failed to load worksheet.</p>';
       }
     };
 
@@ -596,6 +596,86 @@ void loop() {
 
     if (closeBtn) closeBtn.addEventListener('click', showList);
     showList();
+  }
+
+  escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  textToHTML(text) {
+    const lines = text.split('\n');
+    let html = '';
+    let inUl = false;
+    let inOl = false;
+
+    const closeList = () => {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (inOl) { html += '</ol>'; inOl = false; }
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      if (!line) {
+        closeList();
+        continue;
+      }
+
+      // YouTube URL → video button
+      if (/^https?:\/\/(www\.)?(youtu\.be|youtube\.com)/.test(line)) {
+        closeList();
+        const url = line.trim();
+        html += `<div class="worksheet-video"><a class="worksheet-video-link" href="${url}" target="_blank" rel="noopener"><span>▶</span> Watch Video</a></div>`;
+        continue;
+      }
+
+      // Skip CP code lines (e.g. "CP4807-1Introduction to microcontrollers")
+      if (/^CP\d+/.test(line)) continue;
+
+      // Worksheet section header (e.g. "Worksheet 4")
+      if (/^Worksheet \d+$/.test(line)) {
+        closeList();
+        const num = line.split(' ')[1];
+        const nextLine = (i + 1 < lines.length) ? lines[i + 1].trim() : '';
+        if (nextLine && !/^CP\d+/.test(nextLine) && !/^https/.test(nextLine) && nextLine.length < 80) {
+          html += `<div class="worksheet-section"><h3>Worksheet ${this.escapeHtml(num)} — ${this.escapeHtml(nextLine)}</h3></div>`;
+          i++;
+        } else {
+          html += `<div class="worksheet-section"><h3>${this.escapeHtml(line)}</h3></div>`;
+        }
+        continue;
+      }
+
+      // Named section headers
+      if (/^(Over to you|Challenges|Hints|Part \d+|Preparation|Teacher.s notes?|Contents|Bronze|Silver|Gold|Hardware|Pedagogy|Assessment|Software|Time|Example programs|Version control)[:.]?\s*$/i.test(line)) {
+        closeList();
+        html += `<h3 class="worksheet-section-title">${this.escapeHtml(line)}</h3>`;
+        continue;
+      }
+
+      // Bullet item (* or o )
+      if (/^\*\s/.test(line) || /^o\s/.test(line)) {
+        if (inOl) { html += '</ol>'; inOl = false; }
+        if (!inUl) { html += '<ul class="worksheet-list">'; inUl = true; }
+        html += `<li>${this.escapeHtml(line.replace(/^[*o]\s+/, ''))}</li>`;
+        continue;
+      }
+
+      // Numbered list item
+      if (/^\d+\.\s/.test(line)) {
+        if (inUl) { html += '</ul>'; inUl = false; }
+        if (!inOl) { html += '<ol class="worksheet-list">'; inOl = true; }
+        html += `<li>${this.escapeHtml(line.replace(/^\d+\.\s*/, ''))}</li>`;
+        continue;
+      }
+
+      // Regular paragraph
+      closeList();
+      html += `<p class="worksheet-description">${this.escapeHtml(line)}</p>`;
+    }
+
+    closeList();
+    return html;
   }
 
   logDebugInfo() {
