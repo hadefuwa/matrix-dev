@@ -30,10 +30,15 @@ export class EB3DisplayRunner {
       return { success: false };
     }
 
-    onOutput(`🎨 Sending ${packets.length} command(s) to display...\n`);
+    // Always prepend the display init sequence so it's in a known state,
+    // unless the code already starts with a begin() call (which handles it)
+    const hasBegin = /display\.begin\s*\(\s*\)/.test(code);
+    const allPackets = hasBegin ? packets : [...this._initPackets(), ...packets];
+
+    onOutput(`🎨 Sending ${allPackets.length} command(s) to display...\n`);
 
     try {
-      for (const packet of packets) {
+      for (const packet of allPackets) {
         await serial.sendBytes(packet);
         // Give the display time to process each command
         await _delay(20);
@@ -44,6 +49,20 @@ export class EB3DisplayRunner {
       onOutput(`❌ Serial error: ${err.message}\n`);
       return { success: false };
     }
+  }
+
+  /**
+   * Full init sequence matching EB3Display::begin():
+   * setBackgroundColor(0,0,0) + setForegroundColor(255,255,255) +
+   * setDisplayOrientation(1) + clearDisplay()
+   */
+  _initPackets() {
+    return [
+      this._packet([0x43, 0, 0, 0]),           // 'C' bg black
+      this._packet([0x42, 255, 255, 255]),      // 'B' fg white
+      this._packet([0x4B, 1]),                  // 'K' orientation 90°CW
+      this._packet([0x44]),                     // 'D' clear
+    ];
   }
 
   // ---------------------------------------------------------------------------
@@ -131,10 +150,10 @@ export class EB3DisplayRunner {
   _buildPacket(method, a) {
     switch (method) {
 
-      // begin() — the web IDE sends commands directly, so we skip the full
-      // begin() sequence. Just send clearDisplay so the screen starts fresh.
+      // begin() — send the full init sequence (bg black, fg white, orientation, clear)
+      // We return null here because run() injects _initPackets() when begin() is detected
       case 'begin':
-        return this._packet([0x44]); // 'D' clear
+        return null;
 
       case 'clearDisplay':
         return this._packet([0x44]); // 'D'
