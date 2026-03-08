@@ -72,6 +72,9 @@ void loop() {
     // AI assistant
     this.initChat();
 
+    // Mobile bottom nav
+    this.initMobileNav();
+
     // Populate COM port list from previously-authorized ports
     await this.refreshPortList();
 
@@ -949,6 +952,38 @@ void loop() {
 
     closeList();
     return html;
+  }
+
+  initMobileNav() {
+    const nav = document.getElementById('mobile-nav');
+    if (!nav) return;
+
+    const panels = {
+      left:  document.getElementById('leftSidebar'),
+      main:  document.querySelector('.app-main'),
+      right: document.getElementById('rightSidebar'),
+    };
+
+    const setActive = (key) => {
+      Object.values(panels).forEach(p => p?.classList.remove('mobile-active'));
+      panels[key]?.classList.add('mobile-active');
+      nav.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.classList.toggle('mobile-nav-active', btn.dataset.panel === key);
+      });
+    };
+
+    nav.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => setActive(btn.dataset.panel));
+    });
+
+    // Activate the Code panel by default on mobile
+    const isMobile = () => window.innerWidth <= 768;
+    if (isMobile()) setActive('main');
+
+    // Re-apply on resize
+    window.addEventListener('resize', () => {
+      if (isMobile() && !document.querySelector('.mobile-active')) setActive('main');
+    });
   }
 
   logDebugInfo() {

@@ -2097,26 +2097,192 @@ body {
   margin-top: 8px;
 }
 
-/* Mobile responsive: stack everything vertically */
-@media (max-width: 900px) {
-  .app-titlebar { flex-wrap: wrap; height: auto; padding: 12px; gap: 8px; }
-  .titlebar-menu { flex-wrap: wrap; width: 100%; }
-  .menu-btn { flex: 1 1 auto; }
-
-  .app-header { flex-direction: column; align-items: flex-start; gap: 12px; height: auto; padding: 12px; }
-  .header-controls { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
-
-  .app-container { display: flex; flex-direction: column; gap: 12px; }
-  .sidebar-resizer { display: none !important; }
-  .sidebar, #leftSidebar, #rightSidebar { width: 100% !important; max-width: 100% !important; }
-  .app-main { width: 100%; }
-  .code-editor, .serial-monitor, .curriculum-page { width: 100%; }
-  .curriculum-page { padding: 12px; }
-  .assistant-panel, .worksheet-viewer, .curriculum-list { padding: 12px; }
-  .chat-options { flex-direction: column; gap: 8px; }
-  .chat-messages { max-height: 240px; }
+/* ─── Mobile Navigation Bar (hidden on desktop) ─── */
+.mobile-nav {
+  display: none;
 }
 
-@media (max-width: 600px) {
-  .logo-img { height: 32px; }
+/* ─── Mobile Layout ─── */
+@media (max-width: 768px) {
+
+  /* Make room for the bottom nav */
+  .app {
+    padding-bottom: 60px;
+  }
+
+  /* Compact titlebar */
+  .app-titlebar {
+    height: 44px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .titlebar-title { font-size: 13px; }
+  .titlebar-menu { gap: 4px; }
+  .menu-btn { padding: 4px 8px; font-size: 11px; }
+
+  /* Driver banner compact */
+  .driver-banner { padding: 8px 12px; }
+  .driver-banner-text { font-size: 12px; }
+
+  /* App container becomes a position context for sliding panels */
+  .app-container {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Hide resizers */
+  .sidebar-resizer { display: none !important; }
+
+  /* Hide desktop sidebar collapse toggles */
+  .sidebar-header { display: none; }
+
+  /* Each panel takes full space and slides off-screen by default */
+  #leftSidebar,
+  .app-main,
+  #rightSidebar {
+    position: absolute !important;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Active panel slides into view */
+  #leftSidebar.mobile-active,
+  .app-main.mobile-active,
+  #rightSidebar.mobile-active {
+    transform: translateX(0);
+  }
+
+  /* Left sidebar — scrollable content */
+  #leftSidebar .sidebar-content {
+    overflow-y: auto;
+    height: auto;
+    position: static;
+  }
+
+  /* Main area stacks editor + monitor vertically */
+  .app-main {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .code-editor {
+    flex-shrink: 0;
+  }
+
+  /* Monaco editor needs an explicit height on mobile */
+  .editor-container {
+    height: 280px !important;
+    min-height: 280px;
+  }
+
+  .serial-monitor {
+    flex-shrink: 0;
+    min-height: 200px;
+  }
+
+  /* Right sidebar — curriculum + chat scroll naturally */
+  #rightSidebar .sidebar-content {
+    position: static;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .curriculum-page {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .curriculum-list,
+  .worksheet-viewer {
+    position: static;
+    height: auto;
+    overflow: visible;
+    flex: none;
+  }
+
+  .worksheet-content {
+    height: auto;
+    overflow: visible;
+    max-height: none;
+  }
+
+  /* Combo board scales down */
+  .combo-board-frame {
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
+
+  /* Chat panel */
+  .chat-messages { max-height: 220px; }
+  .chat-options { flex-direction: column; gap: 6px; }
+
+  /* Bottom nav bar */
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--vscode-titlebar-bg);
+    border-top: 1px solid var(--vscode-border);
+    z-index: 500;
+    align-items: stretch;
+  }
+
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: transparent;
+    border: none;
+    color: var(--vscode-text-secondary);
+    cursor: pointer;
+    padding: 6px 4px;
+    transition: color 0.15s ease, background 0.15s ease;
+    font-size: 11px;
+  }
+
+  .mobile-nav-btn:hover {
+    background: var(--vscode-input-bg);
+    color: var(--vscode-text);
+  }
+
+  .mobile-nav-btn.mobile-nav-active {
+    color: var(--vscode-accent);
+    background: rgba(88, 166, 255, 0.08);
+  }
+
+  .mobile-nav-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .mobile-nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .editor-container { height: 220px !important; }
+  .titlebar-title { display: none; }
+  .menu-btn { padding: 4px 6px; font-size: 10px; }
 }
