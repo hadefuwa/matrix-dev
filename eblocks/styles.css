@@ -2102,8 +2102,14 @@ body {
   display: none;
 }
 
+/* Banner visibility */
+.mobile-only-banner  { display: none; }
+.desktop-only-banner { display: block; }
+
 /* ─── Mobile Layout ─── */
 @media (max-width: 768px) {
+  .mobile-only-banner  { display: block; }
+  .desktop-only-banner { display: none !important; }
 
   /* Make room for the bottom nav */
   .app {

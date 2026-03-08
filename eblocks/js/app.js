@@ -186,6 +186,10 @@ void loop() {
       const banner = document.getElementById('driver-banner');
       if (banner) banner.style.display = 'none';
     });
+    on('mobile-warning-dismiss', 'click', () => {
+      const banner = document.getElementById('mobile-warning-banner');
+      if (banner) banner.style.display = 'none';
+    });
     on('driver-modal-close', 'click', () => {
       const modal = document.getElementById('driver-modal');
       if (modal) modal.style.display = 'none';

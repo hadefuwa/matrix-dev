@@ -57,8 +57,19 @@
       })();
     </script>
 
-    <!-- Driver Installation Banner -->
-    <div id="driver-banner" class="driver-banner">
+    <!-- Mobile Warning Banner (shown only on mobile) -->
+    <div id="mobile-warning-banner" class="driver-banner mobile-only-banner">
+      <div class="driver-banner-content">
+        <div class="driver-banner-icon">📱</div>
+        <div class="driver-banner-text">
+          <strong>Mobile device detected.</strong> Connecting to an E-Blocks board requires a PC with Chrome or Edge.
+        </div>
+        <button id="mobile-warning-dismiss" class="driver-banner-dismiss" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <!-- Driver Installation Banner (hidden on mobile) -->
+    <div id="driver-banner" class="driver-banner desktop-only-banner">
       <div class="driver-banner-content">
         <div class="driver-banner-icon">⚠️</div>
         <div class="driver-banner-text">
