@@ -33,6 +33,16 @@ export class CodeRunner {
       let loopIterations = 0;
 
       try {
+        // EB3Display code targets the physical board — JSCPP can't simulate it
+        if (code.includes('#include <EB3Display.h>') || code.includes('EB3Display')) {
+          onOutput('ℹ️  EB3Display code runs on the physical EB3 board.\n');
+          onOutput('    Connect your board via USB and use the Upload button to program it.\n');
+          onOutput('    The display commands will execute on the board once uploaded.\n');
+          this.isRunning = false;
+          resolve({ success: true });
+          return;
+        }
+
         // Ensure JSCPP is available (load dynamically if needed)
         if (typeof JSCPP === 'undefined') {
           await this.loadJSCPP();
@@ -106,65 +116,12 @@ export class CodeRunner {
   preprocessCode(code) {
     let processedCode = code;
 
-    // Inline EB3Display stub — JSCPP's includes config can't load it via lib.load
-    if (processedCode.includes('#include <EB3Display.h>')) {
-      processedCode = processedCode.replace(
-        /\s*#include\s*<EB3Display\.h>\s*/,
-        '\n' + this.eb3DisplayStub() + '\n'
-      );
-
-      // JSCPP can't handle const char* — replace string literals inside
-      // display method calls with 0 so they match the int stub signatures
-      processedCode = processedCode.replace(
-        /(display\s*\.\s*\w+\s*\()([^)]*)\)/g,
-        (match, open, args) => open + args.replace(/"[^"]*"/g, '0') + ')'
-      );
-    }
-
     // Wrap bare code that has no setup()/loop() in an Arduino structure
     if (!processedCode.includes('void setup()') && !processedCode.includes('void loop()')) {
       processedCode = `#include <Arduino.h>\n\nvoid setup() {\n  ${processedCode}\n}\n\nvoid loop() {}\n`;
     }
 
     return processedCode;
-  }
-
-  /**
-   * Minimal EB3Display stub for JSCPP — avoids const char* (unsupported)
-   */
-  eb3DisplayStub() {
-    return `
-class HardwareSerial {
-  public:
-    void begin(int baud) {}
-};
-HardwareSerial Serial2;
-HardwareSerial Serial3;
-class EB3Display {
-  public:
-    EB3Display(HardwareSerial s, int b) {}
-    void begin() {}
-    void clearDisplay() {}
-    void setDisplayOrientation(int o) {}
-    void setBacklightBrightness(int b) {}
-    void setForegroundColor(int r, int g, int b) {}
-    void setBackgroundColor(int r, int g, int b) {}
-    void drawPixel(int x, int y) {}
-    void drawLine(int x1, int y1, int x2, int y2) {}
-    void drawRectangle(int x1, int y1, int x2, int y2, int t, int s) {}
-    void drawRoundedRectangle(int x1, int y1, int x2, int y2, int r, int t, int s) {}
-    void drawCircle(int x, int y, int r, int t, int s) {}
-    void drawEllipse(int x, int y, int xr, int yr, int t, int s) {}
-    void drawArc(int x, int y, int r, int sa, int ea, int res, int t, int s) {}
-    void printText(int text, int x, int y, int font, int t) {}
-    void printNumber(int n, int x, int y, int font, int t) {}
-    void printFloat(float n, int dp, int x, int y, int font, int t) {}
-    void setFontScaler(int sx, int sy) {}
-    void drawQRCode(int x, int y, int s, int text) {}
-    int touchCheck() { return 0; }
-    int touchReadX() { return 0; }
-    int touchReadY() { return 0; }
-};`;
   }
 
   /**
