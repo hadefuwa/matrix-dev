@@ -587,6 +587,18 @@
     let dragCurrent = { x: 0, y: 0 };
     let selectedId = null;
 
+    // Restore saved state if available
+    try {
+      const saved = localStorage.getItem('eb3_graphics_state');
+      if (saved) {
+        const s = JSON.parse(saved);
+        if (Array.isArray(s.shapes)) shapes = s.shapes;
+        if (typeof s.shapeIdCounter === 'number') shapeIdCounter = s.shapeIdCounter;
+        if (typeof s.fgColor === 'string') fgColor = s.fgColor;
+        if (typeof s.bgColor === 'string') bgColor = s.bgColor;
+      }
+    } catch (_) {}
+
     // ================================================================
     // Canvas setup
     // ================================================================
@@ -1074,6 +1086,12 @@
     // ================================================================
     function updateCode() {
       document.getElementById('code-output').textContent = generateCode();
+      // Persist state so shapes survive navigation
+      try {
+        localStorage.setItem('eb3_graphics_state', JSON.stringify({
+          shapes, shapeIdCounter, fgColor, bgColor
+        }));
+      } catch (_) {}
     }
 
     function generateCode() {
@@ -1222,6 +1240,11 @@
     // Init
     // ================================================================
     initColors();
+    // Sync color pickers with restored state
+    const _fgP = document.getElementById('fg-picker'), _fgH = document.getElementById('fg-hex');
+    const _bgP = document.getElementById('bg-picker'), _bgH = document.getElementById('bg-hex');
+    if (_fgP) { _fgP.value = fgColor; _fgH.value = fgColor; }
+    if (_bgP) { _bgP.value = bgColor; _bgH.value = bgColor; }
     initTools();
     updatePropsPanel();
     render();

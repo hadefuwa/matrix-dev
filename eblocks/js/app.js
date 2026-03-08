@@ -132,6 +132,11 @@ void loop() {
           wordWrap: 'on'
         });
 
+        // Auto-save on every change so content survives navigation
+        this.editor.onDidChangeModelContent(() => {
+          localStorage.setItem('eblocks-code', this.editor.getValue());
+        });
+
         console.log('Monaco Editor initialized');
         resolve();
       });
