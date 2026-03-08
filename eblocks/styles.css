@@ -623,6 +623,7 @@ body {
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .sidebar.collapsed .sidebar-content {
@@ -1364,12 +1365,15 @@ body {
   display: block;
 }
 
-/* Curriculum Page */
+/* Curriculum Page — absolute fill bypasses flex chain height issues */
 .curriculum-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
   overflow: hidden;
 }
 
@@ -1393,6 +1397,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
 }
 
 .curriculum-loading {
@@ -1526,7 +1531,6 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
   overflow: hidden;
 }
 
@@ -1534,7 +1538,6 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px;
@@ -1694,14 +1697,11 @@ body {
 }
 
 .worksheet-content {
-  flex: 1 1 0;
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px;
   color: var(--vscode-text);
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-  height: 0;
 }
 
 .worksheet-section {
@@ -1831,5 +1831,4 @@ body {
 
 @media (max-width: 600px) {
   .logo-img { height: 32px; }
-  .worksheet-content { max-height: 50vh; }
 }
