@@ -7,11 +7,18 @@ const ROOT_DIR = __dirname;
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(ROOT_DIR, "data"));
 const UPLOADS_DIR = path.resolve(process.env.IMAGE_UPLOAD_DIR || path.join(ROOT_DIR, "assets", "uploads"));
 const ADMIN_TOKEN = (process.env.ADMIN_TOKEN || "").trim();
+const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
+const GEMINI_MODEL = "gemini-2.0-flash-lite";
 const MAX_IMAGE_BYTES = 1024 * 1024;
+const MAX_CHAT_BODY_BYTES = 64 * 1024;
+const CHAT_TIMEOUT_MS = 15000;
+const CHAT_WINDOW_MS = 5 * 60 * 1000;
+const CHAT_MAX_REQUESTS = 12;
 const ALLOWED_IMAGE_TYPES = {
   "image/jpeg": ".jpg",
   "image/png": ".png"
 };
+const chatRateLimits = new Map();
 
 const JSON_FILES = {
   topics: "topics.json",
@@ -44,9 +51,15 @@ const server = http.createServer(async (req, res) => {
         env: {
           dataDir: DATA_DIR,
           imageUploadDir: UPLOADS_DIR,
-          adminTokenConfigured: Boolean(ADMIN_TOKEN)
+          adminTokenConfigured: Boolean(ADMIN_TOKEN),
+          geminiConfigured: Boolean(GEMINI_API_KEY)
         }
       });
+    }
+
+    if (pathname === "/api/eblocks/chat") {
+      if (req.method === "POST") return handleEblocksChat(req, res);
+      return sendJson(res, 405, { error: "Method not allowed" });
     }
 
     if (pathname === "/api/upload-image") {
@@ -155,6 +168,55 @@ async function handleImageUpload(req, res) {
   }
 }
 
+async function handleEblocksChat(req, res) {
+  if (!GEMINI_API_KEY) {
+    return sendJson(res, 503, { error: "AI assistant is not configured on the server" });
+  }
+
+  const clientIp = getClientIp(req);
+  const rateLimit = checkRateLimit(clientIp);
+  if (!rateLimit.ok) {
+    return sendJson(res, 429, {
+      error: "Too many chat requests. Please wait a moment and try again.",
+      retryAfterMs: rateLimit.retryAfterMs
+    });
+  }
+
+  let body;
+  try {
+    body = await readJsonBody(req, { maxBytes: MAX_CHAT_BODY_BYTES });
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || "Invalid JSON body" });
+  }
+
+  const rawMessage = typeof body.message === "string" ? body.message : "";
+  const message = rawMessage.trim();
+  if (!message) {
+    return sendJson(res, 400, { error: "message is required" });
+  }
+
+  try {
+    const normalized = normalizeChatPayload(body);
+    const { requestBody, warnings } = buildGeminiChatRequest(normalized);
+    const result = await callGeminiGenerateContent(requestBody);
+
+    return sendJson(res, 200, {
+      reply: result.reply,
+      usage: result.usage,
+      warnings
+    });
+  } catch (error) {
+    if (error && error.name === "AbortError") {
+      return sendJson(res, 504, { error: "AI assistant timed out. Please try again." });
+    }
+    if (error && error.code === "GEMINI_UPSTREAM") {
+      return sendJson(res, 502, { error: "AI assistant is temporarily unavailable. Please try again." });
+    }
+    console.error("Gemini chat error:", error);
+    return sendJson(res, 500, { error: "AI assistant request failed" });
+  }
+}
+
 function isAuthorized(req) {
   const tokenHeader = String(req.headers["x-admin-token"] || "").trim();
   const authHeader = String(req.headers.authorization || "").trim();
@@ -163,12 +225,19 @@ function isAuthorized(req) {
   return token && token === ADMIN_TOKEN;
 }
 
-async function readJsonBody(req) {
+async function readJsonBody(req, options = {}) {
   const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
+  let total = 0;
+  const maxBytes = typeof options.maxBytes === "number" ? options.maxBytes : MAX_IMAGE_BYTES * 2;
+
+  for await (const chunk of req) {
+    total += chunk.length;
+    if (total > maxBytes) throw new Error("Request body is too large");
+    chunks.push(chunk);
+  }
+
   const raw = Buffer.concat(chunks).toString("utf8");
   if (!raw.trim()) throw new Error("Request body cannot be empty");
-  if (raw.length > MAX_IMAGE_BYTES * 2) throw new Error("Request body is too large");
   return JSON.parse(raw);
 }
 
@@ -228,4 +297,195 @@ async function sendFile(res, filePath) {
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(payload));
+}
+
+function getClientIp(req) {
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  if (forwarded) return forwarded;
+  return req.socket && req.socket.remoteAddress ? req.socket.remoteAddress : "unknown";
+}
+
+function checkRateLimit(clientIp) {
+  const now = Date.now();
+  const current = chatRateLimits.get(clientIp);
+  const recentHits = current ? current.hits.filter((hit) => now - hit < CHAT_WINDOW_MS) : [];
+
+  if (recentHits.length >= CHAT_MAX_REQUESTS) {
+    const oldest = recentHits[0];
+    return {
+      ok: false,
+      retryAfterMs: Math.max(CHAT_WINDOW_MS - (now - oldest), 1000)
+    };
+  }
+
+  recentHits.push(now);
+  chatRateLimits.set(clientIp, { hits: recentHits });
+
+  if (chatRateLimits.size > 500) {
+    for (const [key, entry] of chatRateLimits.entries()) {
+      if (!entry.hits.length || now - entry.hits[entry.hits.length - 1] > CHAT_WINDOW_MS) {
+        chatRateLimits.delete(key);
+      }
+    }
+  }
+
+  return { ok: true };
+}
+
+function normalizeChatPayload(body) {
+  const warnings = [];
+  const editorCode = trimText(body.editorCode, 12000, warnings, "Editor code was trimmed.");
+  const boardType = trimText(body.boardType, 120, warnings);
+  const serialContext = trimText(body.serialContext, 3000, warnings, "Serial context was trimmed.");
+  const worksheet = normalizeWorksheet(body.worksheet, warnings);
+  const conversation = normalizeConversation(body.conversation, warnings);
+  const message = trimText(body.message, 2000, warnings, "Prompt was trimmed.");
+
+  return {
+    message,
+    editorCode,
+    boardType,
+    serialContext,
+    worksheet,
+    conversation,
+    warnings
+  };
+}
+
+function normalizeWorksheet(worksheet, warnings) {
+  if (!worksheet || typeof worksheet !== "object") return null;
+
+  const code = trimText(worksheet.code, 120, warnings);
+  const title = trimText(worksheet.title, 200, warnings);
+  const text = trimText(worksheet.text, 8000, warnings, "Worksheet context was trimmed.");
+
+  if (!code && !title && !text) return null;
+  return { code, title, text };
+}
+
+function normalizeConversation(conversation, warnings) {
+  if (!Array.isArray(conversation)) return [];
+
+  const limited = conversation
+    .slice(-8)
+    .map((entry) => {
+      const role = entry && entry.role === "assistant" ? "assistant" : "user";
+      const content = trimText(entry && entry.content, 1500, warnings, "Conversation history was trimmed.");
+      return content ? { role, content } : null;
+    })
+    .filter(Boolean);
+
+  if (conversation.length > limited.length) {
+    warnings.push("Older conversation history was dropped.");
+  }
+
+  return limited;
+}
+
+function trimText(value, maxLength, warnings, warningMessage) {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  if (warningMessage && warnings) warnings.push(warningMessage);
+  return `${text.slice(0, maxLength)}\n...[truncated]`;
+}
+
+function buildGeminiChatRequest(payload) {
+  const warnings = [...payload.warnings];
+  const sections = [
+    `User question:\n${payload.message}`,
+    payload.boardType ? `Board type:\n${payload.boardType}` : "",
+    payload.editorCode ? `Current editor code:\n\`\`\`cpp\n${payload.editorCode}\n\`\`\`` : "",
+    payload.serialContext ? `Recent serial monitor output:\n${payload.serialContext}` : ""
+  ];
+
+  if (payload.worksheet) {
+    const worksheetHeader = [payload.worksheet.code, payload.worksheet.title].filter(Boolean).join(" - ");
+    sections.push(`Open worksheet${worksheetHeader ? ` (${worksheetHeader})` : ""}:\n${payload.worksheet.text || ""}`.trim());
+  }
+
+  sections.push("Answer for the Matrix TSL E-blocks IDE. Be concise, practical, and explicit about hardware assumptions.");
+
+  const contents = [];
+  for (const entry of payload.conversation) {
+    contents.push({
+      role: entry.role === "assistant" ? "model" : "user",
+      parts: [{ text: entry.content }]
+    });
+  }
+
+  contents.push({
+    role: "user",
+    parts: [{ text: sections.filter(Boolean).join("\n\n") }]
+  });
+
+  return {
+    warnings,
+    requestBody: {
+      systemInstruction: {
+        parts: [
+          {
+            text:
+              "You are the E-blocks AI assistant for Matrix TSL. Help with Arduino Mega, ESP32, Firmata, serial monitor troubleshooting, combo board logic, and worksheet tutoring. Keep responses concise and practical. Explain hardware assumptions explicitly. Do not invent unsupported libraries or APIs. Distinguish between interpreted browser IDE behavior and code that requires running on a physical board."
+          }
+        ]
+      },
+      contents,
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 1024
+      }
+    }
+  };
+}
+
+async function callGeminiGenerateContent(requestBody) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      }
+    );
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error("Gemini upstream request failed");
+      error.code = "GEMINI_UPSTREAM";
+      error.status = response.status;
+      error.details = data && data.error ? data.error : null;
+      throw error;
+    }
+
+    const reply = extractGeminiText(data);
+    if (!reply) {
+      const error = new Error("Gemini returned no text");
+      error.code = "GEMINI_UPSTREAM";
+      throw error;
+    }
+
+    return {
+      reply,
+      usage: data.usageMetadata || null
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function extractGeminiText(data) {
+  const candidate = data && Array.isArray(data.candidates) ? data.candidates[0] : null;
+  const parts = candidate && candidate.content && Array.isArray(candidate.content.parts) ? candidate.content.parts : [];
+  const text = parts
+    .map((part) => (part && typeof part.text === "string" ? part.text : ""))
+    .join("")
+    .trim();
+
+  return text;
 }

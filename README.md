@@ -108,6 +108,7 @@ No `npm install` needed — the server uses only Node.js built-in modules (`http
 |----------|---------|-------------|
 | `PORT` | `3000` | Port the server listens on |
 | `ADMIN_TOKEN` | *(none)* | Token required for admin write operations (PUT /api/*, POST /api/upload-image). If not set, write endpoints return 500. |
+| `GEMINI_API_KEY` | *(none)* | Google AI Studio API key used by `POST /api/eblocks/chat`. Keep it server-side only. |
 | `DATA_DIR` | `./data` | Path to JSON data files directory |
 | `IMAGE_UPLOAD_DIR` | `./assets/uploads` | Path where uploaded images are saved |
 
@@ -130,6 +131,7 @@ This project is deployed on [Railway](https://railway.com) as the `matrix-home` 
 3. Railway will auto-detect Node.js and run `npm start` → `node server.js`
 4. Set environment variables in Railway → **Variables**:
    - `ADMIN_TOKEN` = your secret token
+   - `GEMINI_API_KEY` = your Google AI Studio key for the E-blocks assistant
 5. Add custom domain: `matrixtsl.dev`
 
 ### Auto-Deploy
@@ -204,6 +206,41 @@ Uploads a base64-encoded image.
 ```
 
 Constraints: PNG/JPEG only, max 1 MB per image.
+
+### POST /api/eblocks/chat
+Gemini-backed assistant endpoint for the E-blocks IDE.
+
+**Request body:**
+```json
+{
+  "message": "Why is my LED not blinking?",
+  "editorCode": "// current code",
+  "boardType": "Arduino Mega (arduino:avr:mega)",
+  "worksheet": {
+    "code": "CP0507-1",
+    "title": "Motors and Microcontrollers",
+    "text": "..."
+  },
+  "serialContext": "[12:00:00] LED ON",
+  "conversation": [
+    { "role": "user", "content": "Previous question" },
+    { "role": "assistant", "content": "Previous answer" }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "reply": "Check the selected board, pin mode, and whether the browser IDE or a physical board is running the code.",
+  "usage": {
+    "promptTokenCount": 123,
+    "candidatesTokenCount": 45,
+    "totalTokenCount": 168
+  },
+  "warnings": []
+}
+```
 
 ### GET /api/health
 Returns server status and configuration info.
