@@ -69,6 +69,16 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname.startsWith("/api/")) {
       const key = pathname.replace("/api/", "");
+      if (key.endsWith(".csv")) {
+        const csvKey = key.replace(".csv", "");
+        if (!Object.prototype.hasOwnProperty.call(JSON_FILES, csvKey)) {
+          return sendJson(res, 404, { error: "Unknown API resource" });
+        }
+        if (req.method === "GET") return handleGetCsv(csvKey, res);
+        if (req.method === "PUT") return handlePutCsv(req, res, csvKey);
+        return sendJson(res, 405, { error: "Method not allowed" });
+      }
+
       if (!Object.prototype.hasOwnProperty.call(JSON_FILES, key)) {
         return sendJson(res, 404, { error: "Unknown API resource" });
       }
@@ -117,6 +127,61 @@ async function handlePutJson(req, res, key) {
     const filePath = path.join(DATA_DIR, JSON_FILES[key]);
     await fs.writeFile(filePath, `${JSON.stringify(body, null, 2)}\n`, "utf8");
     return sendJson(res, 200, { ok: true, saved: JSON_FILES[key], count: body.length });
+  } catch (error) {
+    return sendJson(res, 500, { error: `Could not write ${JSON_FILES[key]}` });
+  }
+}
+
+
+async function handleGetCsv(key, res) {
+  const filePath = path.join(DATA_DIR, JSON_FILES[key]);
+  try {
+    const raw = await fs.readFile(filePath, "utf8");
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) return sendText(res, 500, "CSV export expects an array");
+    const csv = buildCsvForKey(key, data);
+    res.writeHead(200, {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename=${key}.csv`
+    });
+    return res.end(csv);
+  } catch (error) {
+    if (error.code === "ENOENT") return sendText(res, 404, `${JSON_FILES[key]} not found`);
+    return sendText(res, 500, `Could not export ${JSON_FILES[key]} as CSV`);
+  }
+}
+
+async function handlePutCsv(req, res, key) {
+  if (!ADMIN_TOKEN) return sendJson(res, 500, { error: "ADMIN_TOKEN is not configured on the server" });
+  if (!isAuthorized(req)) return sendJson(res, 401, { error: "Unauthorized" });
+
+  let body;
+  try {
+    body = await readTextBody(req);
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || "Invalid CSV body" });
+  }
+
+  let records;
+  try {
+    records = parseCsv(body);
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || "Invalid CSV data" });
+  }
+
+  let payload;
+  try {
+    payload = parseCsvForKey(key, records);
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || "CSV mapping failed" });
+  }
+
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    const filePath = path.join(DATA_DIR, JSON_FILES[key]);
+    await fs.writeFile(filePath, `${JSON.stringify(payload, null, 2)}
+`, "utf8");
+    return sendJson(res, 200, { ok: true, saved: JSON_FILES[key], count: payload.length });
   } catch (error) {
     return sendJson(res, 500, { error: `Could not write ${JSON_FILES[key]}` });
   }
@@ -245,6 +310,224 @@ async function readJsonBody(req, options = {}) {
   return JSON.parse(raw);
 }
 
+async function readTextBody(req, options = {}) {
+  const chunks = [];
+  let total = 0;
+  const maxBytes = typeof options.maxBytes === "number" ? options.maxBytes : MAX_IMAGE_BYTES * 4;
+
+  for await (const chunk of req) {
+    total += chunk.length;
+    if (total > maxBytes) throw new Error("Request body is too large");
+    chunks.push(chunk);
+  }
+
+  const raw = Buffer.concat(chunks).toString("utf8");
+  if (!raw.trim()) throw new Error("Request body cannot be empty");
+  return raw;
+}
+
+
+const CSV_SCHEMAS = {
+  topics: {
+    headers: [
+      "id",
+      "name",
+      "subject",
+      "domain",
+      "level",
+      "estimated_minutes",
+      "hardware_tags",
+      "image",
+      "images",
+      "content_outcomes_html",
+      "content_explain_html",
+      "content_practice_html",
+      "content_assessment_html"
+    ],
+    toRow: (topic) => [
+      topic.id || "",
+      topic.name || "",
+      topic.subject || "",
+      topic.domain || "",
+      topic.level || "",
+      topic.estimated_minutes ?? "",
+      Array.isArray(topic.hardware_tags) ? topic.hardware_tags.join("|") : "",
+      topic.image || "",
+      Array.isArray(topic.images) ? topic.images.join("|") : "",
+      topic.content?.outcomes_html || "",
+      topic.content?.explain_html || "",
+      topic.content?.practice_html || "",
+      topic.content?.assessment_html || ""
+    ],
+    fromRow: (row) => {
+      const content = {
+        outcomes_html: row.content_outcomes_html || "",
+        explain_html: row.content_explain_html || "",
+        practice_html: row.content_practice_html || "",
+        assessment_html: row.content_assessment_html || ""
+      };
+      const hasContent = Object.values(content).some((val) => val && String(val).trim());
+      return {
+        id: row.id || undefined,
+        name: row.name || "",
+        subject: row.subject || "",
+        domain: row.domain || "",
+        level: row.level || "",
+        estimated_minutes: row.estimated_minutes ? Number(row.estimated_minutes) : undefined,
+        hardware_tags: splitList(row.hardware_tags),
+        image: row.image || undefined,
+        images: splitList(row.images),
+        ...(hasContent ? { content } : {})
+      };
+    }
+  },
+  hardware: {
+    headers: ["sku", "name", "supports_tags", "learners_per_kit", "notes", "image"],
+    toRow: (item) => [
+      item.sku || "",
+      item.name || "",
+      Array.isArray(item.supports_tags) ? item.supports_tags.join("|") : "",
+      item.learners_per_kit ?? "",
+      item.notes || "",
+      item.image || ""
+    ],
+    fromRow: (row) => ({
+      sku: row.sku || "",
+      name: row.name || "",
+      supports_tags: splitList(row.supports_tags),
+      learners_per_kit: row.learners_per_kit ? Number(row.learners_per_kit) : undefined,
+      notes: row.notes || "",
+      image: row.image || ""
+    })
+  },
+  templates: {
+    headers: ["id", "name", "intended_duration", "blocks_json"],
+    toRow: (tpl) => [
+      tpl.id || "",
+      tpl.name || "",
+      tpl.intended_duration ?? "",
+      JSON.stringify(tpl.blocks || [])
+    ],
+    fromRow: (row) => ({
+      id: row.id || "",
+      name: row.name || "",
+      intended_duration: row.intended_duration ? Number(row.intended_duration) : undefined,
+      blocks: parseJsonList(row.blocks_json)
+    })
+  }
+};
+
+function buildCsvForKey(key, data) {
+  const schema = CSV_SCHEMAS[key];
+  const rows = [schema.headers, ...data.map(schema.toRow)];
+  return rows.map((row) => row.map(csvEscape).join(",")).join("
+") + "
+";
+}
+
+function parseCsvForKey(key, records) {
+  const schema = CSV_SCHEMAS[key];
+  if (!schema) throw new Error("Unknown CSV schema");
+  return records.map(schema.fromRow).filter((row) => Object.keys(row).length > 0);
+}
+
+function splitList(value) {
+  if (!value) return [];
+  return String(value)
+    .split("|")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function parseJsonList(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function csvEscape(value) {
+  const str = value === null || value === undefined ? "" : String(value);
+  if (/["
+
+,]/.test(str)) {
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') {
+          field += '"';
+          i += 1;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += ch;
+      }
+      continue;
+    }
+
+    if (ch === '"') {
+      inQuotes = true;
+      continue;
+    }
+
+    if (ch === ',') {
+      row.push(field);
+      field = "";
+      continue;
+    }
+
+    if (ch === '
+') {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+      continue;
+    }
+
+    if (ch === '
+') {
+      continue;
+    }
+
+    field += ch;
+  }
+
+  if (field.length || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+
+  if (!rows.length) return [];
+  const headers = rows.shift().map((h) => h.trim()).filter(Boolean);
+  return rows
+    .filter((row) => row.some((cell) => String(cell || "").trim()))
+    .map((row) => {
+      const record = {};
+      headers.forEach((header, idx) => {
+        record[header] = (row[idx] ?? "").trim();
+      });
+      return record;
+    });
+}
+
 async function serveStatic(pathname, res) {
   if (pathname === "/favicon.ico") {
     return sendFile(res, path.join(ROOT_DIR, "assets", "matrix-icon.ico"));
@@ -301,6 +584,11 @@ async function sendFile(res, filePath) {
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(payload));
+}
+
+function sendText(res, statusCode, payload) {
+  res.writeHead(statusCode, { "Content-Type": "text/plain; charset=utf-8" });
+  res.end(String(payload));
 }
 
 function getClientIp(req) {

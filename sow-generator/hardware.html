@@ -290,6 +290,9 @@
 <div class="toolbar">
   <button class="btn btn-primary" id="btn-add" disabled>+ Add Hardware Item</button>
   <button class="btn btn-success" id="btn-save" disabled>Save Changes</button>
+  <button class="btn btn-ghost" id="btn-export-csv" disabled>Export CSV</button>
+  <button class="btn btn-ghost" id="btn-import-csv" disabled>Import CSV</button>
+  <input type="file" id="csv-input" accept=".csv,text/csv" style="display:none">
   <span class="status-bar" id="status-bar">Loading hardware...</span>
 </div>
 
@@ -362,6 +365,9 @@
 
   const btnAdd = document.getElementById('btn-add');
   const btnSave = document.getElementById('btn-save');
+  const btnExportCsv = document.getElementById('btn-export-csv');
+  const btnImportCsv = document.getElementById('btn-import-csv');
+  const csvInput = document.getElementById('csv-input');
   const statusBar = document.getElementById('status-bar');
   const itemList = document.getElementById('item-list');
   const emptyState = document.getElementById('empty-state');
@@ -387,6 +393,8 @@
   function unlock() {
     btnAdd.disabled = false;
     btnSave.disabled = false;
+    btnExportCsv.disabled = false;
+    btnImportCsv.disabled = false;
     statusBar.textContent = `${hardware.length} hardware item${hardware.length !== 1 ? 's' : ''} loaded`;
     statusBar.className = 'status-bar loaded';
   }
@@ -537,6 +545,68 @@
     }
 
     showToast('Hardware saved to server', 'success');
+  });
+
+  btnExportCsv.addEventListener('click', () => {
+    window.location = '/api/hardware.csv';
+  });
+
+  btnImportCsv.addEventListener('click', () => {
+    csvInput.click();
+  });
+
+  csvInput.addEventListener('change', async () => {
+    const file = csvInput.files && csvInput.files[0];
+    if (!file) return;
+
+    const token = await resolveAdminToken();
+    if (!token) {
+      showToast('Matrix staff token required to import CSV', 'error');
+      return;
+    }
+
+    try {
+      const csvText = await file.text();
+      let response = await fetch('/api/hardware.csv', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'text/csv',
+          'x-admin-token': token
+        },
+        body: csvText
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+        const retryToken = await resolveAdminToken(true);
+        if (!retryToken) {
+          showToast('Import cancelled', 'error');
+          return;
+        }
+        response = await fetch('/api/hardware.csv', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'text/csv',
+            'x-admin-token': retryToken
+          },
+          body: csvText
+        });
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Import failed (${response.status})`);
+      }
+
+      const refreshed = await fetch('/api/hardware').then((r) => r.json());
+      hardware = Array.isArray(refreshed) ? refreshed : [];
+      render();
+      showToast('CSV imported successfully', 'success');
+    } catch (error) {
+      showToast(`CSV import failed: ${error.message}`, 'error');
+    } finally {
+      csvInput.value = '';
+    }
   });
 
   function openModal() {
