@@ -50,16 +50,25 @@ Yes — the **current SOW Generator app already proves we can serve granular con
 ---
 
 ## 4) Create SCORM‑compliant content – and with what features?
-**Answer:** We can generate SCORM packages from the same data structure.
+**Answer:** We can generate SCORM packages from the same data structure. A SCORM package is essentially:
+- an **`imsmanifest.xml`** (course structure + metadata)
+- one or more **SCOs** (Sharable Content Objects)
+- static assets (HTML/CSS/JS/media)
 
-**Minimum features:**
-- Titles, objectives
-- Module sequencing
+**Minimum features (MVP):**
+- Titles + learning objectives
+- Module/lesson sequencing (simple linear order)
 - Completion tracking (complete/incomplete)
-- Score/pass‑fail (optional)
-- Duration tracking
+- Duration/time tracking
+- Optional score/pass‑fail for quizzes
 
-**Recommendation:** Start with **SCORM 1.2** (simpler). Upgrade to SCORM 2004 only if sequencing rules are needed.
+**Nice‑to‑have features (Phase 2):**
+- Mastery/assessment logic (pass thresholds)
+- Optional branching or prerequisites
+- Rich media (video, interactive activities)
+- Accessibility metadata
+
+**Recommendation:** Start with **SCORM 1.2** (simpler data model: `cmi.core.*`). Move to **SCORM 2004** only if we need advanced sequencing rules.
 
 ---
 
@@ -81,13 +90,17 @@ Yes — the **current SOW Generator app already proves we can serve granular con
 ---
 
 ## 6) Can we generate SCORM content from a spreadsheet + AI? Or what editing tool do we use?
-**Answer:** Yes — spreadsheet + AI can generate structured content, then package to SCORM.
+**Answer:** Yes. The cleanest pipeline is:
+1. **Spreadsheet** as the authoring source of truth (topics, objectives, activities, duration, assessments)
+2. **AI generation** to expand text (lesson notes, activities, teacher prompts)
+3. **JSON mapping** to a consistent schema
+4. **SCORM packaging** into a compliant ZIP (manifest + SCOs)
 
 **Options:**
-- **Internal generator:** Spreadsheet → JSON → SCORM package
-- **External authoring tools:** (Adapt, Articulate, H5P) – higher cost/overhead
+- **Internal generator:** Spreadsheet → JSON → SCORM package (best fit with current app + low cost)
+- **External authoring tools:** Adapt / Articulate / H5P (faster UI authoring but expensive + harder to automate)
 
-**Recommendation:** Build internal generator first; it fits the existing architecture.
+**Recommendation:** Build the internal generator first, then evaluate external tools only if we need advanced interactions or non‑technical authoring.
 
 ---
 
@@ -100,9 +113,17 @@ Yes — the **current SOW Generator app already proves we can serve granular con
 ---
 
 ## 8) Do we understand SCORM? (I don’t fully.)
-**Answer:** We should do a short internal primer. SCORM is a packaging + tracking standard for LMS delivery.
+**Answer:** SCORM is a **packaging + tracking standard** for LMS delivery. Key terms:
+- **LMS** = Learning Management System (where SCORM is uploaded)
+- **SCO** = Sharable Content Object (a launchable unit)
+- **API** = JS interface the LMS exposes for tracking
+- **`cmi.core` / `cmi.score` / `cmi.completion_status`** = fields the LMS tracks
 
-**Recommendation:** 30‑minute walkthrough + a minimal SCORM checklist for MVP.
+**SCORM 1.2 vs 2004:**
+- **1.2:** simpler, widely supported, limited sequencing
+- **2004:** more complex, supports sequencing rules
+
+**Recommendation:** Do a 30‑minute primer + create a **1‑page SCORM checklist** (manifest, SCO launch, completion tracking, score tracking). That’s enough for MVP.
 
 ---
 
