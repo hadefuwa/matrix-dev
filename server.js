@@ -422,7 +422,7 @@ function buildGeminiChatRequest(payload) {
   return {
     warnings,
     requestBody: {
-      systemInstruction: {
+      system_instruction: {
         parts: [
           {
             text:
