@@ -59,7 +59,8 @@ export class CodeRunner {
           debug: false,
           // Add custom functions for Arduino compatibility
           includes: {
-            'Arduino.h': arduinoEnvironment.header
+            'Arduino.h': arduinoEnvironment.header,
+            'EB3Display.h': arduinoEnvironment.eb3DisplayHeader
           }
         };
 
@@ -167,7 +168,46 @@ void loop() {
       unsigned long millis() { return 0; }
     `;
     
-    return { header };
+    const eb3DisplayHeader = `
+      class HardwareSerial {
+        public:
+          void begin(int baud) {}
+          void print(const char* s) {}
+          void println(const char* s) {}
+          void println(int n) {}
+          void println() {}
+      };
+      HardwareSerial Serial2;
+      HardwareSerial Serial3;
+
+      class EB3Display {
+        public:
+          EB3Display(HardwareSerial serialPort, int baudRate) {}
+          void begin() {}
+          void clearDisplay() {}
+          void setDisplayOrientation(int orientation) {}
+          void setBacklightBrightness(int brightness) {}
+          void setForegroundColor(int r, int g, int b) {}
+          void setBackgroundColor(int r, int g, int b) {}
+          void drawPixel(int x, int y) {}
+          void drawLine(int x1, int y1, int x2, int y2) {}
+          void drawRectangle(int x1, int y1, int x2, int y2, int transparent, int solid) {}
+          void drawRoundedRectangle(int x1, int y1, int x2, int y2, int radius, int transparent, int solid) {}
+          void drawCircle(int x, int y, int radius, int transparent, int solid) {}
+          void drawEllipse(int x, int y, int xRadius, int yRadius, int transparent, int solid) {}
+          void drawArc(int x, int y, int radius, int startAngle, int endAngle, int resolution, int transparent, int solid) {}
+          void printText(const char* text, int x, int y, int font, int transparent) {}
+          void printNumber(int number, int x, int y, int font, int transparent) {}
+          void printFloat(float number, int decimalPlaces, int x, int y, int font, int transparent) {}
+          void setFontScaler(int scaleX, int scaleY) {}
+          void drawQRCode(int x, int y, int scaler, const char* text) {}
+          int touchCheck() { return 0; }
+          int touchReadX() { return 0; }
+          int touchReadY() { return 0; }
+      };
+    `;
+
+    return { header, eb3DisplayHeader };
   }
 
   /**
