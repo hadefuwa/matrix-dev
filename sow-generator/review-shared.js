@@ -163,7 +163,7 @@ function buildHardwareHtml(hardwareRows) {
 
   const rows = hardwareRows.map((row) => {
     const imageCell = row.image
-      ? `<img src="${escapeHtml(row.image)}" alt="${escapeHtml(row.name)} image" class="hardware-image">`
+      ? `<img src="${escapeHtml(resolveAssetPath(row.image))}" alt="${escapeHtml(row.name)} image" class="hardware-image">`
       : "-";
     return `
       <tr>
@@ -204,7 +204,7 @@ function buildLessonHtml(lesson) {
     const maybeImage = blockIndex === 0 && lesson.topic.image
       ? `
         <li class="lesson-image-item">
-          <img src="${escapeHtml(lesson.topic.image)}" alt="${escapeHtml(lesson.topic.name)} illustration" class="lesson-image-lesson">
+          <img src="${escapeHtml(resolveAssetPath(lesson.topic.image))}" alt="${escapeHtml(lesson.topic.name)} illustration" class="lesson-image-lesson">
         </li>
       `
       : "";
@@ -223,7 +223,7 @@ function buildLessonHtml(lesson) {
   const galleryHtml = Array.isArray(lesson.topic.images) && lesson.topic.images.length
     ? `
       <div class="lesson-images-gallery">
-        ${lesson.topic.images.map((src) => `<img src="${escapeHtml(src)}" alt="${escapeHtml(lesson.topic.name)} worksheet image" class="lesson-worksheet-img">`).join("")}
+        ${lesson.topic.images.map((src) => `<img src="${escapeHtml(resolveAssetPath(src))}" alt="${escapeHtml(lesson.topic.name)} worksheet image" class="lesson-worksheet-img">`).join("")}
       </div>
     `
     : "";
@@ -235,6 +235,12 @@ function buildLessonHtml(lesson) {
       ${galleryHtml}
     </article>
   `;
+}
+
+function resolveAssetPath(src) {
+  if (!src) return src;
+  if (/^(https?:)?\/\//.test(src) || src.startsWith("/")) return src;
+  return "/" + src;
 }
 
 function escapeHtml(value) {
