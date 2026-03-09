@@ -10,8 +10,12 @@ const state = {
   teacherChecks: [],
   hardwareRows: [],
   classSize: 24,
-  hasGeneratedScheme: false
+  hasGeneratedScheme: false,
+  chatHistory: []
 };
+
+const SOW_CHAT_STORAGE_KEY = "sow_chat_history_v1";
+const MAX_CHAT_HISTORY = 20;
 
 const topicsTreeEl = document.getElementById("topics-tree");
 const topicSearchEl = document.getElementById("topic-search");
@@ -60,6 +64,126 @@ async function init() {
   renderTeacherChecks();
   renderKpis();
   syncPrintButtonState();
+  initSowChat();
+}
+
+function initSowChat() {
+  try {
+    const raw = sessionStorage.getItem(SOW_CHAT_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    state.chatHistory = Array.isArray(parsed) ? parsed.slice(-MAX_CHAT_HISTORY) : [];
+  } catch (_) {
+    state.chatHistory = [];
+  }
+  renderSowChatMessages();
+
+  const form = document.getElementById("sow-chat-form");
+  const clearBtn = document.getElementById("sow-chat-clear-btn");
+  const input = document.getElementById("sow-chat-input");
+
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      sendSowChatMessage();
+    });
+  }
+  if (input) {
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendSowChatMessage();
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      state.chatHistory = [];
+      sessionStorage.removeItem(SOW_CHAT_STORAGE_KEY);
+      renderSowChatMessages();
+      setSowChatStatus("Conversation cleared.", "success");
+    });
+  }
+}
+
+function renderSowChatMessages() {
+  const messagesEl = document.getElementById("sow-chat-messages");
+  if (!messagesEl) return;
+  messagesEl.innerHTML = "";
+
+  if (!state.chatHistory.length) {
+    const empty = document.createElement("div");
+    empty.className = "sow-chat-empty";
+    empty.textContent = "Ask me which topics suit your course, student level, or subject area.";
+    messagesEl.appendChild(empty);
+    return;
+  }
+
+  state.chatHistory.forEach((entry) => {
+    const item = document.createElement("div");
+    item.className = `sow-chat-message ${entry.role}`;
+    const role = document.createElement("span");
+    role.className = "sow-chat-message-role";
+    role.textContent = entry.role === "assistant" ? "Advisor" : "You";
+    const body = document.createElement("div");
+    body.textContent = entry.content;
+    item.appendChild(role);
+    item.appendChild(body);
+    messagesEl.appendChild(item);
+  });
+
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function setSowChatStatus(message, type = "") {
+  const statusEl = document.getElementById("sow-chat-status");
+  if (!statusEl) return;
+  statusEl.textContent = message;
+  statusEl.className = "sow-chat-status" + (type ? ` ${type}` : "");
+}
+
+async function sendSowChatMessage() {
+  const input = document.getElementById("sow-chat-input");
+  const sendBtn = document.getElementById("sow-chat-send-btn");
+  if (!input || !sendBtn) return;
+
+  const message = input.value.trim();
+  if (!message) {
+    setSowChatStatus("Enter a message to get started.", "error");
+    return;
+  }
+
+  state.chatHistory.push({ role: "user", content: message });
+  state.chatHistory = state.chatHistory.slice(-MAX_CHAT_HISTORY);
+  input.value = "";
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Sending...";
+  setSowChatStatus("Waiting for response...");
+  renderSowChatMessages();
+
+  try {
+    const response = await fetch("/api/sow/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, conversation: state.chatHistory.slice(0, -1) })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Chat request failed");
+
+    state.chatHistory.push({ role: "assistant", content: data.reply || "No reply received." });
+    state.chatHistory = state.chatHistory.slice(-MAX_CHAT_HISTORY);
+    sessionStorage.setItem(SOW_CHAT_STORAGE_KEY, JSON.stringify(state.chatHistory));
+    renderSowChatMessages();
+    setSowChatStatus("Reply received.", "success");
+  } catch (error) {
+    state.chatHistory.push({ role: "assistant", content: `Sorry, I couldn't complete that request: ${error.message}` });
+    renderSowChatMessages();
+    setSowChatStatus(error.message, "error");
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Send";
+    input.focus();
+  }
 }
 
 function bindEvents() {

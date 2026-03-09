@@ -64,6 +64,11 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 405, { error: "Method not allowed" });
     }
 
+    if (pathname === "/api/sow/chat") {
+      if (req.method === "POST") return handleSowChat(req, res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+
     if (pathname === "/api/eblocks/upload") {
       if (req.method === "POST") return handleArduinoUpload(req, res);
       return sendJson(res, 405, { error: "Method not allowed" });
@@ -289,6 +294,85 @@ async function handleEblocksChat(req, res) {
       return sendJson(res, 502, { error: "AI assistant is temporarily unavailable. Please try again." });
     }
     console.error("Gemini chat error:", error);
+    return sendJson(res, 500, { error: "AI assistant request failed" });
+  }
+}
+
+async function handleSowChat(req, res) {
+  if (!GEMINI_API_KEY) {
+    return sendJson(res, 503, { error: "AI assistant is not configured on the server" });
+  }
+
+  const clientIp = getClientIp(req);
+  const rateLimit = checkRateLimit(clientIp);
+  if (!rateLimit.ok) {
+    return sendJson(res, 429, {
+      error: "Too many chat requests. Please wait a moment and try again.",
+      retryAfterMs: rateLimit.retryAfterMs
+    });
+  }
+
+  let body;
+  try {
+    body = await readJsonBody(req, { maxBytes: MAX_CHAT_BODY_BYTES });
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || "Invalid JSON body" });
+  }
+
+  const rawMessage = typeof body.message === "string" ? body.message : "";
+  const message = rawMessage.trim();
+  if (!message) {
+    return sendJson(res, 400, { error: "message is required" });
+  }
+
+  let topicsSummary = "";
+  try {
+    const raw = await fs.readFile(path.join(DATA_DIR, JSON_FILES.topics), "utf8");
+    const topics = JSON.parse(raw);
+    if (Array.isArray(topics)) {
+      topicsSummary = topics
+        .map((t) => `- ${t.name} (${[t.subject, t.domain, t.level].filter(Boolean).join(", ")})`)
+        .join("\n");
+    }
+  } catch (_) {}
+
+  const conversation = normalizeConversation(body.conversation || [], []);
+  const trimmedMessage = trimText(message, 2000, []);
+
+  const contents = [];
+  for (const entry of conversation) {
+    contents.push({
+      role: entry.role === "assistant" ? "model" : "user",
+      parts: [{ text: entry.content }]
+    });
+  }
+  contents.push({ role: "user", parts: [{ text: trimmedMessage }] });
+
+  const requestBody = {
+    systemInstruction: {
+      parts: [{
+        text: `You are a helpful assistant for Matrix TSL, a UK company that manufactures engineering education equipment used by 16–21 year old students at colleges and universities. You are speaking with a college or university professor who is building a Scheme of Work using the Matrix TSL Scheme of Work Generator tool.\n\nHelp them select appropriate topics for their course, understand what each topic covers, and structure a well-balanced scheme of work. Be friendly, professional, and concise. If they describe their course or student level, suggest relevant topics from the list below.\n\nAvailable topics in the tool:\n${topicsSummary || "No topics currently available."}`
+      }]
+    },
+    contents,
+    generationConfig: {
+      temperature: 0.5,
+      maxOutputTokens: 1024
+    }
+  };
+
+  try {
+    const result = await callGeminiGenerateContent(requestBody);
+    return sendJson(res, 200, { reply: result.reply, usage: result.usage });
+  } catch (error) {
+    if (error && error.name === "AbortError") {
+      return sendJson(res, 504, { error: "AI assistant timed out. Please try again." });
+    }
+    if (error && error.code === "GEMINI_UPSTREAM") {
+      console.error("SOW chat upstream error:", { status: error.status, details: error.details });
+      return sendJson(res, 502, { error: "AI assistant is temporarily unavailable. Please try again." });
+    }
+    console.error("SOW chat error:", error);
     return sendJson(res, 500, { error: "AI assistant request failed" });
   }
 }

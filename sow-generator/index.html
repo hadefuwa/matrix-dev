@@ -72,6 +72,27 @@
       </div>
     </section>
 
+    <section class="panel sow-chat-panel">
+      <h2>AI Topic Advisor</h2>
+      <p class="help">Describe your course and I'll suggest topics from our library.</p>
+      <div id="sow-chat-status" class="sow-chat-status" aria-live="polite">Ready</div>
+      <div id="sow-chat-messages" class="sow-chat-messages">
+        <div class="sow-chat-empty">Ask me which topics suit your course, student level, or subject area.</div>
+      </div>
+      <form id="sow-chat-form" class="sow-chat-form">
+        <textarea
+          id="sow-chat-input"
+          class="sow-chat-input"
+          rows="3"
+          placeholder="e.g. I'm teaching a Level 3 electrical engineering course to 17 year olds..."
+        ></textarea>
+        <div class="sow-chat-footer">
+          <button id="sow-chat-clear-btn" class="sow-chat-clear-btn" type="button">Clear</button>
+          <button id="sow-chat-send-btn" class="sow-chat-send-btn" type="submit">Send</button>
+        </div>
+      </form>
+    </section>
+
     <section class="panel panel-wide">
       <h2>Generated Scheme of Work</h2>
       <div class="output-actions">
