@@ -152,7 +152,7 @@ h4 {
 
 .layout {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-columns: 1fr 1fr 1fr 2fr;
   gap: 1rem;
   width: 100%;
   max-width: none;
@@ -253,13 +253,9 @@ h4 {
 
 .panel-wide {
   min-width: 0;
-  grid-column: 3;
-  grid-row: 1 / 3;
 }
 
 .sow-chat-panel {
-  grid-column: 1 / 3;
-  grid-row: 2;
   animation-delay: 220ms;
 }
 
@@ -984,7 +980,7 @@ tbody tr:hover {
   .site-nav,
   .panel:first-child,
   .panel:nth-child(2),
-  .sow-chat-panel,
+  .panel:nth-child(3),
   .metrics,
   .output-actions,
   .asset-viewer,

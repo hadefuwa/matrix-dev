@@ -52,26 +52,6 @@
   </section>
 
   <main class="layout">
-    <section class="panel">
-      <h2>1. Select Topics</h2>
-      <label for="topic-search">Search</label>
-      <input id="topic-search" type="search" placeholder="Search topics...">
-      <div id="topics-tree" class="topics-tree"></div>
-    </section>
-
-    <section class="panel">
-      <h2>2. Arrange Lessons</h2>
-      <p class="help">Drag to reorder. Set duration per lesson.</p>
-      <ul id="selected-lessons" class="lesson-list"></ul>
-
-      <div class="controls">
-        <label for="class-size">Class size</label>
-        <input id="class-size" type="number" min="1" value="24">
-        <button id="generate-btn" type="button">Generate &amp; Review</button>
-        <button id="clear-btn" type="button">Reset Session</button>
-      </div>
-    </section>
-
     <section class="panel sow-chat-panel">
       <h2>AI Topic Advisor</h2>
       <p class="help">Describe your course and I'll suggest topics from our library.</p>
@@ -91,6 +71,26 @@
           <button id="sow-chat-send-btn" class="sow-chat-send-btn" type="submit">Send</button>
         </div>
       </form>
+    </section>
+
+    <section class="panel">
+      <h2>1. Select Topics</h2>
+      <label for="topic-search">Search</label>
+      <input id="topic-search" type="search" placeholder="Search topics...">
+      <div id="topics-tree" class="topics-tree"></div>
+    </section>
+
+    <section class="panel">
+      <h2>2. Arrange Lessons</h2>
+      <p class="help">Drag to reorder. Set duration per lesson.</p>
+      <ul id="selected-lessons" class="lesson-list"></ul>
+
+      <div class="controls">
+        <label for="class-size">Class size</label>
+        <input id="class-size" type="number" min="1" value="24">
+        <button id="generate-btn" type="button">Generate &amp; Review</button>
+        <button id="clear-btn" type="button">Reset Session</button>
+      </div>
     </section>
 
     <section class="panel panel-wide">
