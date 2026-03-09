@@ -1232,10 +1232,17 @@
     });
 
     document.getElementById('btn-open').addEventListener('click', () => {
-      // Save both generated code and graphics state before navigating
-      localStorage.setItem('eb3_generated_code', generateCode());
+      // Always save graphics state
       localStorage.setItem('eb3_graphics_state', JSON.stringify({ shapes, shapeIdCounter, fgColor, bgColor }));
-      window.location.href = 'index.html';
+      const code = generateCode();
+      // If running inside index.html iframe, postMessage to parent (keeps serial connection alive)
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'eb3-open-in-editor', code }, '*');
+      } else {
+        // Fallback: direct navigation when opened standalone
+        localStorage.setItem('eb3_generated_code', code);
+        window.location.href = 'index.html';
+      }
     });
 
     // ================================================================

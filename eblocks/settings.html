@@ -220,6 +220,61 @@
             </div>
           </div>
 
+          <!-- EB3Display Bridge Firmware Section -->
+          <div class="settings-section" style="grid-column: 1 / -1;">
+            <div class="settings-section-header">
+              <h2>EB3Display Bridge Firmware</h2>
+            </div>
+            <div class="settings-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+              <p style="margin:0;color:var(--vscode-text-secondary);font-size:13px;">
+                Flash this firmware to your E-Blocks board <strong>once</strong> using Arduino IDE.
+                After flashing, the web IDE can send graphics directly to the display over USB serial —
+                no re-flashing needed for each design.
+              </p>
+              <p style="margin:0;color:var(--vscode-text-secondary);font-size:13px;">
+                <strong>How to flash:</strong> Open Arduino IDE → Paste the code below into a new sketch →
+                Select <em>Arduino Mega 2560</em> (or ESP32S3) → Click Upload.
+              </p>
+              <div style="position:relative;width:100%;">
+                <pre id="bridge-firmware-code" style="background:var(--vscode-editor-background,#1e1e1e);color:#d4d4d4;padding:12px;border-radius:4px;font-size:12px;overflow-x:auto;white-space:pre;margin:0;border:1px solid var(--vscode-border,#333);">/**
+ * EB3Display Bridge Firmware
+ * Flash ONCE via Arduino IDE. After this, use the web IDE
+ * to send graphics directly to the display over USB serial.
+ *
+ * E-Blocks 3 Mega : USB = Serial2 (pins 16/17)
+ *                   Display = Serial3 (pin 14 RX3, pin 15 TX3)
+ * ESP32S3         : USB = Serial (CDC)
+ *                   Display = Serial2 (GPIO 18 RX, GPIO 17 TX)
+ */
+#define BAUD        115200
+#define ESP32_RX_PIN 18
+#define ESP32_TX_PIN 17
+
+void setup() {
+#if defined(ARDUINO_AVR_MEGA2560)
+  Serial2.begin(BAUD);   // USB (E-Blocks 3 Mega routes USB to Serial2)
+  Serial3.begin(BAUD);   // Display UART
+#elif defined(ARDUINO_ESP32S3_DEV) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(ARDUINO_ARCH_ESP32)
+  Serial.begin(BAUD);
+  Serial2.begin(BAUD, SERIAL_8N1, ESP32_RX_PIN, ESP32_TX_PIN);
+#endif
+}
+
+void loop() {
+#if defined(ARDUINO_AVR_MEGA2560)
+  if (Serial2.available()) Serial3.write(Serial2.read());
+  if (Serial3.available()) Serial2.write(Serial3.read());
+#elif defined(ARDUINO_ESP32S3_DEV) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(ARDUINO_ARCH_ESP32)
+  if (Serial.available())  Serial2.write(Serial.read());
+  if (Serial2.available()) Serial.write(Serial2.read());
+#endif
+}</pre>
+                <button id="bridge-copy-btn" onclick="copyBridgeFirmware()" style="position:absolute;top:8px;right:8px;padding:4px 10px;font-size:12px;cursor:pointer;background:var(--vscode-button-background,#0e639c);color:white;border:none;border-radius:3px;">Copy</button>
+              </div>
+              <button onclick="downloadBridgeFirmware()" style="padding:6px 14px;font-size:13px;cursor:pointer;background:var(--vscode-button-background,#0e639c);color:white;border:none;border-radius:3px;">⬇ Download .ino file</button>
+            </div>
+          </div>
+
           <!-- Application Settings Section -->
           <div class="settings-section">
             <div class="settings-section-header">
@@ -501,6 +556,26 @@
         }
       }
     })();
+
+    function copyBridgeFirmware() {
+      const code = document.getElementById('bridge-firmware-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('bridge-copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+
+    function downloadBridgeFirmware() {
+      const code = document.getElementById('bridge-firmware-code').textContent;
+      const blob = new Blob([code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'eb3display-bridge.ino';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   </script>
 </body>
 </html>

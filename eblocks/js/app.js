@@ -149,6 +149,14 @@ void loop() {
       if (el) el.addEventListener(event, fn);
     };
 
+    // Receive generated code from graphics editor iframe
+    window.addEventListener('eb3-load-code', (e) => {
+      if (e.detail && e.detail.code) {
+        this.editor.setValue(e.detail.code);
+        this.logToConsole('🎨 Loaded code from Graphics Editor', 'success');
+      }
+    });
+
     // Connect button (may not exist in all HTML versions)
     on('connect-btn', 'click', () => this.handleConnect());
 
