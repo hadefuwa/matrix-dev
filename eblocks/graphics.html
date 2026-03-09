@@ -1232,7 +1232,9 @@
     });
 
     document.getElementById('btn-open').addEventListener('click', () => {
+      // Save both generated code and graphics state before navigating
       localStorage.setItem('eb3_generated_code', generateCode());
+      localStorage.setItem('eb3_graphics_state', JSON.stringify({ shapes, shapeIdCounter, fgColor, bgColor }));
       window.location.href = 'index.html';
     });
 
@@ -1246,6 +1248,7 @@
     if (_fgP) { _fgP.value = fgColor; _fgH.value = fgColor; }
     if (_bgP) { _bgP.value = bgColor; _bgH.value = bgColor; }
     initTools();
+    refreshShapeList();
     updatePropsPanel();
     render();
     updateCode();
