@@ -237,7 +237,7 @@ function buildLessonHtml(lesson) {
   `;
 }
 
-function resolveAssetPath(src) {
+export function resolveAssetPath(src) {
   if (!src) return src;
   if (/^(https?:)?\/\//.test(src) || src.startsWith("/")) return src;
   return "/" + src;

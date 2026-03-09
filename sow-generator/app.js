@@ -1,4 +1,4 @@
-import { buildReviewPayload, REVIEW_STORAGE_KEY } from "./review-shared.js";
+import { buildReviewPayload, REVIEW_STORAGE_KEY, resolveAssetPath } from "./review-shared.js";
 
 const state = {
   topics: [],
@@ -451,7 +451,7 @@ function renderLessonPacks() {
         const imgLi = document.createElement("li");
         imgLi.className = "lesson-image-item";
         const img = document.createElement("img");
-        img.src = lesson.topic.image;
+        img.src = resolveAssetPath(lesson.topic.image);
         img.alt = `${lesson.topic.name} illustration`;
         img.className = "lesson-image-lesson";
         imgLi.appendChild(img);
@@ -467,7 +467,7 @@ function renderLessonPacks() {
       gallery.className = "lesson-images-gallery";
       images.forEach((src) => {
         const img = document.createElement("img");
-        img.src = src;
+        img.src = resolveAssetPath(src);
         img.alt = `${lesson.topic.name} worksheet image`;
         img.className = "lesson-worksheet-img";
         gallery.appendChild(img);
@@ -516,7 +516,7 @@ function renderTeacherChecks() {
 function renderViewer(lesson, block) {
   const imageHtml =
     block.key === "outcomes" && lesson.topic.image
-      ? `<div class="lesson-image-viewer-wrap"><img src="${escapeHtml(lesson.topic.image)}" alt="${escapeHtml(lesson.topic.name)} illustration" class="lesson-image-viewer"></div>`
+      ? `<div class="lesson-image-viewer-wrap"><img src="${escapeHtml(resolveAssetPath(lesson.topic.image))}" alt="${escapeHtml(lesson.topic.name)} illustration" class="lesson-image-viewer"></div>`
       : "";
   viewerEl.innerHTML = `
     <h4>Lesson ${lesson.lessonNumber}: ${escapeHtml(lesson.topic.name)}</h4>
