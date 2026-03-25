@@ -9,6 +9,8 @@ const ROOT_DIR = __dirname;
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(ROOT_DIR, "data"));
 const UPLOADS_DIR = path.resolve(process.env.IMAGE_UPLOAD_DIR || path.join(ROOT_DIR, "assets", "uploads"));
 const ADMIN_TOKEN = (process.env.ADMIN_TOKEN || "").trim();
+const SITE_USERNAME = (process.env.SITE_USERNAME || "admin").trim();
+const SITE_PASSWORD = (process.env.SITE_PASSWORD || "").trim();
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
 const GEMINI_MODEL = "gemini-2.5-flash-lite";
 const MAX_IMAGE_BYTES = 1024 * 1024;
@@ -44,6 +46,10 @@ const MIME_TYPES = {
 
 const server = http.createServer(async (req, res) => {
   try {
+    if (SITE_PASSWORD && !isBasicAuthAuthorized(req)) {
+      return sendBasicAuthRequired(res);
+    }
+
     const url = new URL(req.url, "http://localhost");
     const pathname = decodeURIComponent(url.pathname);
 
@@ -777,25 +783,78 @@ async function sendFile(res, filePath) {
   try {
     const data = await fs.readFile(filePath);
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, {
+    const headers = {
       "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
-      "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=300"
-    });
+      "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=300",
+      "X-Robots-Tag": "noindex, nofollow"
+    };
+
+    res.writeHead(200, headers);
+
+    if (ext === ".html") {
+      return res.end(injectRobotsMetaTag(data));
+    }
+
     res.end(data);
   } catch (error) {
-    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    res.writeHead(404, {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Robots-Tag": "noindex, nofollow"
+    });
     res.end("Not Found");
   }
 }
 
 function sendJson(res, statusCode, payload) {
-  res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
+  res.writeHead(statusCode, {
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Robots-Tag": "noindex, nofollow"
+  });
   res.end(JSON.stringify(payload));
 }
 
 function sendText(res, statusCode, payload) {
-  res.writeHead(statusCode, { "Content-Type": "text/plain; charset=utf-8" });
+  res.writeHead(statusCode, {
+    "Content-Type": "text/plain; charset=utf-8",
+    "X-Robots-Tag": "noindex, nofollow"
+  });
   res.end(String(payload));
+}
+
+function injectRobotsMetaTag(htmlBuffer) {
+  const html = htmlBuffer.toString("utf8");
+  if (html.includes('name="robots"')) return html;
+  return html.replace(
+    /<head([^>]*)>/i,
+    `<head$1>\n  <meta name="robots" content="noindex, nofollow">`
+  );
+}
+
+function isBasicAuthAuthorized(req) {
+  const authHeader = String(req.headers.authorization || "");
+  if (!authHeader.toLowerCase().startsWith("basic ")) return false;
+
+  try {
+    const encoded = authHeader.slice(6).trim();
+    const decoded = Buffer.from(encoded, "base64").toString("utf8");
+    const separatorIndex = decoded.indexOf(":");
+    if (separatorIndex === -1) return false;
+
+    const username = decoded.slice(0, separatorIndex);
+    const password = decoded.slice(separatorIndex + 1);
+    return username === SITE_USERNAME && password === SITE_PASSWORD;
+  } catch (_) {
+    return false;
+  }
+}
+
+function sendBasicAuthRequired(res) {
+  res.writeHead(401, {
+    "Content-Type": "text/plain; charset=utf-8",
+    "WWW-Authenticate": 'Basic realm="Matrix Private Site"',
+    "X-Robots-Tag": "noindex, nofollow"
+  });
+  res.end("Authentication required.");
 }
 
 function getClientIp(req) {
