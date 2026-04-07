@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Under the Hood | Course Build Prototype</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav-shell">
+      <a class="brand" href="index.html">Course Build Prototype</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Overview</a>
+        <a href="workflow.html">How it works</a>
+        <a class="is-active" href="backend.html" aria-current="page">Under the hood</a>
+        <a href="upload.html">Upload prototype</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero hero-backend">
+      <div class="wrap simple-hero simple-hero-single">
+        <div class="simple-hero-copy">
+          <p class="eyebrow">Under The Hood</p>
+          <h1>The reference page: proof, structure, warnings, and SCORM gaps.</h1>
+          <p class="lede">
+            This is where the detailed evidence lives after the front pages are simplified.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Current State</p>
+          <h2>The prototype has real evidence, but it is not the full build yet.</h2>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card status-card">
+            <table class="status-table">
+              <tbody>
+                <tr><th>Reports</th><td>5 populated reports</td></tr>
+                <tr><th>Tagged blocks</th><td>32 found</td></tr>
+                <tr><th>Extracted files</th><td>2 present</td></tr>
+                <tr><th>Built outputs</th><td>1 learner HTML and 1 prototype worksheet output</td></tr>
+                <tr><th>Validation</th><td>2 of 28 learner outputs confirmed</td></tr>
+                <tr><th>SCORM</th><td>Not ready</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="card tighten-card">
+            <p class="mini-label">Still needs tightening</p>
+            <ul class="fact-list">
+              <li>Duplicate filename `CP4807-1.doc` still needs to be resolved in the source.</li>
+              <li>`CP4807-CPDcert` still needs a file extension.</li>
+              <li>The remaining 26 learner outputs still need to be built.</li>
+              <li>SCORM version, launch structure, tracking, completion, and navigation are still undefined.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Core Files</p>
+          <h2>The repo already contains the pieces the pipeline needs.</h2>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card tree-card">
+            <pre class="code-block"><code>source/
+outputs/
+  extracted/
+  html/
+  docx/
+  browser-course/
+  scorm/
+reports/
+specs/
+agents.md
+prompt-01-analyse.md
+prompt-02-extract.md
+prompt-03-build.md
+prompt-04-package-scorm.md</code></pre>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">What they mean</p>
+            <ul class="fact-list">
+              <li><code>source/</code> = authoring</li>
+              <li><code>reports/</code> = evidence</li>
+              <li><code>outputs/</code> = generated files</li>
+              <li><code>prompt-*.md</code> = automation steps</li>
+              <li><code>specs/</code> + <code>agents.md</code> = rules and stop conditions</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Actual Excerpt</p>
+          <h2>One small repo snippet makes the evidence feel real.</h2>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card fact-card">
+            <p class="mini-label">From the extracted file</p>
+            <pre class="code-block"><code>Homework 1
+Design a program that controls two sets
+of traffic lights at a junction.
+
+RED: 20 seconds
+AMBER: 3 seconds
+GREEN: 20 seconds</code></pre>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">Why it matters</p>
+            <ul class="fact-list">
+              <li>This excerpt is taken from <code>outputs/extracted/CP4807-H1.txt</code>.</li>
+              <li>It shows the pipeline is preserving real source content, not placeholder copy.</li>
+              <li>The same content then becomes <code>outputs/html/CP4807-H1.html</code>.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Proof Chain</p>
+          <h2>One example file shows the pipeline is real.</h2>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card fact-card">
+            <p class="mini-label">Example flow</p>
+            <ul class="fact-list">
+              <li>Analysis identifies `CP4807-H1.html` as Homework 1.</li>
+              <li>Extraction creates `outputs/extracted/CP4807-H1.txt`.</li>
+              <li>Build creates `outputs/html/CP4807-H1.html`.</li>
+              <li>Validation reports no broken internal references in that built file.</li>
+            </ul>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">Example files present now</p>
+            <ul class="fact-list">
+              <li>`outputs/extracted/CP4807-1.txt`</li>
+              <li>`outputs/extracted/CP4807-H1.txt`</li>
+              <li>`outputs/html/CP4807-H1.html`</li>
+              <li>`outputs/docx/CP4807-1.html`</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         TAGGING RULES
+         ══════════════════════════════════════════════════ -->
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Source Tagging Rules</p>
+          <h2>Every block must follow this exact pattern for the pipeline to process it correctly.</h2>
+          <p>The analysis agent scans the source document for blocks that match a known tag pattern. A block that is malformed, missing a filename, or uses an unrecognised tag will be flagged in the analysis report and skipped during extraction.</p>
+        </div>
+
+        <!-- Block anatomy -->
+        <div class="tag-anatomy card">
+          <p class="mini-label">Anatomy of a valid tagged block</p>
+          <div class="tag-anatomy-body">
+            <div class="tag-anatomy-code">
+              <pre class="code-block tag-annotated"><code><span class="ta-open">&lt;HTML&gt;</span>
+<span class="ta-title">Homework 1</span>
+<span class="ta-fname">&lt;filename&gt;"CP4807-H1.html"&lt;/filename&gt;</span>
+
+<span class="ta-content">Design a program that controls
+two sets of traffic lights
+at a junction.</span>
+
+<span class="ta-close">&lt;/HTML&gt;</span></code></pre>
+            </div>
+            <div class="tag-anatomy-notes">
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-open">Opening tag</span>
+                <p>Sets the output type for this block. Must be one of the recognised tags listed below. The AI uses this to decide what to build.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-title">Display title</span>
+                <p>Optional. Appears as the heading in the built output. If omitted, the filename stem is used instead.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-fname">Filename tag</span>
+                <p>Required. Must be unique across the entire source document and must include a valid file extension.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-content">Block content</span>
+                <p>The learner-facing material. Teacher notes and wrapper tags are stripped during the extraction stage.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-close">Closing tag</span>
+                <p>Must exactly match the opening tag including case. <code>&lt;HTML&gt;</code> must close with <code>&lt;/HTML&gt;</code> — not <code>&lt;/html&gt;</code>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tag type reference -->
+        <div class="subsection-heading">
+          <h3>Recognised tag types</h3>
+          <p>The opening tag determines what the AI builds. Using an unrecognised tag causes the block to be skipped with a warning.</p>
+        </div>
+
+        <div class="grid three-up tag-type-grid">
+          <article class="card tag-type-card">
+            <code class="tag-display">&lt;HTML&gt;</code>
+            <h3>Learner HTML page</h3>
+            <p>Builds a learner-facing web page. Used for homework, assignments, assessments, and any block that needs a browser-rendered output.</p>
+            <div class="tag-type-foot">
+              <div class="tag-type-eg"><span class="mini-label" style="margin:0;display:inline">e.g.</span> <code>CP4807-H1.html</code></div>
+              <div class="tag-scorm-note">Assessment subtype becomes a SCO item in the SCORM manifest.</div>
+            </div>
+          </article>
+
+          <article class="card tag-type-card">
+            <code class="tag-display">&lt;worksheet&gt;</code>
+            <h3>Worksheet output</h3>
+            <p>Builds a structured worksheet. Used for in-class activities or any block that needs a printable, downloadable format.</p>
+            <div class="tag-type-foot">
+              <div class="tag-type-eg"><span class="mini-label" style="margin:0;display:inline">e.g.</span> <code>CP4807-1.docx</code></div>
+              <div class="tag-scorm-note tag-scorm-neutral">Not a SCO — does not become a trackable SCORM item.</div>
+            </div>
+          </article>
+
+          <article class="card tag-type-card">
+            <code class="tag-display">&lt;document&gt;</code>
+            <h3>Document output</h3>
+            <p>Builds a reference or supporting document. Used for reading resources, guidance material, and supplementary content.</p>
+            <div class="tag-type-foot">
+              <div class="tag-type-eg"><span class="mini-label" style="margin:0;display:inline">e.g.</span> <code>CP4807-CPDcert.pdf</code></div>
+              <div class="tag-scorm-note tag-scorm-neutral">Supplementary resource only — not tracked by the LMS.</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         FILENAME RULES + COMMON ERRORS
+         ══════════════════════════════════════════════════ -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Filename Rules</p>
+          <h2>Filenames must be unique, correctly typed, and include the right extension.</h2>
+          <p>The filename tag is how the pipeline knows where to write each output. An incorrect or duplicated filename breaks the chain for that block only — the rest of the source continues to process.</p>
+        </div>
+
+        <!-- 4 filename rules -->
+        <div class="grid two-up fname-rules-grid">
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Must be unique across the whole source document</strong>
+              <p>No two blocks can share a filename. Duplicates are flagged in the analysis report and the second block is skipped.</p>
+            </div>
+          </div>
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Must include a file extension</strong>
+              <p>The extension tells the pipeline which folder to route the output to. Without one the file cannot be placed or built.</p>
+            </div>
+          </div>
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Must be wrapped in double quotes inside the tag</strong>
+              <p>The value must be quoted: <code>&lt;filename&gt;"CP4807-H1.html"&lt;/filename&gt;</code>. Unquoted filenames may not be parsed correctly.</p>
+            </div>
+          </div>
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Extension should match the tag type</strong>
+              <p>An <code>&lt;HTML&gt;</code> block should use <code>.html</code> or <code>.htm</code>. A mismatch creates a routing warning in the analysis report.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Common errors -->
+        <div class="subsection-heading" style="margin-top:2.5rem;">
+          <h3>Common tagging errors — and what actually happens</h3>
+          <p>These are the three errors found in this source document. Each is flagged in the analysis report so nothing is silently dropped.</p>
+        </div>
+
+        <div class="grid three-up error-cards-grid">
+
+          <article class="card error-card">
+            <div class="error-type-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Duplicate filename
+            </div>
+            <div class="error-split">
+              <div>
+                <div class="error-badge-wrong">Wrong</div>
+                <pre class="code-block code-block-sm"><code>&lt;HTML&gt;
+&lt;filename&gt;"CP4807-1.doc"
+&lt;/filename&gt;
+&lt;/HTML&gt;
+
+&lt;worksheet&gt;
+&lt;filename&gt;"CP4807-1.doc"
+&lt;/filename&gt;
+&lt;/worksheet&gt;</code></pre>
+              </div>
+              <div class="error-fix-block">
+                <div class="error-badge-fix">Fix</div>
+                <p>Give every block a distinct filename. The second block here is flagged as a duplicate and not extracted.</p>
+                <div class="error-real-case">
+                  <strong>Found in this source:</strong> <code>CP4807-1.doc</code> appears twice.
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card error-card">
+            <div class="error-type-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Missing file extension
+            </div>
+            <div class="error-split">
+              <div>
+                <div class="error-badge-wrong">Wrong</div>
+                <pre class="code-block code-block-sm"><code>&lt;document&gt;
+&lt;filename&gt;"CP4807-CPDcert"
+&lt;/filename&gt;
+...
+&lt;/document&gt;</code></pre>
+              </div>
+              <div class="error-fix-block">
+                <div class="error-badge-fix">Fix</div>
+                <p>Add a valid extension so the pipeline knows where to route the output.</p>
+                <code class="fix-inline">"CP4807-CPDcert.pdf"</code>
+                <div class="error-real-case">
+                  <strong>Found in this source:</strong> <code>CP4807-CPDcert</code> has no extension.
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card error-card">
+            <div class="error-type-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Mismatched closing tag
+            </div>
+            <div class="error-split">
+              <div>
+                <div class="error-badge-wrong">Wrong</div>
+                <pre class="code-block code-block-sm"><code>&lt;HTML&gt;
+&lt;filename&gt;"CP4807-H1.html"
+&lt;/filename&gt;
+Content here.
+&lt;/html&gt;</code></pre>
+              </div>
+              <div class="error-fix-block">
+                <div class="error-badge-fix">Fix</div>
+                <p>The closing tag must exactly match the opening tag — including uppercase. <code>&lt;HTML&gt;</code> must close with <code>&lt;/HTML&gt;</code>.</p>
+                <div class="error-real-case">
+                  <strong>Result:</strong> Block not recognised. Content is silently skipped.
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCORM SOURCE REQUIREMENTS
+         ══════════════════════════════════════════════════ -->
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">SCORM Source Requirements</p>
+          <h2>Five decisions must be defined before SCORM packaging can run.</h2>
+          <p>The pipeline reads these from the source document or a companion definitions file. If any are absent, packaging stops safely and the missing items are listed in the packaging report. None of these can be guessed or defaulted.</p>
+        </div>
+
+        <div class="scorm-req-grid">
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">1</div>
+            <div class="scorm-req-body">
+              <h3>SCORM version</h3>
+              <p>Specify <code>1.2</code> or <code>2004</code>. The manifest schema, API calls, and data model differ between versions. This cannot be derived from the content.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>scorm-version: "1.2"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">2</div>
+            <div class="scorm-req-body">
+              <h3>Launch file</h3>
+              <p>The filename of the first page an LMS should open. Must be one of the built HTML outputs and must already exist before packaging runs.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>launch: "CP4807-H1.html"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">3</div>
+            <div class="scorm-req-body">
+              <h3>Tracking model</h3>
+              <p>Whether the LMS tracks completion, score, or both. Determines which SCORM API calls are written into the SCO and how the manifest declares them.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>tracking: "completion-only"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">4</div>
+            <div class="scorm-req-body">
+              <h3>Completion model</h3>
+              <p>How the LMS decides a learner has finished. Common options are page-view, quiz-pass, time-based, or manual. Must be explicitly chosen by the author.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>completion: "page-view"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">5</div>
+            <div class="scorm-req-body">
+              <h3>Navigation rules</h3>
+              <p>Whether learners can move freely between items or must follow a linear sequence. Affects the manifest organisation and item ordering in the LMS.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>navigation: "free"</code></div>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="scorm-req-note card" style="margin-top:1rem;">
+          <div class="scorm-req-note-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <p>All five must be defined. The packaging prompt explicitly checks for each one and stops with a clear error listing what is missing. Partial definitions are not used — the whole packaging stage is deferred until all five are present.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Prompts And Rules</p>
+          <h2>The prompts line up directly with the stage model.</h2>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card coverage-card">
+            <h3>Prompt files</h3>
+            <ul class="fact-list">
+              <li>`prompt-01-analyse.md` finds blocks, filenames, warnings, and SCORM gaps.</li>
+              <li>`prompt-02-extract.md` creates the staged block files.</li>
+              <li>`prompt-03-build.md` creates learner-facing outputs.</li>
+              <li>`prompt-04-package-scorm.md` stops packaging if the required SCORM decisions are missing.</li>
+            </ul>
+          </article>
+
+          <article class="card coverage-card">
+            <h3>Rules files</h3>
+            <ul class="fact-list">
+              <li>`tag-rules.md` defines block recognition and filename binding.</li>
+              <li>`output-rules.md` defines output behavior and naming.</li>
+              <li>`scorm-rules.md` defines minimum requirements and stop conditions.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">SCORM Gap List</p>
+          <h2>Packaging is blocked for clear reasons, not because the pipeline is vague.</h2>
+        </div>
+
+        <div class="grid three-up">
+          <article class="card benefit-card light-card">
+            <h3>Missing decisions</h3>
+            <p>Version, launch structure, completion, tracking, and navigation still need to be defined.</p>
+          </article>
+          <article class="card benefit-card light-card">
+            <h3>Missing package parts</h3>
+            <p>No launch file and no manifest can be created yet from the current state.</p>
+          </article>
+          <article class="card benefit-card light-card">
+            <h3>Why that is good</h3>
+            <p>The process stops safely instead of claiming SCORM compliance too early.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Prototype | Tagged DOCX Preview</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg: #eef4ff;
+      --panel: #ffffff;
+      --ink: #10213f;
+      --muted: #597096;
+      --line: #c9d6f2;
+      --accent: #2b5be4;
+      --accent-soft: #dce7ff;
+      --success: #11795d;
+      --success-soft: #dcf8ee;
+      --warn: #a55a00;
+      --warn-soft: #fff0da;
+      --danger: #a52828;
+      --danger-soft: #ffe3e3;
+      --shadow: 0 18px 40px rgba(28, 53, 109, 0.12);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, #fdf7ea 0, rgba(253,247,234,0.7) 24%, transparent 48%),
+        linear-gradient(180deg, #eff5ff 0%, #e7efff 100%);
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #edf3ff;
+      border: 1px solid #d7e2fb;
+      border-radius: 8px;
+      padding: 0.12rem 0.42rem;
+      font-size: 0.92em;
+    }
+
+    .wrap { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; }
+    .site-header { padding: 1rem 0 0; }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(201,214,242,0.8);
+      border-radius: 999px;
+      padding: 0.75rem 1rem;
+      backdrop-filter: blur(18px);
+    }
+    .brand { font-weight: 800; letter-spacing: 0.02em; text-decoration: none; }
+    .brand-note { color: var(--muted); font-size: 0.95rem; width: 100%; }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+    }
+    .site-nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 999px;
+      transition: 160ms ease;
+    }
+    .site-nav a:hover,
+    .site-nav a.is-active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .hero { padding: 2rem 0 1.4rem; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 1.3rem;
+      align-items: stretch;
+    }
+    .hero-copy,
+    .hero-side,
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(201,214,242,0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-copy {
+      padding: 1.8rem;
+      background:
+        linear-gradient(135deg, rgba(43,91,228,0.07), rgba(17,121,93,0.03)),
+        var(--panel);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      margin: 0 0 0.85rem;
+    }
+    h1, h2, h3, h4, p { margin-top: 0; }
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.02;
+      margin-bottom: 0.85rem;
+      max-width: 12ch;
+    }
+    .lede {
+      font-size: 1.08rem;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 64ch;
+      margin-bottom: 1.1rem;
+    }
+    .hero-flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-top: 1.25rem;
+    }
+    .flow-chip {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid #d5e1fb;
+      background: #f8fbff;
+    }
+    .flow-chip strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+    .flow-chip span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    .hero-side { padding: 1.4rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .stat {
+      padding: 1rem;
+      border-radius: 16px;
+      background: #f8fbff;
+      border: 1px solid #d8e3fb;
+    }
+    .stat strong {
+      display: block;
+      font-size: 1.55rem;
+      margin-bottom: 0.25rem;
+    }
+    .stat span { color: var(--muted); line-height: 1.45; font-size: 0.93rem; }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.2rem;
+      padding-bottom: 2rem;
+    }
+    .stack { display: grid; gap: 1.2rem; }
+    .panel { padding: 1.35rem; }
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .section-head p { color: var(--muted); max-width: 58ch; margin-bottom: 0; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: #f2f6ff;
+      border: 1px solid #d6e1fb;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .dropzone {
+      position: relative;
+      border: 1.5px dashed #aec3f7;
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(220,231,255,0.55), rgba(255,255,255,0.95)),
+        #fff;
+      padding: 1.35rem;
+      transition: 180ms ease;
+    }
+    .dropzone.is-dragover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 18px 28px rgba(43,91,228,0.13);
+    }
+    .dropzone h3 { margin-bottom: 0.45rem; }
+    .dropzone p { color: var(--muted); line-height: 1.6; margin-bottom: 1rem; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.92rem 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button-primary {
+      background: linear-gradient(135deg, #2b5be4, #3d77ff);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(43,91,228,0.22);
+    }
+    .button-secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid #cddafb;
+    }
+    .file-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .preview-box,
+    .warning-list,
+    .empty-state,
+    .output-list,
+    .block-list,
+    .scorm-grid {
+      display: grid;
+      gap: 0.9rem;
+    }
+    .preview-box {
+      max-height: 480px;
+      overflow: auto;
+      padding: 1rem;
+      background: #fbfdff;
+      border: 1px solid #dce6fb;
+      border-radius: 18px;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      color: #243a62;
+    }
+    .empty-state {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px dashed #c5d6f8;
+      background: #f8fbff;
+      color: var(--muted);
+    }
+    .block-card,
+    .output-card,
+    .scorm-card,
+    .warning-card {
+      border: 1px solid #d8e3fb;
+      background: #fbfdff;
+      border-radius: 18px;
+      padding: 1rem;
+    }
+    .block-top,
+    .output-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+    .block-meta,
+    .output-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+    .mini-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.34rem 0.68rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .mini-tag.success { background: var(--success-soft); color: var(--success); }
+    .mini-tag.warn { background: var(--warn-soft); color: var(--warn); }
+    .mini-tag.danger { background: var(--danger-soft); color: var(--danger); }
+    .excerpt {
+      background: #fff;
+      border: 1px solid #e0e8fb;
+      border-radius: 14px;
+      padding: 0.9rem;
+      line-height: 1.65;
+      color: #243a62;
+      white-space: pre-wrap;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.9rem;
+    }
+    .meta-box {
+      background: #fff;
+      border: 1px solid #e0e8fb;
+      border-radius: 14px;
+      padding: 0.8rem;
+    }
+    .meta-box strong {
+      display: block;
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.28rem;
+    }
+    .scorm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .scorm-card p,
+    .warning-card p,
+    .output-card p,
+    .block-card p { color: var(--muted); line-height: 1.55; margin-bottom: 0; }
+    .warning-card.warn { background: #fffaf1; border-color: #f2d7aa; }
+    .warning-card.danger { background: #fff5f5; border-color: #f1c2c2; }
+    .status-banner {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid #dce6fb;
+      background: linear-gradient(180deg, #f7faff, #ffffff);
+      color: var(--muted);
+    }
+    .status-banner strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .action-panel,
+    .generated-panel {
+      margin-bottom: 2rem;
+    }
+    .action-panel[hidden],
+    .generated-panel[hidden] {
+      display: none;
+    }
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .action-button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.95rem 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2b5be4, #3d77ff);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(43,91,228,0.18);
+    }
+    .action-button.secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid #cddafb;
+      box-shadow: none;
+    }
+    .action-button[disabled] {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .action-note {
+      margin-top: 0.9rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .generated-list {
+      display: grid;
+      gap: 0.9rem;
+    }
+    .generated-card {
+      border: 1px solid #d8e3fb;
+      border-radius: 18px;
+      padding: 1rem;
+      background: #fbfdff;
+    }
+    .generated-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .generated-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .download-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 0.85rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid #cddafb;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1040px) {
+      .hero-grid,
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 1rem, 1180px); }
+      .brand-row { border-radius: 24px; align-items: flex-start; flex-direction: column; }
+      .site-nav { width: 100%; }
+      .hero-copy, .hero-side, .panel { padding: 1rem; }
+      .hero-flow,
+      .stats,
+      .meta-grid,
+      .scorm-grid { grid-template-columns: 1fr; }
+      .section-head,
+      .block-top,
+      .output-top,
+      .generated-card-top { flex-direction: column; align-items: flex-start; }
+      .button-row .button,
+      .action-button,
+      .download-link { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <div class="brand-row">
+        <a class="brand" href="upload.html">Tagged DOCX Upload Prototype</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="index.html">Overview</a>
+          <a href="workflow.html">How it works</a>
+          <a href="backend.html">Under the hood</a>
+          <a class="is-active" href="upload.html" aria-current="page">Upload prototype</a>
+        </nav>
+        <div class="brand-note">Browser-only preview for source analysis, proposed outputs, and SCORM gaps.</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Prototype Mode</p>
+          <h1>Upload one tagged Word source and see what the pipeline would do.</h1>
+          <p class="lede">
+            This demo extracts readable text from a local <code>.docx</code>, detects custom tags, lists the blocks in source
+            order, proposes outputs, and highlights missing SCORM decisions without claiming compliance.
+          </p>
+
+          <div class="hero-flow">
+            <div class="flow-chip">
+              <strong>1. Upload source</strong>
+              <span>Pick a tagged Word file from your machine. Nothing is uploaded to a server.</span>
+            </div>
+            <div class="flow-chip">
+              <strong>2. Detect structure</strong>
+              <span>Preview the document, find tags, filenames, warnings, and likely classifications.</span>
+            </div>
+            <div class="flow-chip">
+              <strong>3. Show outcomes</strong>
+              <span>See proposed HTML or DOCX-style outputs plus what SCORM still needs.</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-side">
+          <p class="eyebrow">What This Checks</p>
+          <div class="stats">
+            <div class="stat">
+              <strong>Tags</strong>
+              <span><code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, <code>&lt;document&gt;</code>, and <code>&lt;filename&gt;</code>.</span>
+            </div>
+            <div class="stat">
+              <strong>Blocks</strong>
+              <span>Source order, tag type, filename, excerpt, and likely classification.</span>
+            </div>
+            <div class="stat">
+              <strong>Outputs</strong>
+              <span>Likely destination folders such as <code>outputs/html/</code> and <code>outputs/docx/</code>.</span>
+            </div>
+            <div class="stat">
+              <strong>SCORM</strong>
+              <span>Version, launch file, manifest, completion, tracking, and sequencing gaps.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <div class="stack">
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <h2>Upload area</h2>
+              <p>Select a local tagged Word file and the page will parse it inside the browser.</p>
+            </div>
+            <span class="pill">Accepts <code>.docx</code></span>
+          </div>
+
+          <label class="dropzone" id="dropzone">
+            <input id="fileInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+            <h3>Drop a <code>.docx</code> here or click to browse</h3>
+            <p>Example source: <code>CP4807 - Introduction to microcontrollers 05 04 26.docx</code></p>
+            <div class="button-row">
+              <span class="button button-primary">Choose DOCX</span>
+              <span class="button button-secondary">Browser only</span>
+            </div>
+            <div class="file-meta" id="fileMeta">
+              <span>No file loaded yet.</span>
+            </div>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <h2>Document preview</h2>
+              <p>Best-effort readable text extracted from the uploaded Word file.</p>
+            </div>
+            <span class="pill" id="previewStatus">Waiting for upload</span>
+          </div>
+          <div id="previewBox" class="empty-state">
+            Upload a tagged <code>.docx</code> to see the extracted document text here.
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <h2>Detected blocks</h2>
+              <p>Custom-tagged blocks are listed in the order they appear in the source.</p>
+            </div>
+            <span class="pill" id="blocksCount">0 blocks</span>
+          </div>
+          <div id="blocksList" class="empty-state">
+            No blocks yet. Upload a document to detect <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, and <code>&lt;document&gt;</code> sections.
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <h2>Proposed outputs</h2>
+              <p>Valid blocks produce likely output types and likely destination folders.</p>
+            </div>
+            <span class="pill" id="outputsCount">0 outputs</span>
+          </div>
+          <div id="outputsList" class="empty-state">
+            Proposed outputs will appear here after tags and filenames are detected.
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <h2>SCORM readiness</h2>
+              <p>This panel shows what is present and what is still missing for packaging decisions.</p>
+            </div>
+            <span class="pill" id="scormStatus">Not assessed</span>
+          </div>
+          <div id="scormPanel" class="empty-state">
+            Upload a source document to inspect SCORM-related notes and missing decisions.
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <h2>Errors and warnings</h2>
+              <p>Friendly warnings are shown for invalid files, missing filenames, and malformed tags.</p>
+            </div>
+            <span class="pill" id="warningsCount">0 warnings</span>
+          </div>
+          <div id="warningsList" class="empty-state">
+            No warnings yet.
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel action-panel" id="actionsPanel" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Complete the prototype flow</h2>
+          <p>Once the source has been analysed, you can generate browser-only prototype artefacts and download them.</p>
+        </div>
+        <span class="pill" id="actionStatus">Ready after analysis</span>
+      </div>
+      <div class="action-bar">
+        <button class="action-button" id="generateBtn" type="button" disabled>Generate Prototype Outputs</button>
+        <button class="action-button secondary" id="summaryBtn" type="button" disabled>Download Summary Report</button>
+        <button class="action-button secondary" id="bundleBtn" type="button" disabled>Download Output Bundle</button>
+      </div>
+      <p class="action-note">Prototype mode only: HTML blocks generate browser files, worksheet/document blocks generate stand-in previews, and SCORM remains a readiness note rather than a real package.</p>
+    </section>
+
+    <section class="panel generated-panel" id="generatedPanel" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Generated prototype outputs</h2>
+          <p>These browser-generated artefacts are downloadable stand-ins so the full flow can be demonstrated end to end.</p>
+        </div>
+        <span class="pill" id="generatedCount">0 files</span>
+      </div>
+      <div id="generatedList" class="empty-state">No prototype artefacts generated yet.</div>
+    </section>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const dropzone = document.getElementById("dropzone");
+    const previewBox = document.getElementById("previewBox");
+    const previewStatus = document.getElementById("previewStatus");
+    const blocksList = document.getElementById("blocksList");
+    const blocksCount = document.getElementById("blocksCount");
+    const outputsList = document.getElementById("outputsList");
+    const outputsCount = document.getElementById("outputsCount");
+    const scormPanel = document.getElementById("scormPanel");
+    const scormStatus = document.getElementById("scormStatus");
+    const warningsList = document.getElementById("warningsList");
+    const warningsCount = document.getElementById("warningsCount");
+    const fileMeta = document.getElementById("fileMeta");
+    const actionsPanel = document.getElementById("actionsPanel");
+    const actionStatus = document.getElementById("actionStatus");
+    const generateBtn = document.getElementById("generateBtn");
+    const summaryBtn = document.getElementById("summaryBtn");
+    const bundleBtn = document.getElementById("bundleBtn");
+    const generatedPanel = document.getElementById("generatedPanel");
+    const generatedCount = document.getElementById("generatedCount");
+    const generatedList = document.getElementById("generatedList");
+
+    let currentSourceFile = "";
+    let currentSourceText = "";
+    let currentAnalysis = null;
+    let generatedArtefacts = [];
+    let activeObjectUrls = [];
+
+    const TAG_PATTERNS = [
+      { label: "HTML", open: /<HTML>/gi, close: /<\/HTML>/gi },
+      { label: "worksheet", open: /<worksheet>/gi, close: /<\/worksheet>/gi },
+      { label: "document", open: /<document>/gi, close: /<\/document>/gi }
+    ];
+
+    fileInput.addEventListener("change", (event) => {
+      const [file] = event.target.files || [];
+      if (file) handleFile(file);
+    });
+
+    ["dragenter", "dragover"].forEach((name) => {
+      dropzone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropzone.classList.add("is-dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((name) => {
+      dropzone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropzone.classList.remove("is-dragover");
+      });
+    });
+
+    dropzone.addEventListener("drop", (event) => {
+      const [file] = event.dataTransfer.files || [];
+      if (file) handleFile(file);
+    });
+
+    generateBtn.addEventListener("click", () => {
+      if (!currentAnalysis) return;
+      generatedArtefacts = buildPrototypeArtefacts(currentAnalysis.blocks);
+      renderGeneratedOutputs(generatedArtefacts);
+      actionStatus.textContent = "Prototype outputs generated";
+    });
+
+    summaryBtn.addEventListener("click", () => {
+      if (!currentAnalysis) return;
+      downloadTextFile(`${baseName(currentSourceFile) || "prototype"}-summary-report.txt`, buildSummaryReport());
+    });
+
+    bundleBtn.addEventListener("click", async () => {
+      if (!currentAnalysis) return;
+      if (!generatedArtefacts.length) {
+        generatedArtefacts = buildPrototypeArtefacts(currentAnalysis.blocks);
+        renderGeneratedOutputs(generatedArtefacts);
+      }
+      await downloadBundle();
+    });
+
+    async function handleFile(file) {
+      resetUI();
+      currentSourceFile = file.name;
+
+      if (!file.name.toLowerCase().endsWith(".docx")) {
+        renderError("Please upload a Word .docx file. This prototype does not parse .doc or PDF files.");
+        return;
+      }
+
+      fileMeta.innerHTML = `
+        <span><strong>File:</strong> ${escapeHtml(file.name)}</span>
+        <span><strong>Size:</strong> ${Math.max(1, Math.round(file.size / 1024))} KB</span>
+        <span><strong>Last modified:</strong> ${new Date(file.lastModified).toLocaleString()}</span>
+      `;
+
+      previewStatus.textContent = "Reading DOCX";
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const zip = await JSZip.loadAsync(buffer);
+        const documentXml = await zip.file("word/document.xml")?.async("string");
+
+        if (!documentXml) {
+          renderError("The uploaded .docx could not be read as a standard Word document.");
+          return;
+        }
+
+        const readableText = extractReadableText(documentXml);
+        const analysis = analyzeText(readableText);
+        currentSourceText = readableText;
+        currentAnalysis = analysis;
+        renderAnalysis(readableText, analysis);
+      } catch (error) {
+        console.error(error);
+        renderError("Something went wrong while reading the document. Try another .docx file or save the source again from Word.");
+      }
+    }
+
+    function extractReadableText(xmlString) {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlString, "application/xml");
+      const paragraphs = [];
+      const nodes = xml.getElementsByTagNameNS("*", "p");
+
+      for (const paragraph of nodes) {
+        const textNodes = paragraph.getElementsByTagNameNS("*", "t");
+        let line = "";
+        for (const node of textNodes) line += node.textContent || "";
+        line = line.replace(/\u00a0/g, " ").trim();
+        if (line) paragraphs.push(line);
+      }
+
+      return paragraphs.join("\n");
+    }
+
+    function analyzeText(text) {
+      const warnings = [];
+      const filenameMatches = [...text.matchAll(/<filename>\s*\"?([^\"<>\n]+)\"?\s*<\/filename>/gi)];
+      const allCloseTags = [...text.matchAll(/<\/(HTML|worksheet|document)>/gi)];
+      const blocks = [];
+      const duplicateMap = new Map();
+
+      TAG_PATTERNS.forEach((tag) => {
+        const opens = [...text.matchAll(new RegExp(tag.open))];
+        const closes = [...text.matchAll(new RegExp(tag.close))];
+
+        if (closes.length > opens.length) {
+          warnings.push({
+            level: "warn",
+            title: `Extra closing ${tag.label} tag`,
+            detail: `Found ${closes.length} closing tags but only ${opens.length} opening tags for ${tag.label}.`
+          });
+        }
+
+        opens.forEach((openMatch) => {
+          const openIndex = openMatch.index ?? 0;
+          const closeMatch = closes.find((candidate) => (candidate.index ?? 0) > openIndex);
+
+          if (!closeMatch) {
+            warnings.push({
+              level: "danger",
+              title: `Unclosed ${tag.label} block`,
+              detail: `An opening <${tag.label}> tag was found without a matching closing tag.`
+            });
+            return;
+          }
+
+          const closeIndex = closeMatch.index ?? 0;
+          const body = text
+            .slice(openIndex + openMatch[0].length, closeIndex)
+            .replace(/<filename>\s*\"?([^\"<>\n]+)\"?\s*<\/filename>/gi, "")
+            .trim();
+
+          const filenameMatch = filenameMatches.find((match) => {
+            const filenameIndex = match.index ?? 0;
+            return filenameIndex > openIndex && filenameIndex < closeIndex;
+          });
+
+          const filename = filenameMatch ? filenameMatch[1].trim() : "";
+          const classification = inferClassification(body, filename);
+          const output = inferOutput(tag.label, filename);
+
+          if (!filename) {
+            warnings.push({
+              level: "warn",
+              title: `Missing filename in ${tag.label} block`,
+              detail: `Block ${blocks.length + 1} has a valid ${tag.label} section but no <filename> value.`
+            });
+          } else {
+            duplicateMap.set(filename, (duplicateMap.get(filename) || 0) + 1);
+          }
+
+          blocks.push({
+            order: blocks.length + 1,
+            tagType: tag.label,
+            filename,
+            excerpt: makeExcerpt(body, 220),
+            body,
+            classification,
+            outputType: output.type,
+            destination: output.destination,
+            rawOpenIndex: openIndex
+          });
+        });
+      });
+
+      duplicateMap.forEach((count, filename) => {
+        if (count > 1) {
+          warnings.push({
+            level: "warn",
+            title: "Duplicate filename",
+            detail: `${filename} appears ${count} times across detected blocks.`
+          });
+        }
+      });
+
+      if (allCloseTags.length && !blocks.length) {
+        warnings.push({
+          level: "warn",
+          title: "Tag-like text found but no valid blocks built",
+          detail: "Closing tags were detected, but the prototype could not form complete blocks from the document text."
+        });
+      }
+
+      blocks.sort((a, b) => a.rawOpenIndex - b.rawOpenIndex).forEach((block, index) => {
+        block.order = index + 1;
+      });
+
+      const scorm = analyzeScorm(text, blocks);
+      return { blocks, warnings, scorm };
+    }
+
+    function inferClassification(content, filename) {
+      const sample = `${filename} ${content}`.toLowerCase();
+      if (sample.includes("teacher")) return "teacher content";
+      if (sample.includes("homework")) return "homework";
+      if (sample.includes("assessment") || sample.includes("quiz") || sample.includes("test")) return "assessment";
+      if (sample.includes("certificate")) return "certificate";
+      if (sample.includes("project")) return "project brief";
+      if (sample.includes("plan") || sample.includes("spec") || sample.includes("instruction")) return "planning/specification";
+      return "learner content";
+    }
+
+    function inferOutput(tagType, filename) {
+      if (tagType.toLowerCase() === "html") {
+        return { type: "Learner HTML", destination: filename ? "outputs/html/" : "outputs/html/ (proposed)" };
+      }
+      return { type: "Worksheet or document output", destination: filename ? "outputs/docx/" : "outputs/docx/ (proposed)" };
+    }
+
+    function analyzeScorm(text, blocks) {
+      const lower = text.toLowerCase();
+      const checks = [
+        { label: "SCORM version", ok: /(scorm\s*1\.2|scorm\s*2004)/i.test(text), missing: "Specify SCORM 1.2 or SCORM 2004 explicitly." },
+        { label: "Launch file", ok: /launch|index\.html|start/i.test(text), missing: "Define which file should launch first." },
+        { label: "Manifest data", ok: /manifest|imsmanifest|identifier|resource/i.test(text), missing: "Add package metadata and manifest structure." },
+        { label: "Completion model", ok: /completion|passed|mastery|score/i.test(text), missing: "Define how completion or passing should be measured." },
+        { label: "Tracking model", ok: /tracking|suspend_data|bookmark|progress/i.test(text), missing: "Define what learner progress should be tracked." },
+        { label: "Navigation / sequencing", ok: /sequencing|navigation|next|previous/i.test(text), missing: "Define learner navigation and sequencing rules." }
+      ];
+
+      const foundScormNotes = lower.includes("scorm");
+      const validOutputs = blocks.filter((block) => block.filename);
+      const ready = checks.every((item) => item.ok) && validOutputs.length > 0;
+
+      return {
+        checks,
+        ready,
+        summary: ready
+          ? "This prototype found the main decisions needed for packaging, but a real build would still need package validation."
+          : foundScormNotes
+            ? "Some SCORM-related notes were found, but important packaging decisions are still missing."
+            : "No clear SCORM specification was found in the uploaded document."
+      };
+    }
+
+    function renderAnalysis(text, analysis) {
+      previewStatus.textContent = "Preview ready";
+      previewBox.className = "preview-box";
+      previewBox.textContent = text || "No readable text could be extracted.";
+
+      renderBlocks(analysis.blocks);
+      renderOutputs(analysis.blocks);
+      renderScorm(analysis.scorm);
+      renderWarnings(analysis.warnings, analysis.blocks.length === 0 && text ? [{
+        level: "warn",
+        title: "No supported tags found",
+        detail: "The document preview was extracted, but no supported custom blocks were detected."
+      }] : []);
+      actionsPanel.hidden = false;
+      setActionButtons(true);
+      actionStatus.textContent = "Analysis complete";
+    }
+
+    function renderBlocks(blocks) {
+      blocksCount.textContent = `${blocks.length} block${blocks.length === 1 ? "" : "s"}`;
+
+      if (!blocks.length) {
+        blocksList.className = "empty-state";
+        blocksList.innerHTML = "No supported tagged blocks were detected in this preview.";
+        return;
+      }
+
+      blocksList.className = "block-list";
+      blocksList.innerHTML = blocks.map((block) => `
+        <article class="block-card">
+          <div class="block-top">
+            <div>
+              <h3>Block ${block.order}</h3>
+              <p>${escapeHtml(block.outputType)}</p>
+            </div>
+            <div class="block-meta">
+              <span class="mini-tag">${escapeHtml(block.tagType)}</span>
+              <span class="mini-tag success">${escapeHtml(block.classification)}</span>
+              ${block.filename ? `<span class="mini-tag">${escapeHtml(block.filename)}</span>` : `<span class="mini-tag warn">filename missing</span>`}
+            </div>
+          </div>
+          <div class="excerpt">${escapeHtml(block.excerpt)}</div>
+          <div class="meta-grid">
+            <div class="meta-box">
+              <strong>Filename</strong>
+              <div>${block.filename ? `<code>${escapeHtml(block.filename)}</code>` : "No filename detected"}</div>
+            </div>
+            <div class="meta-box">
+              <strong>Destination</strong>
+              <div><code>${escapeHtml(block.destination)}</code></div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderOutputs(blocks) {
+      const valid = blocks.filter((block) => block.filename);
+      outputsCount.textContent = `${valid.length} proposed`;
+
+      if (!valid.length) {
+        outputsList.className = "empty-state";
+        outputsList.innerHTML = "Valid outputs will appear here when blocks include usable filenames.";
+        return;
+      }
+
+      outputsList.className = "output-list";
+      outputsList.innerHTML = valid.map((block) => `
+        <article class="output-card">
+          <div class="output-top">
+            <div>
+              <h3>${escapeHtml(block.filename)}</h3>
+              <p>${escapeHtml(block.outputType)}</p>
+            </div>
+            <div class="output-meta">
+              <span class="mini-tag success">${escapeHtml(block.tagType)}</span>
+            </div>
+          </div>
+          <div class="meta-grid">
+            <div class="meta-box">
+              <strong>Likely folder</strong>
+              <div><code>${escapeHtml(block.destination)}</code></div>
+            </div>
+            <div class="meta-box">
+              <strong>Classification</strong>
+              <div>${escapeHtml(block.classification)}</div>
+            </div>
+          </div>
+          <div class="excerpt" style="margin-top:0.9rem;">${escapeHtml(makeExcerpt(block.body, 160))}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderScorm(scorm) {
+      scormStatus.textContent = scorm.ready ? "Potentially packageable" : "Not ready";
+      scormPanel.className = "scorm-grid";
+      scormPanel.innerHTML = `
+        <div class="status-banner" style="grid-column: 1 / -1;">
+          <strong>${escapeHtml(scorm.summary)}</strong>
+          This prototype highlights missing decisions. It does not claim SCORM compliance.
+        </div>
+        ${scorm.checks.map((item) => `
+          <article class="scorm-card">
+            <div class="block-top">
+              <h3>${escapeHtml(item.label)}</h3>
+              <span class="mini-tag ${item.ok ? "success" : "warn"}">${item.ok ? "Found" : "Missing"}</span>
+            </div>
+            <p>${item.ok ? "Relevant wording or signals were found in the uploaded document." : escapeHtml(item.missing)}</p>
+          </article>
+        `).join("")}
+      `;
+    }
+
+    function renderWarnings(primaryWarnings, extraWarnings) {
+      const allWarnings = [...primaryWarnings, ...extraWarnings];
+      warningsCount.textContent = `${allWarnings.length} warning${allWarnings.length === 1 ? "" : "s"}`;
+
+      if (!allWarnings.length) {
+        warningsList.className = "empty-state";
+        warningsList.innerHTML = "No obvious problems were detected in this prototype pass.";
+        return;
+      }
+
+      warningsList.className = "warning-list";
+      warningsList.innerHTML = allWarnings.map((warning) => `
+        <article class="warning-card ${warning.level}">
+          <div class="block-top">
+            <h3>${escapeHtml(warning.title)}</h3>
+            <span class="mini-tag ${warning.level === "danger" ? "danger" : "warn"}">${warning.level === "danger" ? "Error" : "Warning"}</span>
+          </div>
+          <p>${escapeHtml(warning.detail)}</p>
+        </article>
+      `).join("");
+    }
+
+    function renderGeneratedOutputs(files) {
+      generatedPanel.hidden = false;
+      generatedCount.textContent = `${files.length} file${files.length === 1 ? "" : "s"}`;
+
+      if (!files.length) {
+        generatedList.className = "empty-state";
+        generatedList.textContent = "No prototype artefacts were generated from this source.";
+        return;
+      }
+
+      generatedList.className = "generated-list";
+      generatedList.innerHTML = files.map((file) => `
+        <article class="generated-card">
+          <div class="generated-card-top">
+            <div>
+              <h3>${escapeHtml(file.filename)}</h3>
+              <p>${escapeHtml(file.outputLabel)}</p>
+            </div>
+            <a class="download-link" href="${escapeHtml(file.url)}" download="${escapeHtml(file.filename)}">Download</a>
+          </div>
+          <div class="meta-grid">
+            <div class="meta-box">
+              <strong>Source block</strong>
+              <div>${escapeHtml(file.tagType)}</div>
+            </div>
+            <div class="meta-box">
+              <strong>Status</strong>
+              <div>${escapeHtml(file.status)}</div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderError(message) {
+      previewStatus.textContent = "Upload failed";
+      previewBox.className = "empty-state";
+      previewBox.textContent = message;
+      blocksList.className = "empty-state";
+      blocksList.textContent = "No blocks available.";
+      outputsList.className = "empty-state";
+      outputsList.textContent = "No outputs available.";
+      scormPanel.className = "empty-state";
+      scormPanel.textContent = "SCORM readiness could not be assessed.";
+      actionsPanel.hidden = false;
+      setActionButtons(false);
+      actionStatus.textContent = "Waiting for a valid file";
+      renderWarnings([{ level: "danger", title: "File could not be processed", detail: message }], []);
+    }
+
+    function buildPrototypeArtefacts(blocks) {
+      revokeObjectUrls();
+      const validBlocks = blocks.filter((block) => block.filename);
+      return validBlocks.map((block) => {
+        const tag = block.tagType.toLowerCase();
+        const filename = resolvePrototypeFilename(block);
+        const isHtml = tag === "html" || filename.toLowerCase().endsWith(".html") || filename.toLowerCase().endsWith(".htm");
+        const content = isHtml ? buildPrototypeHtml(block, filename) : buildPrototypeText(block);
+        const mime = isHtml ? "text/html;charset=utf-8" : "text/plain;charset=utf-8";
+        const url = createDownloadUrl(content, mime);
+
+        return {
+          filename,
+          tagType: block.tagType,
+          outputLabel: tag === "html" ? "Prototype learner HTML output" : "Prototype stand-in output",
+          status: tag === "html" ? "Ready to download" : "Stand-in preview generated",
+          content,
+          mime,
+          url
+        };
+      });
+    }
+
+    function resolvePrototypeFilename(block) {
+      const original = block.filename.trim();
+      const lower = original.toLowerCase();
+
+      if (block.tagType.toLowerCase() === "html") {
+        if (lower.endsWith(".html") || lower.endsWith(".htm")) return original;
+        return `${original}.htm`;
+      }
+
+      if (lower.endsWith(".html") || lower.endsWith(".htm") || lower.endsWith(".txt")) return original;
+
+      const stripped = original.replace(/\.[^.]+$/, "");
+      return `${stripped || original}.html`;
+    }
+
+    function buildPrototypeHtml(block, filename) {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${escapeHtml(filename)}</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f7ff; color: #172554; }
+    main { max-width: 860px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+    .card { background: white; border: 1px solid #dbe5ff; border-radius: 18px; padding: 1.4rem; }
+    .eyebrow { display: inline-block; padding: 0.25rem 0.55rem; border-radius: 999px; background: #dbe7ff; color: #2855d8; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; }
+    h1 { margin: 0.75rem 0 0.5rem; font-size: 1.9rem; }
+    p, li { line-height: 1.65; color: #405579; }
+    .meta { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0.75rem; margin: 1rem 0 1.2rem; }
+    .meta div { background: #f8fbff; border: 1px solid #dbe5ff; border-radius: 12px; padding: 0.75rem; }
+    .meta strong { display: block; font-size: 12px; text-transform: uppercase; color: #5b7096; margin-bottom: 0.25rem; }
+    .content { white-space: pre-wrap; background: #f8fbff; border-radius: 14px; border: 1px solid #dbe5ff; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <span class="eyebrow">${block.tagType === "HTML" ? "Learner HTML prototype" : "Prototype stand-in"}</span>
+      <h1>${escapeHtml(filename)}</h1>
+      <p>This file was generated in the browser as a prototype artefact from the uploaded DOCX source.</p>
+      <div class="meta">
+        <div><strong>Source block</strong>${escapeHtml(block.tagType)}</div>
+        <div><strong>Classification</strong>${escapeHtml(block.classification)}</div>
+        <div><strong>Destination</strong>${escapeHtml(block.destination)}</div>
+      </div>
+      <div class="content">${escapeHtml(block.body)}</div>
+    </div>
+  </main>
+</body>
+</html>`;
+    }
+
+    function buildPrototypeText(block) {
+      return [
+        `Prototype output: ${block.filename}`,
+        `Source block type: ${block.tagType}`,
+        `Classification: ${block.classification}`,
+        `Proposed destination: ${block.destination}`,
+        "",
+        "Content preview:",
+        block.body
+      ].join("\n");
+    }
+
+    function buildSummaryReport() {
+      if (!currentAnalysis) return "";
+      const filenames = currentAnalysis.blocks.filter((block) => block.filename).map((block) => block.filename);
+      const missingDecisions = currentAnalysis.scorm.checks.filter((item) => !item.ok).map((item) => `- ${item.label}: ${item.missing}`);
+      const warnings = currentAnalysis.warnings.length
+        ? currentAnalysis.warnings.map((warning) => `- [${warning.level.toUpperCase()}] ${warning.title}: ${warning.detail}`)
+        : ["- No obvious warnings detected."];
+      const proposed = currentAnalysis.blocks.length
+        ? currentAnalysis.blocks.map((block) => `- Block ${block.order}: ${block.filename || "(missing filename)"} -> ${block.outputType} -> ${block.destination}`)
+        : ["- No supported tagged blocks detected."];
+
+      return [
+        "Tagged DOCX Prototype Summary",
+        "============================",
+        `Source file: ${currentSourceFile || "Unknown"}`,
+        `Detected blocks: ${currentAnalysis.blocks.length}`,
+        `Valid filenames: ${filenames.length}`,
+        "",
+        "Filenames found:",
+        ...(filenames.length ? filenames.map((name) => `- ${name}`) : ["- None"]),
+        "",
+        "Warnings and errors:",
+        ...warnings,
+        "",
+        "Proposed outputs:",
+        ...proposed,
+        "",
+        "SCORM readiness:",
+        `- ${currentAnalysis.scorm.summary}`,
+        "",
+        "Missing SCORM decisions:",
+        ...(missingDecisions.length ? missingDecisions : ["- None detected by the prototype."]),
+        "",
+        "Prototype note:",
+        "- Worksheet and document outputs may be represented as stand-in HTML or text previews in this browser-only demo."
+      ].join("\n");
+    }
+
+    async function downloadBundle() {
+      const zip = new JSZip();
+      zip.file("summary-report.txt", buildSummaryReport());
+      zip.file("blocks-metadata.json", JSON.stringify(currentAnalysis.blocks, null, 2));
+      zip.file("proposed-outputs.json", JSON.stringify(currentAnalysis.blocks.filter((block) => block.filename).map((block) => ({
+        filename: block.filename,
+        tagType: block.tagType,
+        outputType: block.outputType,
+        destination: block.destination,
+        classification: block.classification
+      })), null, 2));
+      zip.file("scorm-readiness.txt", [
+        currentAnalysis.scorm.summary,
+        "",
+        ...currentAnalysis.scorm.checks.map((item) => `${item.label}: ${item.ok ? "FOUND" : `MISSING - ${item.missing}`}`)
+      ].join("\n"));
+
+      generatedArtefacts.forEach((file) => {
+        zip.file(`generated/${file.filename}`, file.content);
+      });
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = createObjectUrl(blob);
+      triggerDownload(url, `${baseName(currentSourceFile) || "prototype"}-output-bundle.zip`);
+      actionStatus.textContent = "Bundle downloaded";
+    }
+
+    function setActionButtons(enabled) {
+      generateBtn.disabled = !enabled;
+      summaryBtn.disabled = !enabled;
+      bundleBtn.disabled = !enabled;
+    }
+
+    function createDownloadUrl(content, mime) {
+      const blob = new Blob([content], { type: mime });
+      return createObjectUrl(blob);
+    }
+
+    function createObjectUrl(blob) {
+      const url = URL.createObjectURL(blob);
+      activeObjectUrls.push(url);
+      return url;
+    }
+
+    function downloadTextFile(filename, content) {
+      const url = createDownloadUrl(content, "text/plain;charset=utf-8");
+      triggerDownload(url, filename);
+      actionStatus.textContent = "Summary downloaded";
+    }
+
+    function triggerDownload(url, filename) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    function revokeObjectUrls() {
+      activeObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+      activeObjectUrls = [];
+    }
+
+    function baseName(filename) {
+      return filename ? filename.replace(/\.[^.]+$/, "") : "";
+    }
+
+    function resetUI() {
+      revokeObjectUrls();
+      currentSourceFile = "";
+      currentSourceText = "";
+      currentAnalysis = null;
+      generatedArtefacts = [];
+      blocksCount.textContent = "0 blocks";
+      outputsCount.textContent = "0 outputs";
+      warningsCount.textContent = "0 warnings";
+      scormStatus.textContent = "Not assessed";
+      previewBox.className = "empty-state";
+      blocksList.className = "empty-state";
+      outputsList.className = "empty-state";
+      scormPanel.className = "empty-state";
+      warningsList.className = "empty-state";
+      actionsPanel.hidden = true;
+      generatedPanel.hidden = true;
+      generatedList.className = "empty-state";
+      generatedList.textContent = "No prototype artefacts generated yet.";
+      generatedCount.textContent = "0 files";
+      setActionButtons(false);
+    }
+
+    function makeExcerpt(value, maxLength) {
+      const cleaned = value.replace(/\s+/g, " ").trim();
+      if (cleaned.length <= maxLength) return cleaned;
+      return `${cleaned.slice(0, maxLength).trim()}...`;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+  </script>
+</body>
+</html>

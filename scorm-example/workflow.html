@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works | Course Build Prototype</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav-shell">
+      <a class="brand" href="index.html">Course Build Prototype</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Overview</a>
+        <a class="is-active" href="workflow.html" aria-current="page">How it works</a>
+        <a href="backend.html">Under the hood</a>
+        <a href="upload.html">Upload prototype</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero hero-workflow">
+      <div class="hero-dot-grid" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+      <div class="wrap simple-hero simple-hero-single">
+        <div class="simple-hero-copy">
+          <p class="eyebrow">How It Works</p>
+          <h1>Two halves: the engineer prepares the source, then the AI processes it.</h1>
+          <p class="lede">The workflow is easiest to understand when human preparation and AI automation are shown as two separate, sequential parts of the same pipeline.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AT A GLANCE ── -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">At A Glance</p>
+          <h2>Three acts. One connected pipeline.</h2>
+        </div>
+
+        <div class="wf-overview">
+
+          <div class="wf-phase wf-phase-human">
+            <div class="wf-phase-head">
+              <div class="wf-phase-icon wf-icon-human">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <span class="wf-phase-role">Engineer</span>
+            </div>
+            <h3>Prepare the source</h3>
+            <p>Write and structure the content so the AI has something safe and well-defined to work from.</p>
+            <div class="wf-phase-chips">
+              <span>Write in Word</span>
+              <span>Add type tags</span>
+              <span>Add filenames</span>
+              <span>Define SCORM</span>
+              <span>Save to repo</span>
+            </div>
+          </div>
+
+          <div class="wf-phase-arrow" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <path d="M8 18h20M22 12l6 6-6 6" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div class="wf-phase wf-phase-ai">
+            <div class="wf-phase-head">
+              <div class="wf-phase-icon wf-icon-ai">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="11" width="18" height="10" rx="2"/>
+                  <circle cx="12" cy="5" r="2"/>
+                  <path d="M12 7v4M8 11V9M16 11V9"/>
+                </svg>
+              </div>
+              <span class="wf-phase-role">AI Pipeline</span>
+            </div>
+            <h3>Process the source</h3>
+            <p>Five sequential stages — analyse, extract, build, validate, and package only when it is safe to do so.</p>
+            <div class="wf-phase-chips">
+              <span>Analyse</span>
+              <span>Extract</span>
+              <span>Build</span>
+              <span>Validate</span>
+              <span>Package</span>
+            </div>
+          </div>
+
+          <div class="wf-phase-arrow" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <path d="M8 18h20M22 12l6 6-6 6" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div class="wf-phase wf-phase-output">
+            <div class="wf-phase-head">
+              <div class="wf-phase-icon wf-icon-output">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <span class="wf-phase-role">Outputs</span>
+            </div>
+            <h3>Checked outputs</h3>
+            <p>Learner pages, worksheets, reports, and a SCORM package only when the required information is present.</p>
+            <div class="wf-phase-chips">
+              <span>HTML pages</span>
+              <span>Worksheets</span>
+              <span>Reports</span>
+              <span>SCORM</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WHAT THE ENGINEER DOES ── -->
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">What The Engineer Does</p>
+          <h2>Prepare the source so the AI has something safe and structured to work from.</h2>
+        </div>
+
+        <div class="eng-steps">
+
+          <article class="eng-step card">
+            <div class="eng-step-num">1</div>
+            <div class="eng-step-body">
+              <h3>Write in Word</h3>
+              <p>Create the course, homework, worksheet, and assessment content in one source document.</p>
+              <div class="eng-step-result">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                One master authoring file
+              </div>
+            </div>
+          </article>
+
+          <article class="eng-step card">
+            <div class="eng-step-num">2</div>
+            <div class="eng-step-body">
+              <h3>Add tags</h3>
+              <p>Mark blocks with tags like <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, and <code>&lt;document&gt;</code>.</p>
+              <div class="eng-step-result">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                The AI knows what output type each block should become
+              </div>
+            </div>
+          </article>
+
+          <article class="eng-step card">
+            <div class="eng-step-num">3</div>
+            <div class="eng-step-body">
+              <h3>Add filenames</h3>
+              <p>Use <code>&lt;filename&gt;</code> tags so each block has a clear target name.</p>
+              <div class="eng-step-result">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Outputs land in the right folders with the right names
+              </div>
+            </div>
+          </article>
+
+          <article class="eng-step card">
+            <div class="eng-step-num">4</div>
+            <div class="eng-step-body">
+              <h3>Define SCORM decisions</h3>
+              <p>Add version, launch, tracking, completion, and navigation details if SCORM packaging is required.</p>
+              <div class="eng-step-result">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Packaging happens safely instead of being guessed
+              </div>
+            </div>
+          </article>
+
+          <article class="eng-step card eng-step-last">
+            <div class="eng-step-num">5</div>
+            <div class="eng-step-body">
+              <h3>Save into the repo</h3>
+              <p>Place the prepared file in the source folder for the pipeline to use.</p>
+              <div class="eng-step-result">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                AI has a defined, well-structured input to process
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WHAT THE AI DOES ── -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">What The AI Does</p>
+          <h2>Five sequential stages from source to checked output.</h2>
+        </div>
+
+        <div class="ai-pipeline-grid">
+
+          <article class="card ai-stage">
+            <span class="ai-stage-tag ai-tag-1">Analyse</span>
+            <h3>Read the source</h3>
+            <div class="ai-stage-in">
+              <span class="ai-io-label">In</span>
+              Tagged DOCX
+            </div>
+            <p>Finds all tagged blocks, validates filenames, identifies warnings, and notes any missing SCORM decisions.</p>
+            <div class="ai-stage-out">
+              <span class="ai-io-label">Out</span>
+              <code>reports/analysis-report.md</code>
+            </div>
+          </article>
+
+          <article class="card ai-stage">
+            <span class="ai-stage-tag ai-tag-2">Extract</span>
+            <h3>Pull out valid blocks</h3>
+            <div class="ai-stage-in">
+              <span class="ai-io-label">In</span>
+              Analysed source blocks
+            </div>
+            <p>Creates clean extracted text files from each valid tagged block, stripping wrapper tags and teacher notes.</p>
+            <div class="ai-stage-out">
+              <span class="ai-io-label">Out</span>
+              <code>outputs/extracted/</code>
+            </div>
+          </article>
+
+          <article class="card ai-stage">
+            <span class="ai-stage-tag ai-tag-3">Build</span>
+            <h3>Create learner outputs</h3>
+            <div class="ai-stage-in">
+              <span class="ai-io-label">In</span>
+              Extracted block files
+            </div>
+            <p>Builds learner-facing HTML pages and worksheet or document outputs from the clean extracted content.</p>
+            <div class="ai-stage-out">
+              <span class="ai-io-label">Out</span>
+              <code>outputs/html/</code> &amp; <code>outputs/docx/</code>
+            </div>
+          </article>
+
+          <article class="card ai-stage">
+            <span class="ai-stage-tag ai-tag-4">Validate</span>
+            <h3>Check the result</h3>
+            <div class="ai-stage-in">
+              <span class="ai-io-label">In</span>
+              Built outputs
+            </div>
+            <p>Checks for missing files, broken references, duplicates, and any unresolved items before declaring success.</p>
+            <div class="ai-stage-out">
+              <span class="ai-io-label">Out</span>
+              <code>reports/validation-report.md</code>
+            </div>
+          </article>
+
+          <article class="card ai-stage">
+            <span class="ai-stage-tag ai-tag-5">Package</span>
+            <h3>Attempt SCORM if safe</h3>
+            <div class="ai-stage-in">
+              <span class="ai-io-label">In</span>
+              Validated outputs + SCORM decisions
+            </div>
+            <p>Packages only if launch file, version, tracking, and navigation details are all explicitly defined. Otherwise stops safely.</p>
+            <div class="ai-stage-out">
+              <span class="ai-io-label">Out</span>
+              SCORM package or safe stop
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WORKED EXAMPLE ── -->
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Worked Example</p>
+          <h2>One real piece of content moving through the system.</h2>
+        </div>
+
+        <div class="grid three-up">
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Prepared source</span>
+              <span class="mono">Engineer step</span>
+            </div>
+            <pre class="code-block"><code>&lt;HTML&gt;
+Homework 1
+&lt;filename&gt;"CP4807-H1.html"&lt;/filename&gt;
+
+Design a program that controls
+two sets of traffic lights
+at a junction.
+&lt;/HTML&gt;</code></pre>
+            <p class="support-copy">The engineer writes and tags the block, then gives it a filename.</p>
+          </article>
+
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">AI processing</span>
+              <span class="mono">outputs/extracted/CP4807-H1.txt</span>
+            </div>
+            <pre class="code-block"><code>Homework 1
+Design a program that controls two sets
+of traffic lights at a junction.
+
+RED: 20 seconds
+AMBER: 3 seconds
+GREEN: 20 seconds</code></pre>
+            <p class="support-copy">The AI extracts the content and turns it into a clean text file ready for build.</p>
+          </article>
+
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Built result</span>
+              <span class="mono">outputs/html/CP4807-H1.html</span>
+            </div>
+            <div class="browser-frame">
+              <div class="browser-bar">
+                <span></span><span></span><span></span>
+                <div>outputs/html/CP4807-H1.html</div>
+              </div>
+              <div class="browser-body">
+                <span class="mini-label" style="color:var(--accent)">Homework 1 preview</span>
+                <h3>Traffic Light Junction</h3>
+                <p>Built as a learner page with a design brief, hardware mapping, and timing sequence.</p>
+                <div class="callout">Validation says no broken internal references were found in this built file.</div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid two-up" style="margin-top:1.1rem;">
+          <article class="card fact-card">
+            <p class="mini-label">Report evidence</p>
+            <ul class="fact-list">
+              <li>Analysis report: 32 tagged blocks found.</li>
+              <li>Build report: <code>CP4807-H1.html</code> built as a learner-facing HTML page.</li>
+            </ul>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">SCORM outcome</p>
+            <ul class="fact-list">
+              <li>No package created yet.</li>
+              <li>Packaging is blocked until SCORM version, launch, tracking, completion, and navigation are defined.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WHAT COMES OUT ── -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">What Comes Out</p>
+          <h2>Four types of output from a single pipeline run.</h2>
+        </div>
+
+        <div class="grid two-up output-types-grid">
+
+          <article class="card output-type-card output-type-html">
+            <div class="output-type-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <div>
+              <span class="tag">Learner HTML</span>
+              <h3>Learner-facing pages</h3>
+              <p>Built from tagged blocks, formatted for a learner audience with wrappers and teacher notes removed.</p>
+              <code class="output-type-path">outputs/html/</code>
+            </div>
+          </article>
+
+          <article class="card output-type-card output-type-docx">
+            <div class="output-type-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div>
+              <span class="tag">Worksheet / Document</span>
+              <h3>Structured worksheet outputs</h3>
+              <p>Worksheet and document-type blocks built into the appropriate format for classroom or reference use.</p>
+              <code class="output-type-path">outputs/docx/</code>
+            </div>
+          </article>
+
+          <article class="card output-type-card output-type-reports">
+            <div class="output-type-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+            </div>
+            <div>
+              <span class="tag">Reports</span>
+              <h3>Analysis and validation reports</h3>
+              <p>Each stage writes a report. Analysis, extraction, build, validation, and packaging are all logged and reviewable.</p>
+              <code class="output-type-path">reports/</code>
+            </div>
+          </article>
+
+          <article class="card output-type-card output-type-scorm">
+            <div class="output-type-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="tag">SCORM</span>
+              <h3>Package or safe stop</h3>
+              <p>Either a valid SCORM package is produced, or packaging is blocked with clear reasons — never guessed.</p>
+              <code class="output-type-path">scorm-package/ or safe stop</code>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FINAL NOTE ── -->
+    <section class="section section-dark">
+      <div class="wrap">
+        <div class="wf-final-split">
+          <div class="wf-final-block wf-final-human">
+            <div class="wf-final-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <h3>Engineer controls</h3>
+            <ul class="wf-final-list">
+              <li>The source document</li>
+              <li>The tags and filenames</li>
+              <li>The SCORM definitions</li>
+            </ul>
+          </div>
+          <div class="wf-final-divider" aria-hidden="true">+</div>
+          <div class="wf-final-block wf-final-ai">
+            <div class="wf-final-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="10" rx="2"/>
+                <circle cx="12" cy="5" r="2"/>
+                <path d="M12 7v4M8 11V9M16 11V9"/>
+              </svg>
+            </div>
+            <h3>AI handles</h3>
+            <ul class="wf-final-list">
+              <li>Analysis and extraction</li>
+              <li>Building and validation</li>
+              <li>Packaging only when safe</li>
+            </ul>
+          </div>
+          <div class="wf-final-equals" aria-hidden="true">=</div>
+          <div class="wf-final-block wf-final-result">
+            <div class="wf-final-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+            </div>
+            <h3>Checked outputs</h3>
+            <ul class="wf-final-list">
+              <li>HTML, worksheets, reports</li>
+              <li>SCORM only when decisions exist</li>
+              <li>Nothing guessed or skipped</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
