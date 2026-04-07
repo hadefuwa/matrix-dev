@@ -182,7 +182,7 @@ const resources = {
                 <li>Industry 4.0 topics such as communications, data logging, and predictive maintenance</li>
             </ul>
             <div class="document-link">
-                <a href="https://www.matrixtsl.com/smartfactory/" target="_blank" rel="noopener" class="btn btn-info">View Full Product Details</a>
+                <a href="https://www.matrixtsl.com/smartfactory/" target="_blank" rel="noopener" class="btn btn-secondary">View Full Product Details</a>
             </div>
         `
     },
@@ -226,90 +226,181 @@ const resources = {
     }
 };
 
-function openResource(resourceKey) {
-    const modal = document.getElementById("resourceModal");
-    const modalBody = document.getElementById("modalBody");
+let detailPanel;
+let detailTitle;
+let detailEyebrow;
+let detailBody;
+let portalSidebar;
+let sidebarOverlay;
+let sidebarToggle;
+let pageTitle;
+
+function openResource(resourceKey, sectionLabel) {
     const resource = resources[resourceKey];
-
-    if (!resource) {
+    if (!resource || !detailPanel || !detailTitle || !detailBody) {
         return;
     }
 
-    modalBody.innerHTML = `
-        <h1>${resource.title}</h1>
-        ${resource.content}
-    `;
-    showModal();
+    detailTitle.textContent = resource.title;
+    detailEyebrow.textContent = sectionLabel || "Resource details";
+    detailBody.innerHTML = resource.content;
+    detailPanel.setAttribute("aria-hidden", "false");
+    detailPanel.classList.add("open");
 }
 
-function showModal() {
-    const modal = document.getElementById("resourceModal");
-    modal.style.display = "flex";
-    modal.style.pointerEvents = "auto";
-    modal.style.visibility = "visible";
-    modal.style.opacity = "1";
-    document.body.style.overflow = "hidden";
-}
-
-function hideModal() {
-    const modal = document.getElementById("resourceModal");
-    modal.style.display = "none";
-    modal.style.pointerEvents = "none";
-    modal.style.visibility = "hidden";
-    modal.style.opacity = "0";
-    document.body.style.overflow = "auto";
-}
-
-function closeModal() {
-    hideModal();
-}
-
-document.addEventListener("click", function(event) {
-    const tile = event.target.closest(".tile[data-resource]");
-    if (!tile) {
+function closeDetailPanel() {
+    if (!detailPanel) {
         return;
     }
-    openResource(tile.dataset.resource);
-});
+    detailPanel.classList.remove("open");
+    detailPanel.setAttribute("aria-hidden", "true");
+    detailEyebrow.textContent = "Resource details";
+    detailTitle.textContent = "Select a resource";
+    detailBody.innerHTML = '<p class="detail-placeholder">Choose a resource to view specifications, curriculum notes, manuals, and download information.</p>';
+}
 
-window.addEventListener("click", function(event) {
-    const modal = document.getElementById("resourceModal");
-    if (event.target === modal) {
-        closeModal();
+function openSidebar() {
+    if (!portalSidebar || !sidebarOverlay || !sidebarToggle) {
+        return;
     }
-});
+
+    portalSidebar.classList.add("open");
+    sidebarOverlay.hidden = false;
+    sidebarOverlay.classList.add("visible");
+    sidebarToggle.setAttribute("aria-expanded", "true");
+}
+
+function closeSidebar() {
+    if (!portalSidebar || !sidebarOverlay || !sidebarToggle) {
+        return;
+    }
+
+    portalSidebar.classList.remove("open");
+    sidebarOverlay.classList.remove("visible");
+    sidebarOverlay.hidden = true;
+    sidebarToggle.setAttribute("aria-expanded", "false");
+}
+
+function setActiveNav(sectionId) {
+    document.querySelectorAll(".sidebar-link").forEach(function(link) {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + sectionId);
+    });
+}
+
+function initializeSectionTracking() {
+    const sections = document.querySelectorAll("main section[id]");
+    if (!sections.length) {
+        return;
+    }
+
+    const observer = new IntersectionObserver(function(entries) {
+        const visibleEntry = entries
+            .filter(function(entry) {
+                return entry.isIntersecting;
+            })
+            .sort(function(a, b) {
+                return b.intersectionRatio - a.intersectionRatio;
+            })[0];
+
+        if (!visibleEntry) {
+            return;
+        }
+
+        const heading = visibleEntry.target.querySelector("h3");
+        if (pageTitle && heading) {
+            pageTitle.textContent = heading.textContent;
+        }
+        setActiveNav(visibleEntry.target.id);
+    }, {
+        threshold: [0.25, 0.5, 0.75],
+        rootMargin: "-20% 0px -45% 0px"
+    });
+
+    sections.forEach(function(section) {
+        observer.observe(section);
+    });
+}
+
+function initializeResourceActions() {
+    document.addEventListener("click", function(event) {
+        const resourceTrigger = event.target.closest("[data-resource]");
+        if (resourceTrigger) {
+            const sectionLabel =
+                resourceTrigger.getAttribute("data-section-title") ||
+                resourceTrigger.closest("[data-section-title]")?.getAttribute("data-section-title") ||
+                resourceTrigger.closest(".section-group")?.querySelector("h3")?.textContent ||
+                resourceTrigger.closest(".section-panel")?.querySelector("h3")?.textContent ||
+                "Resource details";
+
+            openResource(resourceTrigger.dataset.resource, sectionLabel);
+            if (window.innerWidth <= 1080) {
+                closeSidebar();
+            }
+            return;
+        }
+
+        const navLink = event.target.closest(".sidebar-link");
+        if (navLink && window.innerWidth <= 1080) {
+            closeSidebar();
+        }
+    });
+}
+
+function initializeSidebarToggle() {
+    if (!sidebarToggle) {
+        return;
+    }
+
+    sidebarToggle.addEventListener("click", function() {
+        if (portalSidebar.classList.contains("open")) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
+
+    sidebarOverlay.addEventListener("click", closeSidebar);
+}
+
+function initializeDetailClose() {
+    const closeButton = document.getElementById("detailClose");
+    if (!closeButton) {
+        return;
+    }
+
+    closeButton.addEventListener("click", closeDetailPanel);
+}
+
+function initializePortalInteractions() {
+    detailPanel = document.getElementById("detailPanel");
+    detailTitle = document.getElementById("detailTitle");
+    detailEyebrow = document.getElementById("detailEyebrow");
+    detailBody = document.getElementById("detailBody");
+    portalSidebar = document.getElementById("portalSidebar");
+    sidebarOverlay = document.getElementById("sidebarOverlay");
+    sidebarToggle = document.getElementById("sidebarToggle");
+    pageTitle = document.getElementById("pageTitle");
+
+    initializeResourceActions();
+    initializeSidebarToggle();
+    initializeDetailClose();
+    initializeSectionTracking();
+}
 
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
-        closeModal();
+        closeDetailPanel();
+        closeSidebar();
     }
 });
 
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px"
-};
+window.addEventListener("resize", function() {
+    if (window.innerWidth > 1080) {
+        closeSidebar();
+    }
+    if (window.innerWidth > 1260) {
+        closeDetailPanel();
+    }
+});
 
-const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = "1";
-            entry.target.style.transform = "translateY(0)";
-        }
-    });
-}, observerOptions);
-
-function initializeTileAnimations() {
-    document.querySelectorAll(".tile").forEach(function(tile, index) {
-        tile.style.opacity = "0";
-        tile.style.transform = "translateY(40px) scale(0.9)";
-        tile.style.transition = "opacity 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)";
-
-        setTimeout(function() {
-            tile.style.opacity = "1";
-            tile.style.transform = "translateY(0) scale(1)";
-        }, 200 + (index * 120));
-
-        observer.observe(tile);
-    });
-}
+document.addEventListener("DOMContentLoaded", initializePortalInteractions);

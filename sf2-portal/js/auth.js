@@ -1,128 +1,109 @@
-// Authentication System for Smart Factory 2 Teachers Portal
-
 const AUTH_CONFIG = {
-    username: 'Matrix',
-    password: 'Matrix123',
-    sessionKey: 'sf2PortalAuth'
+    username: "Matrix",
+    password: "Matrix123",
+    sessionKey: "sf2PortalAuth"
 };
 
-// Check if user is authenticated on page load
 function checkAuth() {
     const isAuthenticated = sessionStorage.getItem(AUTH_CONFIG.sessionKey);
-    
-    if (isAuthenticated === 'true') {
+
+    if (isAuthenticated === "true") {
         showMainContent();
     } else {
         showLoginScreen();
     }
 }
 
-// Show login screen
 function showLoginScreen() {
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('mainContent').style.display = 'none';
-    
-    // Focus on username field
-    setTimeout(() => {
-        document.getElementById('username').focus();
-    }, 100);
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("mainContent").style.display = "none";
+
+    setTimeout(function() {
+        const usernameField = document.getElementById("username");
+        if (usernameField) {
+            usernameField.focus();
+        }
+    }, 80);
 }
 
-// Show main content
 function showMainContent() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-    
-    // Trigger tile animations
-    if (typeof initializeTileAnimations === 'function') {
-        initializeTileAnimations();
-    }
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
 }
 
-// Handle login
 function handleLogin(event) {
     event.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const errorMsg = document.getElementById('errorMessage');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    // Clear previous error
-    errorMsg.style.display = 'none';
-    
-    // Disable button and show loading state
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const errorMsg = document.getElementById("errorMessage");
+    const loginBtn = document.getElementById("loginBtn");
+
+    errorMsg.style.display = "none";
     loginBtn.disabled = true;
-    loginBtn.innerHTML = '<span class="loading"></span> Authenticating...';
-    
-    // Simulate authentication delay for better UX
-    setTimeout(() => {
+    loginBtn.innerHTML = '<span class="loading"></span> Signing in...';
+
+    setTimeout(function() {
         if (username === AUTH_CONFIG.username && password === AUTH_CONFIG.password) {
-            // Successful login
-            sessionStorage.setItem(AUTH_CONFIG.sessionKey, 'true');
-            
-            // Success animation
-            loginBtn.innerHTML = '✓ Access Granted';
-            loginBtn.style.background = 'linear-gradient(135deg, #27ae60 0%, #229954 100%)';
-            
-            setTimeout(() => {
+            sessionStorage.setItem(AUTH_CONFIG.sessionKey, "true");
+            loginBtn.textContent = "Access granted";
+            loginBtn.style.background = "var(--success)";
+            loginBtn.style.color = "#07141c";
+
+            setTimeout(function() {
                 showMainContent();
-            }, 500);
-            
+            }, 250);
         } else {
-            // Failed login
-            errorMsg.textContent = 'Invalid username or password';
-            errorMsg.style.display = 'block';
-            
-            // Shake animation
-            const form = document.querySelector('.login-form');
-            form.classList.add('shake');
-            setTimeout(() => form.classList.remove('shake'), 500);
-            
-            // Reset button
+            errorMsg.textContent = "Invalid username or password";
+            errorMsg.style.display = "block";
+
+            const form = document.querySelector(".login-form");
+            form.classList.add("shake");
+            setTimeout(function() {
+                form.classList.remove("shake");
+            }, 350);
+
             loginBtn.disabled = false;
-            loginBtn.innerHTML = 'Sign In';
-            
-            // Clear password field
-            document.getElementById('password').value = '';
-            document.getElementById('password').focus();
+            loginBtn.textContent = "Sign In";
+            loginBtn.style.background = "";
+            loginBtn.style.color = "";
+
+            document.getElementById("password").value = "";
+            document.getElementById("password").focus();
         }
-    }, 800);
+    }, 450);
 }
 
-// Handle logout
 function handleLogout() {
     sessionStorage.removeItem(AUTH_CONFIG.sessionKey);
-    
-    // Clear form
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-    document.getElementById('errorMessage').style.display = 'none';
-    
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("errorMessage").style.display = "none";
+
+    const loginBtn = document.getElementById("loginBtn");
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Sign In";
+    loginBtn.style.background = "";
+    loginBtn.style.color = "";
+
     showLoginScreen();
 }
 
-// Keyboard shortcuts
-document.addEventListener('keydown', function(event) {
-    // Ctrl/Cmd + L to logout (when logged in)
-    if ((event.ctrlKey || event.metaKey) && event.key === 'l') {
-        const mainContent = document.getElementById('mainContent');
-        if (mainContent.style.display === 'block') {
+document.addEventListener("keydown", function(event) {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "l") {
+        const mainContent = document.getElementById("mainContent");
+        if (mainContent && mainContent.style.display === "block") {
             event.preventDefault();
             handleLogout();
         }
     }
 });
 
-// Initialize auth check on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-login: bypass the login screen
-    sessionStorage.setItem(AUTH_CONFIG.sessionKey, 'true');
+document.addEventListener("DOMContentLoaded", function() {
     checkAuth();
 
-    // Add form submit handler
-    const loginForm = document.getElementById('loginForm');
+    const loginForm = document.getElementById("loginForm");
     if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
+        loginForm.addEventListener("submit", handleLogin);
     }
 });

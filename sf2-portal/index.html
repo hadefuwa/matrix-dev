@@ -2,153 +2,312 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Factory 2 Teachers Portal</title>
     <link rel="icon" type="image/x-icon" href="/assets/matrix-icon.ico">
     <link rel="icon" type="image/png" href="/assets/matrix-icon.png">
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="loginScreen" class="login-screen">
-        <div class="login-container">
-            <div class="login-header">
-                <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo" class="login-logo">
-                <h1>Smart Factory 2 Teachers Portal</h1>
-                <p>Authorized Access Only</p>
+        <div class="login-shell">
+            <div class="login-panel">
+                <div class="login-header">
+                    <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo" class="login-logo">
+                    <p class="eyebrow">Teacher access</p>
+                    <h1>Smart Factory 2 Teachers Portal</h1>
+                    <p class="login-subtitle">A secure resource library for planning, setup, and delivery.</p>
+                </div>
+
+                <form id="loginForm" class="login-form">
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+
+                    <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+                    <button type="submit" id="loginBtn" class="btn btn-primary login-btn">Sign In</button>
+                </form>
+
+                <div class="login-footer">
+                    <a href="https://matrixtsl.dev/" class="link-muted">Back to Matrix Apps</a>
+                    <div class="login-support-card">
+                        <strong>Need access?</strong>
+                        <p>Contact our sales team and we will help set up an account for your centre.</p>
+                        <p><a href="tel:01422252380">01422 252380</a> <span aria-hidden="true">|</span> <a href="mailto:sales@matrixtsl.com">sales@matrixtsl.com</a></p>
+                    </div>
+                </div>
             </div>
 
-            <form id="loginForm" class="login-form">
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Enter username" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter password" required>
-                </div>
-
-                <div id="errorMessage" class="error-message" style="display: none;"></div>
-
-                <button type="submit" id="loginBtn" class="btn btn-primary login-btn">
-                    Sign In
-                </button>
-            </form>
-
-            <div class="login-footer">
-                <a href="https://matrixtsl.dev/" style="display:inline-block;margin-bottom:1rem;font-size:0.82rem;color:#a0b4c0;text-decoration:none;">&#8962; Back to Matrix Apps</a>
-                <p>Matrix Technology Solutions</p>
-                <div class="login-banner">
-                    <strong>Need access?</strong> If you do not have or know the login, contact our sales team and we will create you an account.<br>
-                    <span class="contact">01422 252380</span> · <span class="contact">sales@matrixtsl.com</span>
-                </div>
-            </div>
+            <aside class="login-aside" aria-label="Portal benefits">
+                <p class="eyebrow">Inside the portal</p>
+                <h2>Built for classroom delivery</h2>
+                <ul class="login-feature-list">
+                    <li>Curriculum and planning documents in one place.</li>
+                    <li>Setup guidance for hardware, pneumatics, PLC, and HMI workflows.</li>
+                    <li>Quick access to downloads, teaching notes, and support details.</li>
+                </ul>
+                <img src="assets/images/sf2.png" alt="Smart Factory 2 training system" class="login-preview-image">
+            </aside>
         </div>
     </div>
 
     <div id="mainContent" style="display: none;">
-        <header>
-            <div class="container">
-                <div class="header-content">
-                    <div class="logo-container">
-                        <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo">
-                    </div>
-                    <div class="header-text">
-                        <h1>Smart Factory 2 Teachers Portal</h1>
-                        <p class="subtitle">Your resource hub for Smart Factory 2 and Industry 4.0 delivery</p>
-                    </div>
-                    <div class="logout-container">
-                        <a href="https://matrixtsl.dev/" class="btn btn-secondary" style="text-decoration:none;">&#8962; Home</a>
+        <div class="portal-shell">
+            <aside id="portalSidebar" class="portal-sidebar" aria-label="Portal navigation">
+                <div class="sidebar-brand">
+                    <img src="assets/matrix-logo.png" alt="Matrix Technology Solutions Logo" class="sidebar-logo">
+                    <div>
+                        <p class="eyebrow">Matrix Technology Solutions</p>
+                        <h1>SF2 Teachers Portal</h1>
+                        <p class="sidebar-subtitle">Professional teaching resources for Smart Factory 2.</p>
                     </div>
                 </div>
-            </div>
-        </header>
 
-        <main class="container">
-            <section class="section" id="section-sf2">
-                <h2 class="section-title">SF2 - Smart Factory 2</h2>
-                <p class="section-summary">Smart Factory 2 immerses learners in modern manufacturing systems through conveyors, optical and proximity sensing, colour sorting, pneumatic pick-and-place, stepper positioning, robot integration, and PLC/HMI control.</p>
-                <div class="section-media">
-                    <img src="assets/images/sf2.png" alt="Smart Factory 2 training system" class="section-image">
+                <nav class="sidebar-nav">
+                    <a href="#overview" class="sidebar-link active">Overview</a>
+                    <a href="#teaching-resources" class="sidebar-link">Teaching Resources</a>
+                    <a href="#setup-manuals" class="sidebar-link">Setup &amp; Manuals</a>
+                    <a href="#downloads" class="sidebar-link">Downloads</a>
+                    <a href="#support" class="sidebar-link">Support</a>
+                </nav>
+
+                <div class="sidebar-block">
+                    <p class="sidebar-heading">Quick actions</p>
+                    <button type="button" class="sidebar-action" data-resource="quick-start">Open Quick Start</button>
+                    <button type="button" class="sidebar-action" data-resource="scheme-of-work">View Scheme of Work</button>
+                    <a href="https://matrixtsl.dev/" class="sidebar-action sidebar-link-action">Matrix Apps Home</a>
                 </div>
-                <div class="dashboard-grid">
-                    <div class="tile tile-primary" data-resource="specification">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg></div>
-                        <h2>Specification</h2>
-                        <p>Technical specifications, learning outcomes, product references, and Smart Factory system components.</p>
-                        <button class="btn btn-primary">Open Specification</button>
-                    </div>
 
-                    <div class="tile tile-success" data-resource="curriculum">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-                        <h2>Curriculum</h2>
-                        <p>Worksheet-led curriculum covering sensors, conveyors, robot arm work, RFID, analytics, IO-Link, and predictive maintenance.</p>
-                        <button class="btn btn-success">Open Curriculum</button>
-                    </div>
-
-                    <div class="tile tile-info" data-resource="teachers-guide">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-                        <h2>Teachers Guide</h2>
-                        <p>Structured teaching guidance for conveyor, gantry, robot arm, and integrated factory-cell delivery.</p>
-                        <button class="btn btn-info">Open Guide</button>
-                    </div>
-
-                    <div class="tile tile-warning" data-resource="user-manual">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-                        <h2>User Manual</h2>
-                        <p>Setup, wiring, pneumatics, software loading, operating guidance, and robot-arm integration notes.</p>
-                        <button class="btn btn-warning">Open Manual</button>
-                    </div>
-
-                    <div class="tile tile-download" data-resource="tia-portal">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-                        <h2>TIA Portal Project</h2>
-                        <p>Download the Smart Factory PLC and HMI project pack used by the teaching materials.</p>
-                        <button class="btn btn-download">Open Download</button>
-                    </div>
-
-                    <div class="tile tile-secondary" data-resource="quick-start">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
-                        <h2>Quick Start</h2>
-                        <p>A short setup sequence for getting Smart Factory 2 ready for classroom delivery.</p>
-                        <button class="btn btn-secondary">Open Quick Start</button>
-                    </div>
-
-                    <div class="tile tile-info" data-resource="overview">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-                        <h2>System Overview</h2>
-                        <p>A technical overview of Smart Factory 2 hardware, software, learning objectives, and Industry 4.0 use cases.</p>
-                        <button class="btn btn-info">View Overview</button>
-                    </div>
-
-                    <div class="tile tile-scheme" data-resource="scheme-of-work">
-                        <div class="tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-                        <h2>Scheme of Work</h2>
-                        <p>Suggested weekly pacing, practical activities, and assessment guidance for Smart Factory 2.</p>
-                        <button class="btn btn-scheme">View Scheme</button>
-                    </div>
+                <div class="sidebar-block">
+                    <p class="sidebar-heading">Support</p>
+                    <p class="sidebar-meta">01422 252380</p>
+                    <p class="sidebar-meta"><a href="mailto:sales@matrixtsl.com">sales@matrixtsl.com</a></p>
+                    <p class="sidebar-note">For account help, product guidance, or delivery questions.</p>
                 </div>
-            </section>
+            </aside>
 
-            <div id="resourceModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <div id="modalBody"></div>
+            <div id="sidebarOverlay" class="sidebar-overlay" hidden></div>
+
+            <main class="portal-main">
+                <header class="topbar">
+                    <div>
+                        <p class="eyebrow">Teacher resource library</p>
+                        <h2 id="pageTitle">Overview</h2>
+                    </div>
+                    <div class="topbar-actions">
+                        <button id="sidebarToggle" class="icon-btn" type="button" aria-expanded="false" aria-controls="portalSidebar" aria-label="Open navigation">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                        <a href="https://www.matrixtsl.com/smartfactory/" target="_blank" rel="noopener" class="btn btn-secondary topbar-btn">Product page</a>
+                    </div>
+                </header>
+
+                <section class="hero-panel section-panel" id="overview">
+                    <div class="hero-copy">
+                        <p class="eyebrow">Overview</p>
+                        <h3>Smart Factory 2 teacher workspace</h3>
+                        <p class="hero-text">Use this portal to move quickly between planning documents, delivery guidance, setup manuals, and project downloads for Smart Factory 2 and Industry 4.0 teaching.</p>
+                        <div class="hero-actions">
+                            <button type="button" class="btn btn-primary" data-resource="curriculum">Open Curriculum</button>
+                            <button type="button" class="btn btn-ghost" data-resource="teachers-guide">View Teacher Guide</button>
+                        </div>
+                    </div>
+                    <div class="hero-meta">
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">8</span>
+                            <span class="hero-stat-label">Core resources</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">4</span>
+                            <span class="hero-stat-label">Library sections</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-value">1</span>
+                            <span class="hero-stat-label">Teacher portal</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="quick-links section-panel">
+                    <article class="quick-link-card">
+                        <p class="quick-link-label">Planning</p>
+                        <h3>Scheme of Work</h3>
+                        <p>Suggested pacing, practical activities, and assessment checkpoints for classroom delivery.</p>
+                        <button type="button" class="text-action" data-resource="scheme-of-work">View details</button>
+                    </article>
+                    <article class="quick-link-card">
+                        <p class="quick-link-label">Setup</p>
+                        <h3>User Manual</h3>
+                        <p>Hardware, wiring, pneumatics, PLC loading, and operational guidance for the full system.</p>
+                        <button type="button" class="text-action" data-resource="user-manual">Open manual</button>
+                    </article>
+                    <article class="quick-link-card">
+                        <p class="quick-link-label">Download</p>
+                        <h3>TIA Portal Project</h3>
+                        <p>Project pack for commissioning and classroom delivery using the Smart Factory PLC and HMI files.</p>
+                        <button type="button" class="text-action" data-resource="tia-portal">Open download</button>
+                    </article>
+                </section>
+
+                <section class="section-group" id="teaching-resources">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Teaching resources</p>
+                            <h3>Planning and delivery</h3>
+                        </div>
+                        <p class="section-copy">Core documents for lesson structure, curriculum sequencing, and classroom delivery.</p>
+                    </div>
+                    <div class="resource-grid">
+                        <article class="resource-card" data-section-title="Teaching Resources">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Planning</span>
+                                <span class="resource-type">Curriculum</span>
+                            </div>
+                            <h4>Curriculum</h4>
+                            <p>Structured worksheet-led delivery covering sensors, sorting, robot integration, analytics, and predictive maintenance.</p>
+                            <button type="button" class="btn btn-card" data-resource="curriculum">View details</button>
+                        </article>
+                        <article class="resource-card" data-section-title="Teaching Resources">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Guide</span>
+                                <span class="resource-type">Delivery</span>
+                            </div>
+                            <h4>Teachers Guide</h4>
+                            <p>Practical teaching guidance for conveyor, gantry, robot arm, and integrated factory-cell delivery.</p>
+                            <button type="button" class="btn btn-card" data-resource="teachers-guide">View details</button>
+                        </article>
+                        <article class="resource-card" data-section-title="Teaching Resources">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Planning</span>
+                                <span class="resource-type">Schedule</span>
+                            </div>
+                            <h4>Scheme of Work</h4>
+                            <p>Suggested weekly pacing and assessment guidance that can be adapted to your timetable.</p>
+                            <button type="button" class="btn btn-card" data-resource="scheme-of-work">View details</button>
+                        </article>
+                        <article class="resource-card" data-section-title="Teaching Resources">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Reference</span>
+                                <span class="resource-type">Overview</span>
+                            </div>
+                            <h4>System Overview</h4>
+                            <p>A concise technical summary of Smart Factory 2 hardware, software, learning objectives, and Industry 4.0 use cases.</p>
+                            <button type="button" class="btn btn-card" data-resource="overview">View details</button>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section-group" id="setup-manuals">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Setup and manuals</p>
+                            <h3>Technical preparation</h3>
+                        </div>
+                        <p class="section-copy">Reference materials for setup, product specifications, and getting the system ready for delivery.</p>
+                    </div>
+                    <div class="resource-grid">
+                        <article class="resource-card" data-section-title="Setup & Manuals">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Reference</span>
+                                <span class="resource-type">Specification</span>
+                            </div>
+                            <h4>Specification</h4>
+                            <p>Technical specification, learning outcomes, product references, and key Smart Factory system components.</p>
+                            <button type="button" class="btn btn-card" data-resource="specification">View details</button>
+                        </article>
+                        <article class="resource-card" data-section-title="Setup & Manuals">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Manual</span>
+                                <span class="resource-type">Setup</span>
+                            </div>
+                            <h4>User Manual</h4>
+                            <p>Operational guidance for setup, pneumatics, software loading, robot integration, and classroom operation.</p>
+                            <button type="button" class="btn btn-card" data-resource="user-manual">Open manual</button>
+                        </article>
+                        <article class="resource-card" data-section-title="Setup & Manuals">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Guide</span>
+                                <span class="resource-type">Quick Start</span>
+                            </div>
+                            <h4>Quick Start</h4>
+                            <p>A short setup sequence for preparing Smart Factory 2 quickly before classroom delivery.</p>
+                            <button type="button" class="btn btn-card" data-resource="quick-start">Open guide</button>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section-group" id="downloads">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Downloads</p>
+                            <h3>Project files</h3>
+                        </div>
+                        <p class="section-copy">Software and implementation resources that support commissioning and delivery.</p>
+                    </div>
+                    <div class="resource-grid resource-grid-single">
+                        <article class="resource-card resource-card-wide" data-section-title="Downloads">
+                            <div class="resource-card-top">
+                                <span class="resource-tag">Download</span>
+                                <span class="resource-type">PLC / HMI</span>
+                            </div>
+                            <h4>TIA Portal Project</h4>
+                            <p>Download package containing the Smart Factory PLC and HMI project files used by the teaching materials and commissioning workflow.</p>
+                            <button type="button" class="btn btn-card" data-resource="tia-portal">Open download</button>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section-group support-panel" id="support">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Support</p>
+                            <h3>Get help from Matrix</h3>
+                        </div>
+                        <p class="section-copy">Contact the team for teacher access, product support, or delivery questions.</p>
+                    </div>
+                    <div class="support-grid">
+                        <a href="tel:01422252380" class="support-card">
+                            <span class="support-label">Phone</span>
+                            <strong>01422 252380</strong>
+                            <span>Call the sales and support team</span>
+                        </a>
+                        <a href="mailto:sales@matrixtsl.com" class="support-card">
+                            <span class="support-label">Email</span>
+                            <strong>sales@matrixtsl.com</strong>
+                            <span>Request access or product guidance</span>
+                        </a>
+                        <a href="https://www.matrixtsl.com/smartfactory/" target="_blank" rel="noopener" class="support-card">
+                            <span class="support-label">Website</span>
+                            <strong>Smart Factory range</strong>
+                            <span>View the wider product information</span>
+                        </a>
+                    </div>
+                </section>
+            </main>
+
+            <aside id="detailPanel" class="detail-panel" aria-labelledby="detailTitle" aria-hidden="true">
+                <div class="detail-panel-header">
+                    <div>
+                        <p id="detailEyebrow" class="eyebrow">Resource details</p>
+                        <h3 id="detailTitle">Select a resource</h3>
+                    </div>
+                    <button type="button" id="detailClose" class="detail-close" aria-label="Close resource panel">&times;</button>
                 </div>
-            </div>
-        </main>
-
-        <footer>
-            <div class="container">
-                <p>&copy; 2026 Matrix Technology Solutions | Smart Factory 2 Teachers Portal</p>
-                <p class="footer-links">
-                    <a href="mailto:sales@matrixtsl.com">Support</a> |
-                    <a href="mailto:sales@matrixtsl.com">Contact</a> |
-                    <a href="https://www.matrixtsl.com/smartfactory/" target="_blank" rel="noopener">About Smart Factory</a>
-                </p>
-            </div>
-        </footer>
+                <div id="detailBody" class="detail-body">
+                    <p class="detail-placeholder">Choose a resource to view specifications, curriculum notes, manuals, and download information.</p>
+                </div>
+            </aside>
+        </div>
     </div>
 
     <script src="js/auth.js"></script>
