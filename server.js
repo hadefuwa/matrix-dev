@@ -763,6 +763,10 @@ async function serveStatic(pathname, res) {
   if (pathname === "/hardware.html") {
     return sendFile(res, path.join(ROOT_DIR, "sow-generator", "hardware.html"));
   }
+  // SCORM Example
+  if (pathname === "/scorm-example" || pathname === "/scorm-example/") {
+    return sendFile(res, path.join(ROOT_DIR, "scorm-example", "index.html"));
+  }
 
   const safePath = path.normalize(pathname).replace(/^(\.\.(\/|\\|$))+/, "");
   let filePath = path.join(ROOT_DIR, safePath);
