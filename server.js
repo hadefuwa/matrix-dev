@@ -767,6 +767,12 @@ async function serveStatic(pathname, res) {
   if (pathname === "/scorm-example" || pathname === "/scorm-example/") {
     return sendFile(res, path.join(ROOT_DIR, "scorm-example", "index.html"));
   }
+  if (pathname.startsWith("/scorm-example/")) {
+    const relativePath = pathname.slice("/scorm-example/".length);
+    const normalized = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
+    const scopedPath = path.join(ROOT_DIR, "scorm-example", normalized);
+    return sendFile(res, scopedPath);
+  }
 
   const safePath = path.normalize(pathname).replace(/^(\.\.(\/|\\|$))+/, "");
   let filePath = path.join(ROOT_DIR, safePath);
