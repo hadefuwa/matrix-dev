@@ -226,10 +226,24 @@ const resources = {
     }
 };
 
-let detailPanel;
-let detailTitle;
-let detailEyebrow;
-let detailBody;
+const defaultWorkspaceMarkup = `
+    <div class="workspace-placeholder">
+        <div class="workspace-placeholder-copy">
+            <h4>Open any planning, setup, or download resource here</h4>
+            <p>This main workspace now uses the full width of the portal, so large items like the scheme of work are easier to read without being squeezed into a narrow side panel.</p>
+        </div>
+        <div class="workspace-placeholder-actions">
+            <button type="button" class="btn btn-primary" data-resource="scheme-of-work">Open Scheme of Work</button>
+            <button type="button" class="btn btn-highlight" data-resource="quick-start">Open Quick Start</button>
+        </div>
+    </div>
+`;
+
+let workspaceTitle;
+let workspaceEyebrow;
+let workspaceBody;
+let workspaceSection;
+let workspaceReset;
 let portalSidebar;
 let sidebarOverlay;
 let sidebarToggle;
@@ -237,26 +251,24 @@ let pageTitle;
 
 function openResource(resourceKey, sectionLabel) {
     const resource = resources[resourceKey];
-    if (!resource || !detailPanel || !detailTitle || !detailBody) {
+    if (!resource || !workspaceTitle || !workspaceBody || !workspaceSection) {
         return;
     }
 
-    detailTitle.textContent = resource.title;
-    detailEyebrow.textContent = sectionLabel || "Resource details";
-    detailBody.innerHTML = resource.content;
-    detailPanel.setAttribute("aria-hidden", "false");
-    detailPanel.classList.add("open");
+    workspaceTitle.textContent = resource.title;
+    workspaceEyebrow.textContent = sectionLabel || "Resource workspace";
+    workspaceBody.innerHTML = `<div class="workspace-content">${resource.content}</div>`;
+    workspaceSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function closeDetailPanel() {
-    if (!detailPanel) {
+function resetWorkspace() {
+    if (!workspaceTitle || !workspaceBody || !workspaceEyebrow) {
         return;
     }
-    detailPanel.classList.remove("open");
-    detailPanel.setAttribute("aria-hidden", "true");
-    detailEyebrow.textContent = "Resource details";
-    detailTitle.textContent = "Select a resource";
-    detailBody.innerHTML = '<p class="detail-placeholder">Choose a resource to view specifications, curriculum notes, manuals, and download information.</p>';
+
+    workspaceEyebrow.textContent = "Resource workspace";
+    workspaceTitle.textContent = "Select a resource";
+    workspaceBody.innerHTML = defaultWorkspaceMarkup;
 }
 
 function openSidebar() {
@@ -330,7 +342,7 @@ function initializeResourceActions() {
                 resourceTrigger.closest("[data-section-title]")?.getAttribute("data-section-title") ||
                 resourceTrigger.closest(".section-group")?.querySelector("h3")?.textContent ||
                 resourceTrigger.closest(".section-panel")?.querySelector("h3")?.textContent ||
-                "Resource details";
+                "Resource workspace";
 
             openResource(resourceTrigger.dataset.resource, sectionLabel);
             if (window.innerWidth <= 1080) {
@@ -362,20 +374,23 @@ function initializeSidebarToggle() {
     sidebarOverlay.addEventListener("click", closeSidebar);
 }
 
-function initializeDetailClose() {
-    const closeButton = document.getElementById("detailClose");
-    if (!closeButton) {
+function initializeWorkspaceReset() {
+    if (!workspaceReset) {
         return;
     }
 
-    closeButton.addEventListener("click", closeDetailPanel);
+    workspaceReset.addEventListener("click", function() {
+        resetWorkspace();
+        workspaceSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
 }
 
 function initializePortalInteractions() {
-    detailPanel = document.getElementById("detailPanel");
-    detailTitle = document.getElementById("detailTitle");
-    detailEyebrow = document.getElementById("detailEyebrow");
-    detailBody = document.getElementById("detailBody");
+    workspaceTitle = document.getElementById("workspaceTitle");
+    workspaceEyebrow = document.getElementById("workspaceEyebrow");
+    workspaceBody = document.getElementById("workspaceBody");
+    workspaceSection = document.getElementById("resource-workspace");
+    workspaceReset = document.getElementById("workspaceReset");
     portalSidebar = document.getElementById("portalSidebar");
     sidebarOverlay = document.getElementById("sidebarOverlay");
     sidebarToggle = document.getElementById("sidebarToggle");
@@ -383,13 +398,12 @@ function initializePortalInteractions() {
 
     initializeResourceActions();
     initializeSidebarToggle();
-    initializeDetailClose();
+    initializeWorkspaceReset();
     initializeSectionTracking();
 }
 
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
-        closeDetailPanel();
         closeSidebar();
     }
 });
@@ -397,9 +411,6 @@ document.addEventListener("keydown", function(event) {
 window.addEventListener("resize", function() {
     if (window.innerWidth > 1080) {
         closeSidebar();
-    }
-    if (window.innerWidth > 1260) {
-        closeDetailPanel();
     }
 });
 
