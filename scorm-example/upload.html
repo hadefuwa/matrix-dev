@@ -259,7 +259,8 @@
     .empty-state,
     .output-list,
     .block-list,
-    .scorm-grid {
+    .scorm-grid,
+    .media-list {
       display: grid;
       gap: 0.9rem;
     }
@@ -284,7 +285,8 @@
     .block-card,
     .output-card,
     .scorm-card,
-    .warning-card {
+    .warning-card,
+    .media-card {
       border: 1px solid #d8e3fb;
       background: #fbfdff;
       border-radius: 18px;
@@ -351,9 +353,52 @@
     .scorm-card p,
     .warning-card p,
     .output-card p,
-    .block-card p { color: var(--muted); line-height: 1.55; margin-bottom: 0; }
+    .block-card p,
+    .media-card p { color: var(--muted); line-height: 1.55; margin-bottom: 0; }
     .warning-card.warn { background: #fffaf1; border-color: #f2d7aa; }
     .warning-card.danger { background: #fff5f5; border-color: #f1c2c2; }
+    .media-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 0.95rem;
+    }
+    .media-stat {
+      background: #fff;
+      border: 1px solid #e0e8fb;
+      border-radius: 14px;
+      padding: 0.8rem;
+    }
+    .media-stat strong {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+    }
+    .media-stat span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+    .media-link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+    }
+    .media-link-row .download-link {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.82rem;
+    }
+    .media-inline-note {
+      margin-top: 0.75rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
     .status-banner {
       padding: 1rem;
       border-radius: 18px;
@@ -457,7 +502,9 @@
       .hero-flow,
       .stats,
       .meta-grid,
-      .scorm-grid { grid-template-columns: 1fr; }
+      .scorm-grid,
+      .upload-grid,
+      .media-summary { grid-template-columns: 1fr; }
       .section-head,
       .block-top,
       .output-top,
@@ -489,24 +536,24 @@
       <div class="hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">Prototype Mode</p>
-          <h1>Upload one tagged Word source and see what the pipeline would do.</h1>
+          <h1>Upload a tagged Word source plus companion media and see what the pipeline would do.</h1>
           <p class="lede">
-            This demo extracts readable text from a local <code>.docx</code>, detects custom tags, lists the blocks in source
-            order, proposes outputs, and highlights missing SCORM decisions without claiming compliance.
+            This demo extracts readable text from a local <code>.docx</code>, matches explicit media tags against a companion
+            <code>.zip</code> media bundle, proposes outputs, and highlights missing SCORM decisions without claiming compliance.
           </p>
 
           <div class="hero-flow">
             <div class="flow-chip">
               <strong>1. Upload source</strong>
-              <span>Pick a tagged Word file from your machine. Nothing is uploaded to a server.</span>
+              <span>Pick a tagged Word file from your machine, then optionally add a companion media ZIP.</span>
             </div>
             <div class="flow-chip">
               <strong>2. Detect structure</strong>
-              <span>Preview the document, find tags, filenames, warnings, and likely classifications.</span>
+              <span>Preview the document, find tags, filenames, media references, warnings, and likely classifications.</span>
             </div>
             <div class="flow-chip">
               <strong>3. Show outcomes</strong>
-              <span>See proposed HTML or DOCX-style outputs plus what SCORM still needs.</span>
+              <span>See proposed outputs, media matches, and what SCORM still needs.</span>
             </div>
           </div>
         </div>
@@ -516,7 +563,7 @@
           <div class="stats">
             <div class="stat">
               <strong>Tags</strong>
-              <span><code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, <code>&lt;document&gt;</code>, and <code>&lt;filename&gt;</code>.</span>
+              <span><code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, <code>&lt;document&gt;</code>, <code>&lt;filename&gt;</code>, and explicit media tags.</span>
             </div>
             <div class="stat">
               <strong>Blocks</strong>
@@ -525,6 +572,10 @@
             <div class="stat">
               <strong>Outputs</strong>
               <span>Likely destination folders such as <code>outputs/html/</code> and <code>outputs/docx/</code>.</span>
+            </div>
+            <div class="stat">
+              <strong>Media</strong>
+              <span>Explicit references like <code>&lt;image&gt;traffic lights.jpg&lt;/image&gt;</code> matched to ZIP contents.</span>
             </div>
             <div class="stat">
               <strong>SCORM</strong>
@@ -541,23 +592,38 @@
           <div class="section-head">
             <div>
               <h2>Upload area</h2>
-              <p>Select a local tagged Word file and the page will parse it inside the browser.</p>
+              <p>Select a local tagged Word file and, if needed, a companion media ZIP. Everything is parsed inside the browser.</p>
             </div>
-            <span class="pill">Accepts <code>.docx</code></span>
+            <span class="pill">Accepts <code>.docx</code> + <code>.zip</code></span>
           </div>
 
-          <label class="dropzone" id="dropzone">
-            <input id="fileInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-            <h3>Drop a <code>.docx</code> here or click to browse</h3>
-            <p>Example source: <code>CP4807 - Introduction to microcontrollers 05 04 26.docx</code></p>
-            <div class="button-row">
-              <span class="button button-primary">Choose DOCX</span>
-              <span class="button button-secondary">Browser only</span>
-            </div>
-            <div class="file-meta" id="fileMeta">
-              <span>No file loaded yet.</span>
-            </div>
-          </label>
+          <div class="upload-grid">
+            <label class="dropzone" id="dropzone">
+              <input id="fileInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+              <h3>Drop a <code>.docx</code> here or click to browse</h3>
+              <p>Example source: <code>CP4807 - Introduction to microcontrollers 05 04 26.docx</code></p>
+              <div class="button-row">
+                <span class="button button-primary">Choose DOCX</span>
+                <span class="button button-secondary">Source file</span>
+              </div>
+              <div class="file-meta" id="fileMeta">
+                <span>No source file loaded yet.</span>
+              </div>
+            </label>
+
+            <label class="dropzone" id="mediaDropzone">
+              <input id="mediaInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
+              <h3>Drop a media <code>.zip</code> here or click to browse</h3>
+              <p>Teachers can upload the companion media folder as a ZIP. Matching is explicit via tags like <code>&lt;image&gt;name.jpg&lt;/image&gt;</code>.</p>
+              <div class="button-row">
+                <span class="button button-primary">Choose ZIP</span>
+                <span class="button button-secondary">Media bundle</span>
+              </div>
+              <div class="file-meta" id="mediaMeta">
+                <span>No media ZIP loaded yet.</span>
+              </div>
+            </label>
+          </div>
         </section>
 
         <section class="panel">
@@ -617,6 +683,19 @@
         <section class="panel">
           <div class="section-head">
             <div>
+              <h2>Media</h2>
+              <p>This panel shows media tags found in the source, what matched from the uploaded ZIP, and what is still missing.</p>
+            </div>
+            <span class="pill" id="mediaCount">0 references</span>
+          </div>
+          <div id="mediaList" class="empty-state">
+            Upload a source document and optional media ZIP to inspect explicit media references.
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
               <h2>Errors and warnings</h2>
               <p>Friendly warnings are shown for invalid files, missing filenames, and malformed tags.</p>
             </div>
@@ -657,7 +736,7 @@
     </section>
   </main>
 
-  <script>
+  <script type="text/plain" id="legacy-upload-script">
     const fileInput = document.getElementById("fileInput");
     const dropzone = document.getElementById("dropzone");
     const previewBox = document.getElementById("previewBox");
@@ -1244,6 +1323,69 @@
       ].join("\n");
     }
 
+    function buildBasicManifest(analysis, artefacts) {
+      if (!analysis || !artefacts.length) return "";
+
+      const htmlArtefacts = artefacts.filter((file) => /\.html?$/i.test(file.filename));
+      if (!htmlArtefacts.length) return "";
+
+      const packageId = `${baseName(currentSourceFile) || "prototype"}-package`
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "prototype-package";
+      const orgId = `${packageId}-org`;
+      const title = baseName(currentSourceFile) || "Prototype SCORM Package";
+
+      const resourceEntries = artefacts.map((file, index) => {
+        const isHtml = /\.html?$/i.test(file.filename);
+        const resourceId = `res-${index + 1}`;
+        const href = `generated/${file.filename}`;
+        const scormType = isHtml ? "sco" : "asset";
+        return {
+          resourceId,
+          href,
+          scormType,
+          title: file.filename
+        };
+      });
+
+      const itemEntries = resourceEntries
+        .filter((entry) => entry.scormType === "sco")
+        .map((entry, index) => `      <item identifier="item-${index + 1}" identifierref="${entry.resourceId}">
+        <title>${escapeXml(entry.title)}</title>
+      </item>`)
+        .join("\n");
+
+      const resourcesXml = resourceEntries
+        .map((entry) => `    <resource identifier="${entry.resourceId}" type="webcontent" adlcp:scormtype="${entry.scormType}" href="${escapeXml(entry.href)}">
+      <file href="${escapeXml(entry.href)}" />
+    </resource>`)
+        .join("\n");
+
+      return `<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="${escapeXml(packageId)}"
+  version="1.0"
+  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 ims_xml.xsd
+  http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+  <organizations default="${escapeXml(orgId)}">
+    <organization identifier="${escapeXml(orgId)}">
+      <title>${escapeXml(title)}</title>
+${itemEntries}
+    </organization>
+  </organizations>
+  <resources>
+${resourcesXml}
+  </resources>
+</manifest>`;
+    }
+
     async function downloadBundle() {
       const zip = new JSZip();
       zip.file("summary-report.txt", buildSummaryReport());
@@ -1265,10 +1407,15 @@
         zip.file(`generated/${file.filename}`, file.content);
       });
 
+      const manifest = buildBasicManifest(currentAnalysis, generatedArtefacts);
+      if (manifest) {
+        zip.file("imsmanifest.xml", manifest);
+      }
+
       const blob = await zip.generateAsync({ type: "blob" });
       const url = createObjectUrl(blob);
       triggerDownload(url, `${baseName(currentSourceFile) || "prototype"}-output-bundle.zip`);
-      actionStatus.textContent = "Bundle downloaded";
+      actionStatus.textContent = manifest ? "Bundle downloaded with basic imsmanifest.xml" : "Bundle downloaded";
     }
 
     function setActionButtons(enabled) {
@@ -1312,6 +1459,15 @@
       return filename ? filename.replace(/\.[^.]+$/, "") : "";
     }
 
+    function escapeXml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+    }
+
     function resetUI() {
       revokeObjectUrls();
       currentSourceFile = "";
@@ -1350,5 +1506,6 @@
         .replace(/'/g, "&#39;");
     }
   </script>
+  <script src="upload-media.js"></script>
 </body>
 </html>

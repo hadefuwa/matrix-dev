@@ -451,6 +451,74 @@ navigation: "linear"</code></pre>
           </article>
         </div>
 
+        <div class="subsection-heading">
+          <h3>How to upload images with a media ZIP</h3>
+          <p>If a source document comes with a companion media folder, the teacher should compress that folder into one <code>.zip</code> file and upload it alongside the <code>.docx</code> in the browser prototype.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Upload</span>
+            <h3>ZIP the whole media folder, then upload it with the source DOCX</h3>
+            <ul class="fact-list">
+              <li>Keep the original media filenames if possible.</li>
+              <li>Put all images into one folder, then compress that folder as a <code>.zip</code>.</li>
+              <li>Upload the tagged <code>.docx</code> first or second — the prototype can match once both files are loaded.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Matching</span>
+            <h3>Image matching is explicit, not guessed</h3>
+            <ul class="fact-list">
+              <li>The source document must name the exact image file inside an image tag.</li>
+              <li>The uploaded ZIP must contain a file with the same basename, for example <code>traffic lights.jpg</code>.</li>
+              <li>If the ZIP contains duplicate filenames, the match is flagged as ambiguous instead of being guessed.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>How to tag images correctly in the source document</h3>
+          <p>Put the image reference inside the learner block where the image should appear. Use the exact filename from the media folder inside an <code>&lt;image&gt;</code> tag.</p>
+        </div>
+
+        <div class="card authoring-example-card">
+          <pre class="code-block"><code>&lt;HTML&gt;
+Worksheet 4: Traffic lights
+&lt;filename&gt;"CP4807-WS4.html"&lt;/filename&gt;
+
+Study the traffic light sequence below.
+&lt;image&gt;traffic lights.jpg&lt;/image&gt;
+
+Explain what happens when the amber light is shown.
+
+&lt;/HTML&gt;</code></pre>
+          <p class="authoring-example-note">Rule: the text inside <code>&lt;image&gt;</code> must match the media filename exactly. Example: <code>&lt;image&gt;traffic lights.jpg&lt;/image&gt;</code> matches a file named <code>traffic lights.jpg</code> inside the uploaded media ZIP.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Good practice</span>
+            <h3>Keep image references simple and literal</h3>
+            <ul class="fact-list">
+              <li>Use the real filename including the extension, such as <code>.jpg</code>, <code>.png</code>, or <code>.svg</code>.</li>
+              <li>Keep one image tag per referenced file.</li>
+              <li>Place the tag near the learner instruction it supports so the generated page can keep the context clear.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Avoid</span>
+            <h3>Do not rely on the system to infer which image you mean</h3>
+            <ul class="fact-list">
+              <li>Do not write vague references like “use the traffic light image”.</li>
+              <li>Do not expect the system to match Word’s internal image names like <code>image1.emf</code>.</li>
+              <li>Do not rename files after tagging the source unless you also update the tag text.</li>
+            </ul>
+          </article>
+        </div>
+
         <div class="card authoring-example-card">
           <pre class="code-block"><code>&lt;HTML&gt;
 Worksheet 3: Inputs and outputs
