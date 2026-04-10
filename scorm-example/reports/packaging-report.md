@@ -23,9 +23,9 @@ The following information must exist before packaging can be safely attempted. E
 
 **Status: Not specified**
 
-Decision required: SCORM 1.2 or SCORM 2004 (edition 3 or 4)?
+Recommended default: SCORM 1.2.
 
-SCORM 1.2 is the most widely supported across LMS platforms and is recommended unless a specific LMS feature requires SCORM 2004.
+Use SCORM 2004 only if the target LMS explicitly requires it or depends on a 2004-only sequencing feature.
 
 ### 2. Launch structure
 

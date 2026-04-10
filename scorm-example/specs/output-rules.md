@@ -39,6 +39,7 @@ Rules:
 - include a `<title>` matching the content title if known
 - preserve headings, lists, and paragraphs
 - convert plain text layouts into simple readable HTML
+- preserve explicit external resources such as YouTube, datasheet, Google Docs, and Google Slides links as readable launch links when they appear in learner-facing content
 - do not expose internal parsing notes in learner-facing output
 
 ## PDF outputs
@@ -55,8 +56,19 @@ Rules:
 - generate a folder structure suitable for browser delivery
 - create an index or launch page
 - convert each screen definition into a page, link, embed, or document launch item
+- treat clearly authored external URLs as launch items or readable links rather than inventing local copies
 - preserve course sequence exactly as defined unless instructed otherwise
 - report missing assets, broken links, or unsupported file types
+
+## External link rules
+
+When external resources appear in the source:
+
+- preserve the original resource purpose where stated, such as `Video resource`, `Datasheet`, or `Learner slides`
+- keep learner-visible links in learner-facing outputs
+- keep teacher-only links out of learner-facing outputs unless explicitly requested
+- do not convert edit-only teacher links into learner-facing links without explicit instruction
+- report links that are malformed, ambiguous, or unsupported
 
 ## Naming rules
 

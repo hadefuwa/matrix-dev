@@ -66,104 +66,8 @@
       </div>
     </section>
 
-    <section class="section section-tint">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Core Files</p>
-          <h2>The repo already contains the pieces the pipeline needs.</h2>
-        </div>
-
-        <div class="grid two-up">
-          <article class="card tree-card">
-            <pre class="code-block"><code>source/
-outputs/
-  extracted/
-  html/
-  docx/
-  browser-course/
-  scorm/
-reports/
-specs/
-agents.md
-prompt-01-analyse.md
-prompt-02-extract.md
-prompt-03-build.md
-prompt-04-package-scorm.md</code></pre>
-          </article>
-
-          <article class="card fact-card">
-            <p class="mini-label">What they mean</p>
-            <ul class="fact-list">
-              <li><code>source/</code> = authoring</li>
-              <li><code>reports/</code> = evidence</li>
-              <li><code>outputs/</code> = generated files</li>
-              <li><code>prompt-*.md</code> = automation steps</li>
-              <li><code>specs/</code> + <code>agents.md</code> = rules and stop conditions</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
     <section class="section">
       <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Actual Excerpt</p>
-          <h2>One small repo snippet makes the evidence feel real.</h2>
-        </div>
-
-        <div class="grid two-up">
-          <article class="card fact-card">
-            <p class="mini-label">From the extracted file</p>
-            <pre class="code-block"><code>Homework 1
-Design a program that controls two sets
-of traffic lights at a junction.
-
-RED: 20 seconds
-AMBER: 3 seconds
-GREEN: 20 seconds</code></pre>
-          </article>
-
-          <article class="card fact-card">
-            <p class="mini-label">Why it matters</p>
-            <ul class="fact-list">
-              <li>This excerpt is taken from <code>outputs/extracted/CP4807-H1.txt</code>.</li>
-              <li>It shows the pipeline is preserving real source content, not placeholder copy.</li>
-              <li>The same content then becomes <code>outputs/html/CP4807-H1.html</code>.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Proof Chain</p>
-          <h2>One example file shows the pipeline is real.</h2>
-        </div>
-
-        <div class="grid two-up">
-          <article class="card fact-card">
-            <p class="mini-label">Example flow</p>
-            <ul class="fact-list">
-              <li>Analysis identifies `CP4807-H1.html` as Homework 1.</li>
-              <li>Extraction creates `outputs/extracted/CP4807-H1.txt`.</li>
-              <li>Build creates `outputs/html/CP4807-H1.html`.</li>
-              <li>Validation reports no broken internal references in that built file.</li>
-            </ul>
-          </article>
-
-          <article class="card fact-card">
-            <p class="mini-label">Example files present now</p>
-            <ul class="fact-list">
-              <li>`outputs/extracted/CP4807-1.txt`</li>
-              <li>`outputs/extracted/CP4807-H1.txt`</li>
-              <li>`outputs/html/CP4807-H1.html`</li>
-              <li>`outputs/docx/CP4807-1.html`</li>
-            </ul>
-          </article>
-        </div>
       </div>
     </section>
 
@@ -176,6 +80,91 @@ GREEN: 20 seconds</code></pre>
           <p class="eyebrow">Source Tagging Rules</p>
           <h2>Every block must follow this exact pattern for the pipeline to process it correctly.</h2>
           <p>The analysis agent scans the source document for blocks that match a known tag pattern. A block that is malformed, missing a filename, or uses an unrecognised tag will be flagged in the analysis report and skipped during extraction.</p>
+          <div class="hero-actions authoring-actions">
+            <a class="button button-primary" href="specs/source-authoring-guide.md" download="scorm-source-authoring-guide.md">Export authoring rules</a>
+            <a class="button button-secondary button-secondary-dark" href="specs/tag-rules.md" target="_blank" rel="noopener noreferrer">Open tag rules spec</a>
+          </div>
+        </div>
+
+        <div class="card authoring-brief">
+          <div class="authoring-brief-copy">
+            <p class="mini-label">Authoring goal</p>
+            <h3>Write the Word source so each learner-facing item can become a clean, packageable asset.</h3>
+            <p>The best SCORM-ready source is not just tagged. It separates learner pages cleanly, uses predictable filenames, keeps each assessment in its own HTML block, and records the five SCORM decisions explicitly instead of leaving them to be inferred later.</p>
+          </div>
+          <div class="authoring-brief-points">
+            <div><span class="about-dot"></span><span>Use one tagged block per deliverable file.</span></div>
+            <div><span class="about-dot"></span><span>Put learner pages that may be tracked in <code>&lt;HTML&gt;</code> blocks.</span></div>
+            <div><span class="about-dot"></span><span>Keep worksheets and reference documents separate from SCO content.</span></div>
+            <div><span class="about-dot"></span><span>Define SCORM version, launch, tracking, completion, and navigation in the source or a companion spec.</span></div>
+          </div>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>Authoring rules for the best SCORM-compliant resource pack</h3>
+          <p>These rules tell the course author how to prepare the Word document before the pipeline runs, so the generated browser files and later SCORM package are both easier to validate.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Structure</span>
+            <h3>Keep one real output per tagged block</h3>
+            <ul class="fact-list">
+              <li>Start every publishable item with a recognised opening tag and end it with the exact matching closing tag.</li>
+              <li>Put only one learner resource inside each block. Do not combine two assignments, two worksheets, or mixed output types in one tag pair.</li>
+              <li>Keep planning notes, teacher-only comments, and draft instructions outside publishable blocks unless they are meant to appear to learners.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Naming</span>
+            <h3>Give every block a unique, correctly typed filename</h3>
+            <ul class="fact-list">
+              <li>Add a <code>&lt;filename&gt;</code> line inside every block and wrap the filename in double quotes.</li>
+              <li>Make the filename unique across the whole document so the pipeline never has to guess which file wins.</li>
+              <li>Match the extension to the block type: <code>.html</code> for <code>&lt;HTML&gt;</code>, <code>.docx</code> for worksheets, and the intended document type for references.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">SCORM fit</span>
+            <h3>Author trackable learner pages as HTML-first content</h3>
+            <ul class="fact-list">
+              <li>Use <code>&lt;HTML&gt;</code> for pages the LMS may launch or track, especially homework, assignments, quizzes, and assessments.</li>
+              <li>Keep a clear title at the top of the block so the built page and manifest labels are human-readable.</li>
+              <li>Make each assessable item self-contained so it can become its own SCO entry if required.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Clean content</span>
+            <h3>Write source content that can publish without manual cleanup</h3>
+            <ul class="fact-list">
+              <li>Keep learner instructions, questions, tables, and reference text inside the block, but remove author reminders that should not appear in the final output.</li>
+              <li>Use stable wording for headings and task labels so generated navigation stays consistent across outputs.</li>
+              <li>Do not rely on formatting alone to signal meaning. Put key structure into the text itself so extraction does not lose it.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Boundaries</span>
+            <h3>Separate trackable content from supporting files</h3>
+            <ul class="fact-list">
+              <li>Use <code>&lt;worksheet&gt;</code> for printable or downloadable activity sheets that are not expected to be LMS-tracked.</li>
+              <li>Use <code>&lt;document&gt;</code> for certificates, reference PDFs, or supporting resources that sit alongside the course.</li>
+              <li>Do not expect worksheet or document blocks to become trackable SCOs unless they are rebuilt as HTML launchable pages.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Definitions</span>
+            <h3>Record the SCORM decisions explicitly</h3>
+            <ul class="fact-list">
+              <li>State the SCORM version, launch file, tracking model, completion model, and navigation rules in the source or a companion definitions file.</li>
+              <li>Choose a launch file that already exists as a built <code>.html</code> output.</li>
+              <li>Do not leave sequencing, tracking, or completion to the packaging step to invent. Missing decisions block packaging on purpose.</li>
+            </ul>
+          </article>
         </div>
 
         <!-- Block anatomy -->
@@ -254,6 +243,103 @@ at a junction.</span>
               <div class="tag-scorm-note tag-scorm-neutral">Supplementary resource only — not tracked by the LMS.</div>
             </div>
           </article>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>Recommended authoring pattern for SCORM-ready content</h3>
+          <p>This example shows the kind of source structure that gives the packaging stage the least ambiguity later on.</p>
+        </div>
+
+        <div class="card authoring-example-card">
+          <pre class="code-block"><code>&lt;HTML&gt;
+Assessment 1: Traffic light logic
+&lt;filename&gt;"CP4807-A1.html"&lt;/filename&gt;
+
+Create a program that controls two sets of traffic lights at a junction.
+Your solution must include:
+- Red, amber, and green timing
+- A safe transition sequence
+- A short explanation of your logic
+
+&lt;/HTML&gt;
+
+scorm-version: "1.2"
+launch: "CP4807-A1.html"
+tracking: "completion-and-score"
+completion: "quiz-pass"
+navigation: "linear"</code></pre>
+          <p class="authoring-example-note">Best practice: keep the learner page in its own <code>&lt;HTML&gt;</code> block, then define the package-level SCORM settings separately so the launch page and tracking behavior are both explicit.</p>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>How to author external resources and teaching links</h3>
+          <p>This tool is designed for teachers who need to combine worksheets with linked resources. External links should be written in a consistent, explicit way so they can be turned into reliable learner-facing launch items or support links.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Videos</span>
+            <h3>YouTube links should be visible, named, and learner-safe</h3>
+            <ul class="fact-list">
+              <li>Place the link inside the learner block where it is needed, with a clear label such as <code>Video resource: https://youtu.be/...</code>.</li>
+              <li>Use a stable watch or share URL, not a temporary browser address.</li>
+              <li>Name the video in the surrounding text so the built output can show a human-readable link label.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Google files</span>
+            <h3>Google Docs and Slides links must be share-ready</h3>
+            <ul class="fact-list">
+              <li>Use viewable share links, not edit-only links tied to a teacher login.</li>
+              <li>Say what the resource is in plain text, for example <code>Teacher slides: https://docs.google.com/presentation/...</code>.</li>
+              <li>If learners need the file, place it in a learner-facing block. If it is teacher-only, keep it in a support resource block instead.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Datasheets</span>
+            <h3>Datasheet and reference links should describe the target clearly</h3>
+            <ul class="fact-list">
+              <li>Write the resource type and title before the URL, such as <code>Datasheet: PIC16F877A datasheet - https://...</code>.</li>
+              <li>Prefer direct PDF or stable vendor links over search-result URLs.</li>
+              <li>If the linked file is essential to the activity, mention that in the learner instructions so the generated page preserves the dependency.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Separation</span>
+            <h3>Keep learner links and teacher links separate</h3>
+            <ul class="fact-list">
+              <li>Learner-visible links belong inside the learner block they support.</li>
+              <li>Teacher PowerPoints, answer sheets, and delivery notes should go in a separate supporting block, usually <code>&lt;document&gt;</code> or a dedicated teacher resource page.</li>
+              <li>Do not mix teacher-only links into assessment or learner HTML blocks unless learners are meant to see them.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="card authoring-example-card">
+          <pre class="code-block"><code>&lt;HTML&gt;
+Worksheet 3: Inputs and outputs
+&lt;filename&gt;"CP4807-WS3.html"&lt;/filename&gt;
+
+Complete the worksheet tasks below.
+
+Video resource: https://youtu.be/h8-7BsXBpLc
+Datasheet: PIC16F877A datasheet - https://www.example.com/pic16f877a.pdf
+Learner slides: https://docs.google.com/presentation/d/example/view
+
+&lt;/HTML&gt;
+
+&lt;document&gt;
+Teacher delivery pack
+&lt;filename&gt;"CP4807-Teacher-Pack.docx"&lt;/filename&gt;
+
+Teacher slides: https://docs.google.com/presentation/d/example/edit
+Teacher notes: https://docs.google.com/document/d/example/edit
+
+&lt;/document&gt;</code></pre>
+          <p class="authoring-example-note">Rule of thumb: learner-facing links stay with the learner block; teacher-only links go into a separate support output so the SCORM package does not accidentally expose staff materials.</p>
         </div>
       </div>
     </section>
@@ -406,7 +492,7 @@ Content here.
         <div class="section-heading narrow-heading">
           <p class="eyebrow">SCORM Source Requirements</p>
           <h2>Five decisions must be defined before SCORM packaging can run.</h2>
-          <p>The pipeline reads these from the source document or a companion definitions file. If any are absent, packaging stops safely and the missing items are listed in the packaging report. None of these can be guessed or defaulted.</p>
+          <p>The pipeline reads these from the source document or a companion definitions file. If any are absent, packaging stops safely and the missing items are listed in the packaging report. For this prototype, SCORM 1.2 is the recommended default unless a target LMS specifically requires SCORM 2004.</p>
         </div>
 
         <div class="scorm-req-grid">
@@ -415,8 +501,8 @@ Content here.
             <div class="scorm-req-num">1</div>
             <div class="scorm-req-body">
               <h3>SCORM version</h3>
-              <p>Specify <code>1.2</code> or <code>2004</code>. The manifest schema, API calls, and data model differ between versions. This cannot be derived from the content.</p>
-              <div class="scorm-req-eg"><span>e.g.</span><code>scorm-version: "1.2"</code></div>
+              <p>Use <code>1.2</code> by default. Only choose <code>2004</code> if the target LMS explicitly requires it. The manifest schema, API calls, and data model differ between versions, so this still needs to be stated clearly.</p>
+              <div class="scorm-req-eg"><span>recommended</span><code>scorm-version: "1.2"</code></div>
             </div>
           </article>
 
