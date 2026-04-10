@@ -118,14 +118,12 @@ async function handleSourceFile(file) {
   try {
     const buffer = await file.arrayBuffer();
     const zip = await JSZip.loadAsync(buffer);
-    const documentXml = await zip.file("word/document.xml")?.async("string");
-
-    if (!documentXml) {
+    if (!zip.file("word/document.xml")) {
       renderError("The uploaded .docx could not be read as a standard Word document.");
       return;
     }
 
-    currentSourceText = extractReadableText(documentXml);
+    currentSourceText = await extractReadableTextFromDocx(zip);
     currentAnalysis = applyMediaStateToAnalysis(analyzeText(currentSourceText));
     renderAnalysis(currentSourceText, currentAnalysis);
   } catch (error) {
@@ -186,6 +184,22 @@ async function handleMediaFile(file) {
   }
 }
 
+async function extractReadableTextFromDocx(zip) {
+  const xmlEntries = Object.keys(zip.files)
+    .filter((name) => /^word\/(document|header\d+|footer\d+|footnotes|endnotes)\.xml$/i.test(name))
+    .sort((a, b) => a.localeCompare(b));
+
+  const parts = [];
+  for (const entryName of xmlEntries) {
+    const xmlString = await zip.file(entryName)?.async("string");
+    if (!xmlString) continue;
+    const extracted = extractReadableText(xmlString);
+    if (extracted) parts.push(extracted);
+  }
+
+  return parts.join("\n\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
 function extractReadableText(xmlString) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(xmlString, "application/xml");
@@ -196,6 +210,8 @@ function extractReadableText(xmlString) {
     const textNodes = paragraph.getElementsByTagNameNS("*", "t");
     let line = "";
     for (const node of textNodes) line += node.textContent || "";
+    const tabNodes = paragraph.getElementsByTagNameNS("*", "tab");
+    for (const node of tabNodes) line += node.textContent || " ";
     line = line.replace(/\u00a0/g, " ").trim();
     if (line) paragraphs.push(line);
   }
@@ -204,48 +220,67 @@ function extractReadableText(xmlString) {
 }
 function analyzeText(text) {
   const warnings = [];
-  const filenameMatches = [...text.matchAll(/<filename>\s*\"?([^\"<>\n]+)\"?\s*<\/filename>/gi)];
-  const allCloseTags = [...text.matchAll(/<\/(HTML|worksheet|document)>/gi)];
   const blocks = [];
   const duplicateMap = new Map();
+  const tokenPattern = /<filename>\s*\"?([^\"<>\n]+)\"?\s*<\/filename>|<(HTML|worksheet|document)>|<\/(HTML|worksheet|document)>/gi;
+  let currentBlock = null;
+  let lastIndex = 0;
+  let match;
+  let sawTagToken = false;
 
-  TAG_PATTERNS.forEach((tag) => {
-    const opens = [...text.matchAll(new RegExp(tag.open))];
-    const closes = [...text.matchAll(new RegExp(tag.close))];
-    if (closes.length > opens.length) warnings.push({ level: "warn", title: `Extra closing ${tag.label} tag`, detail: `Found ${closes.length} closing tags but only ${opens.length} opening tags for ${tag.label}.` });
+  while ((match = tokenPattern.exec(text)) !== null) {
+    const tokenIndex = match.index ?? 0;
+    const between = text.slice(lastIndex, tokenIndex);
+    if (currentBlock && between) currentBlock.bodyParts.push(between);
 
-    opens.forEach((openMatch) => {
-      const openIndex = openMatch.index ?? 0;
-      const closeMatch = closes.find((candidate) => (candidate.index ?? 0) > openIndex);
-      if (!closeMatch) {
-        warnings.push({ level: "danger", title: `Unclosed ${tag.label} block`, detail: `An opening <${tag.label}> tag was found without a matching closing tag.` });
-        return;
+    const filenameValue = match[1];
+    const openTag = match[2];
+    const closeTag = match[3];
+    const lineNumber = lineNumberAt(text, tokenIndex);
+
+    if (filenameValue) {
+      sawTagToken = true;
+      if (!currentBlock) {
+        warnings.push({ level: "warn", title: "Filename found outside a block", detail: `${sanitizeFilenameValue(filenameValue)} appears at line ${lineNumber} but is not inside <HTML>, <worksheet>, or <document>.` });
+      } else if (!currentBlock.filename) {
+        currentBlock.filename = sanitizeFilenameValue(filenameValue);
       }
+    } else if (openTag) {
+      sawTagToken = true;
+      if (currentBlock) {
+        warnings.push({ level: "danger", title: `Nested or interrupted ${currentBlock.tagType} block`, detail: `A new <${openTag}> tag was found at line ${lineNumber} before <${currentBlock.tagType}> was closed${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.` });
+        finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+      }
+      currentBlock = { tagType: openTag, filename: "", bodyParts: [], rawOpenIndex: tokenIndex, startLine: lineNumber };
+    } else if (closeTag) {
+      sawTagToken = true;
+      if (!currentBlock) {
+        warnings.push({ level: "warn", title: `Extra closing ${closeTag} tag`, detail: `A closing </${closeTag}> tag was found at line ${lineNumber} with no matching opening tag.` });
+      } else if (currentBlock.tagType.toLowerCase() !== closeTag.toLowerCase()) {
+        warnings.push({ level: "danger", title: "Mismatched closing tag", detail: `Line ${lineNumber} closes </${closeTag}> while the open block is <${currentBlock.tagType}>${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.` });
+        finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+        currentBlock = null;
+      } else {
+        currentBlock.endLine = lineNumber;
+        finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+        currentBlock = null;
+      }
+    }
 
-      const closeIndex = closeMatch.index ?? 0;
-      const rawBody = text.slice(openIndex + openMatch[0].length, closeIndex).replace(/<filename>\s*\"?([^\"<>\n]+)\"?\s*<\/filename>/gi, "").trim();
-      const mediaRefs = extractMediaReferences(rawBody);
-      const body = stripMediaTags(rawBody).trim();
-      const filenameMatch = filenameMatches.find((match) => {
-        const filenameIndex = match.index ?? 0;
-        return filenameIndex > openIndex && filenameIndex < closeIndex;
-      });
+    lastIndex = tokenPattern.lastIndex;
+  }
 
-      const filename = filenameMatch ? filenameMatch[1].trim() : "";
-      const classification = inferClassification(body, filename);
-      const output = inferOutput(tag.label, filename);
-      if (!filename) warnings.push({ level: "warn", title: `Missing filename in ${tag.label} block`, detail: `Block ${blocks.length + 1} has a valid ${tag.label} section but no <filename> value.` });
-      else duplicateMap.set(filename, (duplicateMap.get(filename) || 0) + 1);
-
-      blocks.push({ order: blocks.length + 1, tagType: tag.label, filename, excerpt: makeExcerpt(body, 220), body, classification, outputType: output.type, destination: output.destination, rawOpenIndex: openIndex, mediaRefs });
-    });
-  });
+  if (currentBlock) {
+    currentBlock.bodyParts.push(text.slice(lastIndex));
+    warnings.push({ level: "danger", title: `Unclosed ${currentBlock.tagType} block`, detail: `The <${currentBlock.tagType}> block${currentBlock.filename ? ` for ${currentBlock.filename}` : ""} starts at line ${currentBlock.startLine} but has no matching closing tag.` });
+    finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+  }
 
   duplicateMap.forEach((count, filename) => {
     if (count > 1) warnings.push({ level: "warn", title: "Duplicate filename", detail: `${filename} appears ${count} times across detected blocks.` });
   });
 
-  if (allCloseTags.length && !blocks.length) warnings.push({ level: "warn", title: "Tag-like text found but no valid blocks built", detail: "Closing tags were detected, but the prototype could not form complete blocks from the document text." });
+  if (sawTagToken && !blocks.length) warnings.push({ level: "warn", title: "Tag-like text found but no valid blocks built", detail: "The document appears to contain tags, but the prototype could not form complete blocks from them." });
 
   blocks.sort((a, b) => a.rawOpenIndex - b.rawOpenIndex).forEach((block, index) => { block.order = index + 1; });
   return { blocks, warnings, scorm: analyzeScorm(text, blocks), media: emptyMediaState() };
@@ -285,8 +320,8 @@ function applyMediaStateToAnalysis(analysis) {
   });
 
   references.forEach((ref) => {
-    if (ref.status === "missing") mediaWarnings.push({ level: "warn", title: "Missing media file", detail: `Block ${ref.blockOrder} references ${ref.filename} in <${ref.tag}> but no matching media file is available.` });
-    else if (ref.status === "ambiguous") mediaWarnings.push({ level: "warn", title: "Ambiguous media file", detail: `Block ${ref.blockOrder} references ${ref.filename} in <${ref.tag}>, but more than one ZIP entry shares that basename.` });
+    if (ref.status === "missing") mediaWarnings.push({ level: "warn", title: "Missing media file", detail: `Block ${ref.blockOrder}${ref.blockFilename ? ` (${ref.blockFilename})` : ""} references ${ref.filename} in <${ref.tag}> but no matching media file is available.` });
+    else if (ref.status === "ambiguous") mediaWarnings.push({ level: "warn", title: "Ambiguous media file", detail: `Block ${ref.blockOrder}${ref.blockFilename ? ` (${ref.blockFilename})` : ""} references ${ref.filename} in <${ref.tag}>, but more than one ZIP entry shares that basename.` });
   });
 
   if (!currentMediaBundle.length && references.length) mediaWarnings.unshift({ level: "warn", title: "Media ZIP not uploaded", detail: "The source document references explicit media tags, but no companion media ZIP has been loaded yet." });
@@ -304,9 +339,37 @@ function applyMediaStateToAnalysis(analysis) {
   return analysis;
 }
 
+function finalizeBlock(rawBlock, blocks, warnings, duplicateMap) {
+  const rawBody = sanitizeBodyText(rawBlock.bodyParts.join("").trim());
+  const mediaRefs = extractMediaReferences(rawBody);
+  const body = sanitizeBodyText(stripMediaTags(rawBody).trim());
+  const filename = sanitizeFilenameValue(rawBlock.filename);
+  const classification = inferClassification(body, filename);
+  const output = inferOutput(rawBlock.tagType, filename);
+
+  if (!filename) warnings.push({ level: "warn", title: `Missing filename in ${rawBlock.tagType} block`, detail: `The <${rawBlock.tagType}> block starting at line ${rawBlock.startLine} has no <filename> value.` });
+  else duplicateMap.set(filename, (duplicateMap.get(filename) || 0) + 1);
+
+  blocks.push({
+    order: blocks.length + 1,
+    tagType: rawBlock.tagType,
+    filename,
+    excerpt: makeExcerpt(body, 220),
+    body,
+    classification,
+    outputType: output.type,
+    destination: output.destination,
+    rawOpenIndex: rawBlock.rawOpenIndex,
+    mediaRefs,
+    startLine: rawBlock.startLine,
+    endLine: rawBlock.endLine || rawBlock.startLine
+  });
+}
+
 function inferClassification(content, filename) {
   const sample = `${filename} ${content}`.toLowerCase();
-  if (sample.includes("teacher")) return "teacher content";
+  if (/(^|[\s-])(tn|sow|prep)([\s.-]|$)/i.test(filename) || /teacher'?s?\s+notes?|marking scheme|scheme of work|preparation notes?/i.test(sample)) return "teacher content";
+  if (sample.includes("worksheet") || sample.includes("learner")) return "learner content";
   if (sample.includes("homework")) return "homework";
   if (sample.includes("assessment") || sample.includes("quiz") || sample.includes("test")) return "assessment";
   if (sample.includes("certificate")) return "certificate";
@@ -369,7 +432,8 @@ function renderBlocks(blocks) {
           <span class="mini-tag">${escapeHtml(block.tagType)}</span>
           <span class="mini-tag success">${escapeHtml(block.classification)}</span>
           ${block.filename ? `<span class="mini-tag">${escapeHtml(block.filename)}</span>` : `<span class="mini-tag warn">filename missing</span>`}
-          ${block.mediaRefs.length ? `<span class="mini-tag">${block.mediaRefs.length} media</span>` : ""}
+          <span class="mini-tag">lines ${block.startLine}-${block.endLine}</span>
+          ${block.mediaRefs.length ? `<span class="mini-tag">${block.mediaRefs.length} media</span>` : `<span class="mini-tag warn">no media tags</span>`}
         </div>
       </div>
       <div class="excerpt">${escapeHtml(block.excerpt || "(No visible text inside block)")}</div>
@@ -377,7 +441,7 @@ function renderBlocks(blocks) {
         <div class="meta-box"><strong>Filename</strong><div>${block.filename ? `<code>${escapeHtml(block.filename)}</code>` : "No filename detected"}</div></div>
         <div class="meta-box"><strong>Destination</strong><div><code>${escapeHtml(block.destination)}</code></div></div>
       </div>
-      ${block.mediaRefs.length ? `<div class="media-inline-note">Media refs: ${block.mediaRefs.map((ref) => `&lt;${escapeHtml(ref.tag)}&gt;${escapeHtml(ref.filename)}&lt;/${escapeHtml(ref.tag)}&gt;`).join(", ")}</div>` : ""}
+      <div class="media-inline-note">${block.mediaRefs.length ? `Media refs: ${block.mediaRefs.map((ref) => `&lt;${escapeHtml(ref.tag)}&gt;${escapeHtml(ref.filename)}&lt;/${escapeHtml(ref.tag)}&gt;`).join(", ")}` : "Media debug: no explicit media tags detected in this block."}</div>
     </article>
   `).join("");
 }
@@ -453,7 +517,7 @@ function renderMediaPanel(analysis) {
     </div>
     ${mediaState.references.length ? mediaState.references.map((ref) => `
       <article class="media-card">
-        <div class="block-top"><div><h3>${escapeHtml(ref.filename)}</h3><p>Block ${ref.blockOrder} • <code>&lt;${escapeHtml(ref.tag)}&gt;</code> reference</p></div><span class="mini-tag ${ref.status === "matched" ? "success" : "warn"}">${ref.status === "matched" ? "Matched" : ref.status === "ambiguous" ? "Ambiguous" : "Missing"}</span></div>
+        <div class="block-top"><div><h3>${escapeHtml(ref.filename)}</h3><p>Block ${ref.blockOrder} • ${escapeHtml(ref.blockFilename)} • <code>&lt;${escapeHtml(ref.tag)}&gt;</code> reference</p></div><span class="mini-tag ${ref.status === "matched" ? "success" : "warn"}">${ref.status === "matched" ? "Matched" : ref.status === "ambiguous" ? "Ambiguous" : "Missing"}</span></div>
         <p>${escapeHtml(ref.detail)}</p>
         ${ref.matchedFile ? `<div class="meta-grid"><div class="meta-box"><strong>ZIP entry</strong><div><code>${escapeHtml(ref.matchedFile.path)}</code></div></div><div class="meta-box"><strong>Export path</strong><div><code>media/${escapeHtml(ref.matchedFile.exportName)}</code></div></div></div><div class="media-link-row"><a class="download-link" href="${escapeHtml(ref.matchedFile.url)}" download="${escapeHtml(ref.matchedFile.exportName)}">Download media</a></div>` : ""}
       </article>
@@ -526,12 +590,12 @@ function buildPrototypeArtefacts(blocks) {
     const isHtml = tag === "html" || /\.html?$/i.test(filename);
     const content = isHtml ? buildPrototypeHtml(block, filename) : buildPrototypeText(block);
     const mime = isHtml ? "text/html;charset=utf-8" : "text/plain;charset=utf-8";
-    return { filename, tagType: block.tagType, outputLabel: tag === "html" ? "Prototype learner HTML output" : "Prototype stand-in output", status: tag === "html" ? `${block.mediaRefs.filter((ref) => ref.status === "matched").length} media matched` : "Stand-in preview generated", content, mime, url: createDownloadUrl(content, mime) };
+    return { filename, tagType: block.tagType, outputLabel: isHtml ? "Prototype HTML preview" : "Prototype text preview", status: `${block.mediaRefs.filter((ref) => ref.status === "matched").length} media matched`, content, mime, url: createDownloadUrl(content, mime) };
   });
 }
 
 function resolvePrototypeFilename(block) {
-  const original = block.filename.trim();
+  const original = sanitizeFilenameValue(block.filename);
   const lower = original.toLowerCase();
   if (block.tagType.toLowerCase() === "html") return lower.endsWith(".html") || lower.endsWith(".htm") ? original : `${original}.htm`;
   if (lower.endsWith(".html") || lower.endsWith(".htm") || lower.endsWith(".txt")) return original;
@@ -539,6 +603,9 @@ function resolvePrototypeFilename(block) {
 }
 
 function buildPrototypeHtml(block, filename) {
+  const display = deriveDisplayContent(block, filename);
+  const leadMedia = display.leadMedia;
+  const remainingMedia = display.remainingMedia;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -546,33 +613,70 @@ function buildPrototypeHtml(block, filename) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(filename)}</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #f4f7ff; color: #172554; }
-    main { max-width: 860px; margin: 0 auto; padding: 2rem 1rem 3rem; }
-    .card { background: white; border: 1px solid #dbe5ff; border-radius: 18px; padding: 1.4rem; }
-    .eyebrow { display: inline-block; padding: 0.25rem 0.55rem; border-radius: 999px; background: #dbe7ff; color: #2855d8; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; }
-    h1 { margin: 0.75rem 0 0.5rem; font-size: 1.9rem; }
-    p, li { line-height: 1.65; color: #405579; }
-    .meta { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0.75rem; margin: 1rem 0 1.2rem; }
-    .meta div { background: #f8fbff; border: 1px solid #dbe5ff; border-radius: 12px; padding: 0.75rem; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: linear-gradient(180deg, #eef4ff 0%, #f8fafc 100%); color: #14213d; }
+    main { max-width: 1120px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+    .sheet { background: #ffffff; border: 1px solid #d5e1f8; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 60px rgba(37, 99, 235, 0.12); }
+    .topbar { padding: 1rem 1.25rem; background: #f7faff; border-bottom: 1px solid #dbe7ff; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .topbar span { font-size: 0.8rem; color: #476184; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr); gap: 1.5rem; padding: 1.75rem; align-items: start; }
+    .eyebrow { display: inline-block; padding: 0.35rem 0.65rem; border-radius: 999px; background: #e0ecff; color: #1d4ed8; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+    h1 { margin: 0.8rem 0 0.35rem; font-size: clamp(2rem, 4vw, 3.15rem); line-height: 0.96; color: #102038; }
+    .subtitle { margin: 0; font-size: 1.15rem; line-height: 1.35; color: #385170; font-weight: 600; }
+    .summary { margin-top: 1.1rem; font-size: 1rem; line-height: 1.75; color: #455d7a; }
+    .hero-media { background: #fbfdff; border: 1px solid #dbe7ff; border-radius: 20px; padding: 0.9rem; min-height: 220px; }
+    .hero-media img, .hero-media video, .hero-media audio { width: 100%; max-width: 100%; border-radius: 14px; display: block; }
+    .media-label { display: block; margin-bottom: 0.55rem; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #5b7096; }
+    .meta { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0.75rem; padding: 0 1.75rem 1.25rem; }
+    .meta div { background: #f8fbff; border: 1px solid #dbe5ff; border-radius: 14px; padding: 0.85rem; }
     .meta strong { display: block; font-size: 12px; text-transform: uppercase; color: #5b7096; margin-bottom: 0.25rem; }
-    .content, .media-item { white-space: pre-wrap; background: #f8fbff; border-radius: 14px; border: 1px solid #dbe5ff; padding: 1rem; }
-    .media-stack { display: grid; gap: 0.8rem; margin-top: 1rem; }
-    img, video, audio { width: 100%; max-width: 100%; margin-top: 0.7rem; border-radius: 10px; }
+    .content { display: grid; gap: 1rem; padding: 0 1.75rem 1.75rem; }
+    .content-section { background: #fbfdff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1rem 1.1rem; }
+    .content-section h2 { margin: 0 0 0.65rem; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: #1d4ed8; }
+    .content-section p, .content-section li { margin: 0 0 0.7rem; line-height: 1.75; color: #334155; }
+    .content-section p:last-child, .content-section li:last-child { margin-bottom: 0; }
+    .content-section ul { margin: 0; padding-left: 1.2rem; }
+    .media-stack { display: grid; gap: 0.9rem; }
+    .media-item { background: #fbfdff; border: 1px solid #dbe5ff; border-radius: 18px; padding: 1rem; }
+    .media-item strong { display: inline-block; margin-bottom: 0.35rem; }
+    .media-item img, .media-item video, .media-item audio { width: 100%; max-width: 100%; margin-top: 0.75rem; border-radius: 12px; display: block; }
+    .media-item a { color: #1d4ed8; }
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; }
+      .meta { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <div class="card">
-      <span class="eyebrow">${block.tagType === "HTML" ? "Learner HTML prototype" : "Prototype stand-in"}</span>
-      <h1>${escapeHtml(filename)}</h1>
-      <p>This file was generated in the browser as a prototype artefact from the uploaded DOCX source.</p>
+    <div class="sheet">
+      <div class="topbar">
+        <span>Prototype browser output</span>
+        <span>Source tag: ${escapeHtml(block.tagType)}</span>
+        <span>Export file: ${escapeHtml(filename)}</span>
+      </div>
+      <section class="hero">
+        <div>
+          <span class="eyebrow">${block.tagType === "HTML" ? "Learner HTML prototype" : "Worksheet / document prototype"}</span>
+          <h1>${escapeHtml(display.title)}</h1>
+          ${display.subtitle ? `<p class="subtitle">${escapeHtml(display.subtitle)}</p>` : ""}
+          <p class="summary">This preview was generated from the tagged DOCX source and will include any explicitly matched media files from the uploaded ZIP.</p>
+        </div>
+        ${leadMedia ? `<aside class="hero-media"><span class="media-label">Lead media</span>${renderSingleMediaHtml(leadMedia)}</aside>` : `<aside class="hero-media"><span class="media-label">Lead media</span><p style="margin:0;color:#64748b;line-height:1.7;">No matched lead media was available for this block. Use an explicit tag like <code>&lt;image&gt;photo.jpg&lt;/image&gt;</code> and upload the matching file in the media ZIP.</p></aside>`}
+      </section>
       <div class="meta">
         <div><strong>Source block</strong>${escapeHtml(block.tagType)}</div>
         <div><strong>Classification</strong>${escapeHtml(block.classification)}</div>
         <div><strong>Destination</strong>${escapeHtml(block.destination)}</div>
       </div>
-      <div class="content">${escapeHtml(block.body || "(No visible text inside block)")}</div>
-      ${renderPrototypeMediaHtml(block.mediaRefs)}
+      <div class="content">
+        <section class="content-section">
+          <h2>Content</h2>
+          ${renderBodyContentHtml(display.contentLines)}
+        </section>
+        ${remainingMedia.length ? `<section class="content-section"><h2>Attached media</h2>${renderPrototypeMediaHtml(remainingMedia)}</section>` : ""}
+        ${display.missingMedia.length ? `<section class="content-section"><h2>Missing media refs</h2>${display.missingMedia.map((ref) => `<p><strong>&lt;${escapeHtml(ref.tag)}&gt;</strong> ${escapeHtml(ref.filename)}: ${escapeHtml(ref.detail)}</p>`).join("")}</section>` : ""}
+      </div>
     </div>
   </main>
 </body>
@@ -581,14 +685,7 @@ function buildPrototypeHtml(block, filename) {
 
 function renderPrototypeMediaHtml(mediaRefs) {
   if (!mediaRefs.length) return "";
-  return `<section class="media-stack">${mediaRefs.map((ref) => {
-    if (ref.status !== "matched" || !ref.matchedFile) return `<div class="media-item">${escapeHtml(ref.tag)}: ${escapeHtml(ref.filename)} (${escapeHtml(ref.detail)})</div>`;
-    const href = `../media/${encodePathSegment(ref.matchedFile.exportName)}`;
-    if (ref.tag === "image" && isImageFile(ref.matchedFile.exportName)) return `<div class="media-item"><strong>Image:</strong> ${escapeHtml(ref.matchedFile.exportName)}<img src="${href}" alt="${escapeHtml(ref.matchedFile.exportName)}" /></div>`;
-    if (ref.tag === "video" && isVideoFile(ref.matchedFile.exportName)) return `<div class="media-item"><strong>Video:</strong> ${escapeHtml(ref.matchedFile.exportName)}<video controls src="${href}"></video></div>`;
-    if (ref.tag === "audio" && isAudioFile(ref.matchedFile.exportName)) return `<div class="media-item"><strong>Audio:</strong> ${escapeHtml(ref.matchedFile.exportName)}<audio controls src="${href}"></audio></div>`;
-    return `<div class="media-item"><strong>${escapeHtml(capitalize(ref.tag))}:</strong> <a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(ref.matchedFile.exportName)}</a></div>`;
-  }).join("")}</section>`;
+  return `<section class="media-stack">${mediaRefs.map((ref) => `<div class="media-item">${renderSingleMediaHtml(ref)}</div>`).join("")}</section>`;
 }
 
 function buildPrototypeText(block) {
@@ -611,7 +708,7 @@ function buildSummaryReport() {
   const filenames = currentAnalysis.blocks.filter((block) => block.filename).map((block) => block.filename);
   const warnings = dedupeWarnings([...currentAnalysis.warnings, ...currentAnalysis.media.warnings]);
   const missingDecisions = currentAnalysis.scorm.checks.filter((item) => !item.ok).map((item) => `- ${item.label}: ${item.missing}`);
-  const proposed = currentAnalysis.blocks.length ? currentAnalysis.blocks.map((block) => `- Block ${block.order}: ${block.filename || "(missing filename)"} -> ${block.outputType} -> ${block.destination}`) : ["- No supported tagged blocks detected."];
+  const proposed = currentAnalysis.blocks.length ? currentAnalysis.blocks.map((block) => `- Block ${block.order}: ${block.filename || "(missing filename)"} -> ${block.outputType} -> ${block.destination} (lines ${block.startLine}-${block.endLine})`) : ["- No supported tagged blocks detected."];
   return [
     "Tagged DOCX Prototype Summary",
     "============================",
@@ -783,13 +880,112 @@ function emptyMediaState() {
 function extractMediaReferences(body) {
   const refs = [];
   let match;
-  while ((match = MEDIA_PATTERN.exec(body)) !== null) refs.push({ tag: match[1].toLowerCase(), filename: match[2].trim() });
+  while ((match = MEDIA_PATTERN.exec(body)) !== null) refs.push({ tag: match[1].toLowerCase(), filename: sanitizeMediaReferenceName(match[2]) });
   MEDIA_PATTERN.lastIndex = 0;
   return refs;
 }
 
 function stripMediaTags(body) {
   return body.replace(MEDIA_PATTERN, "").replace(/\n{3,}/g, "\n\n");
+}
+
+function deriveDisplayContent(block, filename) {
+  const lines = splitBodyLines(block.body);
+  const matchedMedia = block.mediaRefs.filter((ref) => ref.status === "matched");
+  const missingMedia = block.mediaRefs.filter((ref) => ref.status !== "matched");
+  let title = baseName(filename) || filename;
+  let subtitle = "";
+  let contentLines = [...lines];
+
+  if (lines.length) {
+    if (/^worksheet\b/i.test(lines[0]) || /^document\b/i.test(lines[0]) || /^introduction\b/i.test(lines[0])) {
+      title = lines[0];
+      contentLines = lines.slice(1);
+    } else if (lines[0].length <= 70) {
+      title = lines[0];
+      contentLines = lines.slice(1);
+    }
+  }
+
+  if (contentLines.length && contentLines[0].length <= 110 && !looksLikeSectionLabel(contentLines[0])) {
+    subtitle = contentLines[0];
+    contentLines = contentLines.slice(1);
+  }
+
+  return { title, subtitle, contentLines, leadMedia: matchedMedia[0] || null, remainingMedia: matchedMedia.slice(1), missingMedia };
+}
+
+function renderSingleMediaHtml(ref) {
+  if (ref.status !== "matched" || !ref.matchedFile) return `<p style="margin:0;color:#64748b;line-height:1.7;">${escapeHtml(ref.tag)}: ${escapeHtml(ref.filename)} (${escapeHtml(ref.detail)})</p>`;
+  const href = `../media/${encodePathSegment(ref.matchedFile.exportName)}`;
+  if (ref.tag === "image" && isImageFile(ref.matchedFile.exportName)) return `<strong>Image:</strong> ${escapeHtml(ref.matchedFile.exportName)}<img src="${href}" alt="${escapeHtml(ref.matchedFile.exportName)}" />`;
+  if (ref.tag === "video" && isVideoFile(ref.matchedFile.exportName)) return `<strong>Video:</strong> ${escapeHtml(ref.matchedFile.exportName)}<video controls src="${href}"></video>`;
+  if (ref.tag === "audio" && isAudioFile(ref.matchedFile.exportName)) return `<strong>Audio:</strong> ${escapeHtml(ref.matchedFile.exportName)}<audio controls src="${href}"></audio>`;
+  return `<strong>${escapeHtml(capitalize(ref.tag))}:</strong> <a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(ref.matchedFile.exportName)}</a>`;
+}
+
+function renderBodyContentHtml(lines) {
+  if (!lines.length) return `<p>(No visible text inside block)</p>`;
+  const html = [];
+  let listBuffer = [];
+
+  const flushList = () => {
+    if (!listBuffer.length) return;
+    html.push(`<ul>${listBuffer.map((line) => `<li>${linkifyText(escapeHtml(line))}</li>`).join("")}</ul>`);
+    listBuffer = [];
+  };
+
+  lines.forEach((line) => {
+    if (looksLikeSectionLabel(line)) {
+      flushList();
+      html.push(`<h2>${escapeHtml(trimTrailingColon(line))}</h2>`);
+      return;
+    }
+
+    if (looksLikeBullet(line)) {
+      listBuffer.push(line.replace(/^[-*•]\s+/, "").trim());
+      return;
+    }
+
+    flushList();
+    html.push(`<p>${linkifyText(escapeHtml(line))}</p>`);
+  });
+
+  flushList();
+  return html.join("");
+}
+
+function splitBodyLines(value) {
+  return sanitizeBodyText(value).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+}
+
+function sanitizeBodyText(value) {
+  return String(value || "").replace(/\u00a0/g, " ").replace(/[“”]/g, "\"").replace(/[‘’]/g, "'").replace(/\s+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function sanitizeFilenameValue(value) {
+  const cleaned = String(value || "").replace(/[“”]/g, "").replace(/[‘’]/g, "").replace(/[\u200b-\u200d\uFEFF]/g, "").trim();
+  return cleaned.replace(/[<>:"|?*]/g, "").replace(/\s+/g, " ");
+}
+
+function sanitizeMediaReferenceName(value) {
+  return sanitizeFilenameValue(value).replace(/^\.?[\\/]+/, "");
+}
+
+function looksLikeSectionLabel(line) {
+  return /^[A-Z][A-Za-z0-9 /&()-]{1,40}:$/.test(line) || /^(over to you|challenges|hints|resources|extensions):?$/i.test(line);
+}
+
+function trimTrailingColon(line) {
+  return String(line).replace(/:\s*$/, "");
+}
+
+function looksLikeBullet(line) {
+  return /^[-*•]\s+/.test(line);
+}
+
+function linkifyText(html) {
+  return html.replace(/(https?:\/\/[^\s<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
 
 function buildMediaIndex(files) {
@@ -821,6 +1017,7 @@ function uniqueMatchedMedia(analysis) {
 }
 
 function baseName(filename) { return filename ? filename.replace(/\.[^.]+$/, "") : ""; }
+function lineNumberAt(text, index) { return String(text || "").slice(0, index).split("\n").length; }
 function basenameOnly(value) { return String(value).split("/").pop().split("\\").pop(); }
 function normalizeMediaName(value) { return basenameOnly(value).trim().toLowerCase(); }
 function getMimeType(filename) {
