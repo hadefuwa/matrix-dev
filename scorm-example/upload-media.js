@@ -160,8 +160,10 @@ async function handleMediaFile(file) {
 
       const data = await entry.async("uint8array");
       const mime = getMimeType(exportName);
-      const url = createObjectUrl(new Blob([data], { type: mime }));
-      mediaFiles.push({ path: entry.name, exportName, key: normalizeMediaName(exportName), size: data.byteLength, mime, data, url });
+      const blob = new Blob([data], { type: mime });
+      const url = createObjectUrl(blob);
+      const dataUrl = await blobToDataUrl(blob);
+      mediaFiles.push({ path: entry.name, exportName, key: normalizeMediaName(exportName), size: data.byteLength, mime, data, url, dataUrl });
     }));
 
     currentMediaBundle = mediaFiles.sort((a, b) => a.exportName.localeCompare(b.exportName));
@@ -924,7 +926,7 @@ function deriveDisplayContent(block, filename) {
 
 function renderSingleMediaHtml(ref) {
   if (ref.status !== "matched" || !ref.matchedFile) return `<p style="margin:0;color:#64748b;line-height:1.7;">${escapeHtml(ref.tag)}: ${escapeHtml(ref.filename)} (${escapeHtml(ref.detail)})</p>`;
-  const embeddedHref = buildEmbeddedMediaUrl(ref.matchedFile);
+  const embeddedHref = ref.matchedFile.dataUrl || buildEmbeddedMediaUrl(ref.matchedFile);
   if (ref.tag === "image" && isImageFile(ref.matchedFile.exportName)) return `<strong>Image:</strong> ${escapeHtml(ref.matchedFile.exportName)}<img src="${embeddedHref}" alt="${escapeHtml(ref.matchedFile.exportName)}" />`;
   if (ref.tag === "video" && isVideoFile(ref.matchedFile.exportName)) return `<strong>Video:</strong> ${escapeHtml(ref.matchedFile.exportName)}<video controls src="${embeddedHref}"></video>`;
   if (ref.tag === "audio" && isAudioFile(ref.matchedFile.exportName)) return `<strong>Audio:</strong> ${escapeHtml(ref.matchedFile.exportName)}<audio controls src="${embeddedHref}"></audio>`;
@@ -1027,6 +1029,15 @@ function baseName(filename) { return filename ? filename.replace(/\.[^.]+$/, "")
 function lineNumberAt(text, index) { return String(text || "").slice(0, index).split("\n").length; }
 function basenameOnly(value) { return String(value).split("/").pop().split("\\").pop(); }
 function normalizeMediaName(value) { return basenameOnly(value).trim().toLowerCase(); }
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error("Could not convert blob to data URL."));
+    reader.readAsDataURL(blob);
+  });
+}
+
 function buildEmbeddedMediaUrl(file) {
   return `data:${file.mime || "application/octet-stream"};base64,${uint8ToBase64(file.data)}`;
 }
