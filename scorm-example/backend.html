@@ -556,6 +556,73 @@ Content here.
     <section class="section">
       <div class="wrap">
         <div class="section-heading narrow-heading">
+          <p class="eyebrow">imsmanifest.xml</p>
+          <h2>The manifest is the file that turns built content into a real SCORM package.</h2>
+          <p><code>imsmanifest.xml</code> is the package map for the LMS. It tells the LMS what the course is called, which file launches first, which items are SCOs, and which resources belong inside the package.</p>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card coverage-card">
+            <h3>What the manifest must contain</h3>
+            <ul class="fact-list">
+              <li>A package identifier and basic metadata.</li>
+              <li>An organisation structure showing the launch order or item hierarchy.</li>
+              <li>Resource entries that point to real built files such as HTML pages.</li>
+              <li>SCO or asset declarations that match the chosen tracking approach.</li>
+            </ul>
+          </article>
+
+          <article class="card coverage-card">
+            <h3>What this prototype already knows</h3>
+            <ul class="fact-list">
+              <li>The intended SCORM version should default to <code>1.2</code>.</li>
+              <li><code>&lt;HTML&gt;</code> blocks are the strongest candidates for launchable SCO content.</li>
+              <li><code>&lt;filename&gt;</code> gives the exact resource href the manifest would need.</li>
+              <li>Titles and content grouping can support human-readable item labels in the LMS.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="grid two-up" style="margin-top:1rem;">
+          <article class="card fact-card">
+            <p class="mini-label">Illustrative shape</p>
+            <pre class="code-block"><code>&lt;manifest identifier="course-package"&gt;
+  &lt;organizations default="course-org"&gt;
+    &lt;organization identifier="course-org"&gt;
+      &lt;item identifier="item-a1" identifierref="res-a1"&gt;
+        &lt;title&gt;Assessment 1&lt;/title&gt;
+      &lt;/item&gt;
+    &lt;/organization&gt;
+  &lt;/organizations&gt;
+  &lt;resources&gt;
+    &lt;resource identifier="res-a1" href="CP4807-A1.html" /&gt;
+  &lt;/resources&gt;
+&lt;/manifest&gt;</code></pre>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">Why one is not generated yet</p>
+            <ul class="fact-list">
+              <li>No real launch file has been designated and built for the package yet.</li>
+              <li>The final SCO structure is still undefined.</li>
+              <li>Tracking, completion, and navigation rules are not fully locked.</li>
+              <li>Not all learner-facing files exist yet, so the resource list would be incomplete.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="scorm-req-note card" style="margin-top:1rem;">
+          <div class="scorm-req-note-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <p>This project currently describes the manifest requirements, but it does not yet contain a real <code>imsmanifest.xml</code> file. The manifest can only be generated once the package structure and resource list are explicit and complete.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
           <p class="eyebrow">Prompts And Rules</p>
           <h2>The prompts line up directly with the stage model.</h2>
         </div>
