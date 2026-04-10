@@ -342,7 +342,7 @@ function applyMediaStateToAnalysis(analysis) {
 function finalizeBlock(rawBlock, blocks, warnings, duplicateMap) {
   const rawBody = sanitizeBodyText(rawBlock.bodyParts.join("").trim());
   const mediaRefs = extractMediaReferences(rawBody);
-  const body = sanitizeBodyText(stripMediaTags(rawBody).trim());
+  const body = sanitizeBodyText(stripStructuralTags(stripMediaTags(rawBody)).trim());
   const filename = sanitizeFilenameValue(rawBlock.filename);
   const classification = inferClassification(body, filename);
   const output = inferOutput(rawBlock.tagType, filename);
@@ -889,6 +889,13 @@ function stripMediaTags(body) {
   return body.replace(MEDIA_PATTERN, "").replace(/\n{3,}/g, "\n\n");
 }
 
+function stripStructuralTags(body) {
+  return String(body || "")
+    .replace(/<filename>\s*\"?([^\"<>\n]+)\"?\s*<\/filename>/gi, "")
+    .replace(/<\/?(HTML|worksheet|document)>/gi, "")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
 function deriveDisplayContent(block, filename) {
   const lines = splitBodyLines(block.body);
   const matchedMedia = block.mediaRefs.filter((ref) => ref.status === "matched");
@@ -917,11 +924,11 @@ function deriveDisplayContent(block, filename) {
 
 function renderSingleMediaHtml(ref) {
   if (ref.status !== "matched" || !ref.matchedFile) return `<p style="margin:0;color:#64748b;line-height:1.7;">${escapeHtml(ref.tag)}: ${escapeHtml(ref.filename)} (${escapeHtml(ref.detail)})</p>`;
-  const href = `../media/${encodePathSegment(ref.matchedFile.exportName)}`;
-  if (ref.tag === "image" && isImageFile(ref.matchedFile.exportName)) return `<strong>Image:</strong> ${escapeHtml(ref.matchedFile.exportName)}<img src="${href}" alt="${escapeHtml(ref.matchedFile.exportName)}" />`;
-  if (ref.tag === "video" && isVideoFile(ref.matchedFile.exportName)) return `<strong>Video:</strong> ${escapeHtml(ref.matchedFile.exportName)}<video controls src="${href}"></video>`;
-  if (ref.tag === "audio" && isAudioFile(ref.matchedFile.exportName)) return `<strong>Audio:</strong> ${escapeHtml(ref.matchedFile.exportName)}<audio controls src="${href}"></audio>`;
-  return `<strong>${escapeHtml(capitalize(ref.tag))}:</strong> <a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(ref.matchedFile.exportName)}</a>`;
+  const embeddedHref = buildEmbeddedMediaUrl(ref.matchedFile);
+  if (ref.tag === "image" && isImageFile(ref.matchedFile.exportName)) return `<strong>Image:</strong> ${escapeHtml(ref.matchedFile.exportName)}<img src="${embeddedHref}" alt="${escapeHtml(ref.matchedFile.exportName)}" />`;
+  if (ref.tag === "video" && isVideoFile(ref.matchedFile.exportName)) return `<strong>Video:</strong> ${escapeHtml(ref.matchedFile.exportName)}<video controls src="${embeddedHref}"></video>`;
+  if (ref.tag === "audio" && isAudioFile(ref.matchedFile.exportName)) return `<strong>Audio:</strong> ${escapeHtml(ref.matchedFile.exportName)}<audio controls src="${embeddedHref}"></audio>`;
+  return `<strong>${escapeHtml(capitalize(ref.tag))}:</strong> <a href="${embeddedHref}" download="${escapeHtml(ref.matchedFile.exportName)}">${escapeHtml(ref.matchedFile.exportName)}</a>`;
 }
 
 function renderBodyContentHtml(lines) {
@@ -1020,6 +1027,20 @@ function baseName(filename) { return filename ? filename.replace(/\.[^.]+$/, "")
 function lineNumberAt(text, index) { return String(text || "").slice(0, index).split("\n").length; }
 function basenameOnly(value) { return String(value).split("/").pop().split("\\").pop(); }
 function normalizeMediaName(value) { return basenameOnly(value).trim().toLowerCase(); }
+function buildEmbeddedMediaUrl(file) {
+  return `data:${file.mime || "application/octet-stream"};base64,${uint8ToBase64(file.data)}`;
+}
+
+function uint8ToBase64(uint8) {
+  let binary = "";
+  const chunkSize = 32768;
+  for (let index = 0; index < uint8.length; index += chunkSize) {
+    const chunk = uint8.subarray(index, index + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
 function getMimeType(filename) {
   const lower = filename.toLowerCase();
   if (/\.(jpg|jpeg)$/.test(lower)) return "image/jpeg";
