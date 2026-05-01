@@ -740,13 +740,9 @@
     .detail-label { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0.25rem 0 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
     .detail-label::before, .detail-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
-    /* ── File rows (generated outputs) ── */
-    .file-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid var(--line); }
-    .file-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .file-row:first-child { padding-top: 0; }
-    .file-row-left { display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
-    .file-row-name { font-weight: 600; font-size: 0.88rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .file-row-type { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+    /* ── Build success row ── */
+    .build-success { display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem 0; }
+    .build-success span { flex: 1; font-size: 0.88rem; font-weight: 600; color: var(--success); }
 
     /* ── Warning rows ── */
     .warn-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
