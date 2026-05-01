@@ -772,7 +772,75 @@ Look at the circuit diagram below and answer the questions.</span>
         </div>
       </div>
 
-      <!-- ── Section 7: Quick reference ── -->
+      <!-- ── Section 7: Output files ── -->
+      <div class="section-label">What you get</div>
+
+      <div class="guide-section">
+        <h2>Understanding your output files</h2>
+        <p>
+          When you click <strong>Build Outputs</strong> and download the bundle, you receive a single ZIP file
+          containing everything the tool produced from your source document. Here is what is inside and what
+          each file is for.
+        </p>
+
+        <div class="tag-grid">
+          <div class="tag-card">
+            <div class="tag-card-icon blue">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3>HTML pages</h3>
+            <p>Each <code>&lt;HTML&gt;</code> block becomes a self-contained web page. Open it in any browser to see formatted learner content — headings, lists, tables, images, and links all preserved from your Word document.</p>
+            <span class="output-pill blue">outputs/html/</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon purple">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <h3>Word documents</h3>
+            <p>Each <code>&lt;worksheet&gt;</code> and <code>&lt;document&gt;</code> block becomes a <code>.docx</code> file. Styles, numbering, tables, and images from the source block are carried across and the file opens in Microsoft Word or Google Docs.</p>
+            <span class="output-pill purple">outputs/docx/</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon teal">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <h3>SCORM package</h3>
+            <p>If your source document contains SCORM notes, a ready-to-upload <code>imsmanifest.xml</code> and package structure are generated alongside your HTML files. Upload the ZIP directly to Moodle, Canvas, or any SCORM-compatible LMS.</p>
+            <span class="output-pill teal">scorm/</span>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>Media files travel with the outputs</strong>
+          Any images embedded in your Word document, or matched from your media ZIP, are copied into a <code>media/</code> folder inside the bundle. HTML pages reference them using relative paths, so they display correctly when the bundle is extracted and served from any web server or LMS.</p>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>The bundle is the deliverable</strong>
+          You do not need to do anything to the individual files before uploading. Extract the ZIP, and the folder structure is already correct for deployment. HTML files link to their media, the SCORM manifest points to the right launch file, and Word documents are standalone.</p>
+        </div>
+
+        <h3 style="font-size:1rem;font-weight:800;margin:1.5rem 0 0.5rem;">Folder structure inside the bundle</h3>
+
+        <div class="code-block"><pre><span class="hl-dim">your-document-bundle.zip</span>
+<span class="hl-dim">├──</span> <span class="hl-tag">outputs/</span>
+<span class="hl-dim">│   ├──</span> <span class="hl-attr">html/</span>
+<span class="hl-dim">│   │   ├──</span> <span class="hl-val">CP4807-H1.html</span>       <span class="hl-dim">← from &lt;HTML&gt; blocks</span>
+<span class="hl-dim">│   │   └──</span> <span class="hl-val">CP4807-H2.html</span>
+<span class="hl-dim">│   └──</span> <span class="hl-attr">docx/</span>
+<span class="hl-dim">│       ├──</span> <span class="hl-val">CP4807-1.docx</span>        <span class="hl-dim">← from &lt;worksheet&gt; blocks</span>
+<span class="hl-dim">│       └──</span> <span class="hl-val">CP4807-CPDcert.docx</span>  <span class="hl-dim">← from &lt;document&gt; blocks</span>
+<span class="hl-dim">├──</span> <span class="hl-tag">media/</span>
+<span class="hl-dim">│   ├──</span> <span class="hl-val">traffic-lights.jpg</span>      <span class="hl-dim">← matched media files</span>
+<span class="hl-dim">│   └──</span> <span class="hl-val">intro.mp4</span>
+<span class="hl-dim">└──</span> <span class="hl-tag">scorm/</span>                       <span class="hl-dim">← only present if SCORM detected</span>
+<span class="hl-dim">    ├──</span> <span class="hl-val">imsmanifest.xml</span>
+<span class="hl-dim">    └──</span> <span class="hl-val">…</span></pre></div>
+      </div>
+
+      <!-- ── Section 8: Quick reference ── -->
       <div class="section-label">Quick reference</div>
 
       <div class="guide-section">
