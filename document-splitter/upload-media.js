@@ -725,45 +725,47 @@ async function buildMiniDocx(block) {
 // regardless of which prefix XMLSerializer chooses to emit.
 function buildBlockDocumentXml(paraNodes, linkedToEmbeddedIds = new Set()) {
   try {
-    // Parse a fresh copy of the source document to use as the envelope
     const doc = new DOMParser().parseFromString(currentDocXml, "application/xml");
     const bodyEl = doc.getElementsByTagNameNS("*", "body")[0];
     if (!bodyEl) throw new Error("No body element in document.xml");
 
-    // Clear all existing body content
     while (bodyEl.firstChild) bodyEl.removeChild(bodyEl.firstChild);
 
-    // Import (deep-clone) the block's paragraph nodes into this document
     for (const node of paraNodes) {
       bodyEl.appendChild(doc.importNode(node, true));
     }
 
-    // Word requires a sectPr at the end of every body
     const wNs = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
     bodyEl.appendChild(doc.createElementNS(wNs, "w:sectPr"));
 
-    // Promote r:link → r:embed in the DOM for any IDs that were resolved to embedded files
+    let xmlStr = new XMLSerializer().serializeToString(doc);
+
+    // Promote r:link → r:embed using post-serialization string replacement.
+    // This is more reliable than DOM setAttributeNS because it works regardless of
+    // which namespace prefix XMLSerializer chose for the relationships namespace.
+    // We match on the exact rId value (e.g. "rId8") which is unique, so there is
+    // no risk of accidentally replacing unrelated link attributes.
     if (linkedToEmbeddedIds.size > 0) {
-      const R_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
-      promoteRLinkInDom(bodyEl, R_NS, linkedToEmbeddedIds);
+      console.log("[DOCX-IMG] promoting r:link → r:embed for IDs:", [...linkedToEmbeddedIds]);
+      for (const rId of linkedToEmbeddedIds) {
+        const escapedId = escapeXml(rId);
+        const safeId = escapedId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const before = xmlStr;
+        // Replace <anyprefix>:link="rId" → <anyprefix>:embed="rId"
+        xmlStr = xmlStr.replace(new RegExp(`(\\w[\\w-]*):link="${safeId}"`, "g"), `$1:embed="${escapedId}"`);
+        if (xmlStr === before) {
+          console.warn(`[DOCX-IMG] no r:link="${rId}" found in serialized XML — swap did not apply`);
+        } else {
+          console.log(`[DOCX-IMG] swapped r:link="${rId}" → r:embed="${rId}"`);
+        }
+      }
     }
 
-    return new XMLSerializer().serializeToString(doc);
+    return xmlStr;
   } catch (err) {
     console.error("buildBlockDocumentXml error:", err);
     return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:sectPr/></w:body></w:document>`;
   }
-}
-
-// Recursively walk DOM elements, swapping r:link → r:embed for IDs in linkedIds
-function promoteRLinkInDom(node, R_NS, linkedIds) {
-  if (node.nodeType !== 1) return;
-  const linkVal = node.getAttributeNS(R_NS, "link");
-  if (linkVal && linkedIds.has(linkVal)) {
-    node.removeAttributeNS(R_NS, "link");
-    node.setAttributeNS(R_NS, "r:embed", linkVal);
-  }
-  for (const child of node.childNodes) promoteRLinkInDom(child, R_NS, linkedIds);
 }
 
 // Collect relationship IDs from a DOM subtree using namespace-aware attribute lookup
@@ -784,38 +786,55 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
     collectRelIdsFromNode(node, R_NS, usedRids);
   }
 
+  // Also scan the raw serialized XML for any r:link / r:embed values that
+  // getAttributeNS might have missed (e.g. if namespace prefix resolution
+  // behaved unexpectedly during DOM parsing).
+  const ser = new XMLSerializer();
+  for (const node of paraNodes) {
+    const raw = ser.serializeToString(node);
+    for (const m of raw.matchAll(/\w[\w-]*:(?:link|embed|id|href)="([^"]+)"/g)) {
+      usedRids.add(m[1]);
+    }
+  }
+
+  console.log("[DOCX-IMG] usedRids from paragraphs:", [...usedRids]);
+  console.log("[DOCX-IMG] total relationships in currentRels:", currentRels.size);
+
   const relEntries = [];
   const mediaFiles = [];
-  // Track IDs that were r:link (externally-linked) but resolved to embedded files.
-  // The document XML still has r:link for these — callers must swap them to r:embed.
   const linkedToEmbeddedIds = new Set();
 
   for (const [rId, rel] of currentRels) {
     if (!usedRids.has(rId)) continue;
 
     const isImageRel = rel.type.includes("/image");
+    console.log(`[DOCX-IMG] processing rId=${rId} mode=${rel.mode} isImage=${isImageRel} target=${rel.target}`);
 
     if (rel.mode === "External") {
-      // Try to resolve externally-linked images from the media ZIP or embedded media
       if (isImageRel) {
         const rawFileName = rel.target.split(/[\\/]/).pop();
         const fileName = (() => { try { return decodeURIComponent(rawFileName); } catch (_) { return rawFileName; } })();
         const key = normalizeMediaName(fileName);
+        console.log(`[DOCX-IMG]   external image: rawFileName="${rawFileName}" fileName="${fileName}" key="${key}"`);
+        console.log(`[DOCX-IMG]   zipEntry=${currentMediaIndex.has(key)} embEntry=${currentEmbeddedMediaIndex.has(key)}`);
         const zipEntry = currentMediaIndex.get(key);
         const embEntry = currentEmbeddedMediaIndex.get(key);
         if (zipEntry) {
           mediaFiles.push({ name: zipEntry.exportName, data: zipEntry.data });
           relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(zipEntry.exportName)}"/>`);
           linkedToEmbeddedIds.add(rId);
+          console.log(`[DOCX-IMG]   → resolved from ZIP: ${zipEntry.exportName}`);
           continue;
         } else if (embEntry) {
           mediaFiles.push({ name: embEntry.exportName, data: embEntry.data });
           relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(embEntry.exportName)}"/>`);
           linkedToEmbeddedIds.add(rId);
+          console.log(`[DOCX-IMG]   → resolved from embedded: ${embEntry.exportName}`);
           continue;
+        } else {
+          console.warn(`[DOCX-IMG]   ✗ no match for "${fileName}" — image will be missing`);
         }
       }
-      // Non-image external rel or no match — keep as external link
       relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="${escapeXml(rel.target)}" TargetMode="External"/>`);
     } else {
       // Internal resource — copy the file from the source DOCX
