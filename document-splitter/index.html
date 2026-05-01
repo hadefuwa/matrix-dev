@@ -7,525 +7,705 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     :root {
-      --bg: #eef4ff;
-      --panel: #ffffff;
-      --ink: #10213f;
-      --muted: #597096;
-      --line: #c9d6f2;
-      --accent: #2b5be4;
-      --accent-soft: #dce7ff;
-      --success: #11795d;
+      --ink:          #0f1f3d;
+      --ink-2:        #2d4166;
+      --muted:        #5a7099;
+      --muted-light:  #8ba3c5;
+      --panel:        #ffffff;
+      --surface:      #f5f8ff;
+      --line:         #dde6f8;
+      --accent:       #2b5be4;
+      --accent-mid:   #3d77ff;
+      --accent-soft:  #e0eaff;
+      --accent-xsoft: #f0f4ff;
+      --teal:         #0d9488;
+      --teal-soft:    #d1faf5;
+      --success:      #11795d;
       --success-soft: #dcf8ee;
-      --warn: #a55a00;
-      --warn-soft: #fff0da;
-      --danger: #a52828;
-      --danger-soft: #ffe3e3;
-      --shadow: 0 18px 40px rgba(28, 53, 109, 0.12);
-      --radius: 22px;
+      --warn:         #a55a00;
+      --warn-soft:    #fff0da;
+      --danger:       #c0392b;
+      --danger-soft:  #ffe8e8;
+      --purple:       #6d28d9;
+      --purple-soft:  #ede9fe;
+      --shadow-sm:    0 2px 8px rgba(28,53,109,0.07);
+      --shadow:       0 8px 28px rgba(28,53,109,0.10);
+      --shadow-lg:    0 20px 50px rgba(28,53,109,0.13);
+      --radius:       20px;
+      --radius-sm:    14px;
     }
 
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      background:
-        radial-gradient(circle at top left, #fdf7ea 0, rgba(253,247,234,0.7) 24%, transparent 48%),
-        linear-gradient(180deg, #eff5ff 0%, #e7efff 100%);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: #edf2ff;
       color: var(--ink);
+      min-height: 100vh;
     }
 
+    /* ─── Typography ─── */
+    h1, h2, h3, h4, h5, p { margin-top: 0; }
+    h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.1rem; }
+    h3 { font-size: 0.97rem; font-weight: 700; margin-bottom: 0.3rem; }
     a { color: inherit; }
     code {
-      font-family: Consolas, "Courier New", monospace;
-      background: #edf3ff;
-      border: 1px solid #d7e2fb;
-      border-radius: 8px;
-      padding: 0.12rem 0.42rem;
-      font-size: 0.92em;
+      font-family: "Cascadia Code", Consolas, monospace;
+      background: var(--accent-xsoft);
+      border: 1px solid #cdd9f8;
+      border-radius: 6px;
+      padding: 0.1rem 0.38rem;
+      font-size: 0.875em;
     }
 
-    .wrap { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; }
+    /* ─── Layout ─── */
+    .wrap { width: min(1220px, calc(100% - 2.5rem)); margin: 0 auto; }
 
-    /* Header */
-    .site-header { padding: 1rem 0 0; }
+    /* ─── Header ─── */
+    .site-header { padding: 1.1rem 0 0; }
     .brand-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      background: rgba(255,255,255,0.72);
-      border: 1px solid rgba(201,214,242,0.8);
+      gap: 1.1rem;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(200,215,248,0.9);
       border-radius: 999px;
-      padding: 0.75rem 1.25rem;
-      backdrop-filter: blur(18px);
+      padding: 0.65rem 1.4rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
-    .brand { font-weight: 800; letter-spacing: 0.02em; text-decoration: none; font-size: 1rem; }
-    .brand-tag {
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-weight: 600;
+    .brand {
+      font-weight: 800;
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .brand-sep { color: var(--line); font-weight: 300; }
+    .brand-sub { font-size: 0.82rem; color: var(--muted); font-weight: 500; }
+    .brand-badge {
+      margin-left: auto;
+      padding: 0.28rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
     }
 
-    /* Hero */
-    .hero { padding: 2rem 0 1.4rem; }
+    /* ─── Hero ─── */
+    .hero { padding: 1.8rem 0 1.5rem; }
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.25fr 0.95fr;
-      gap: 1.3rem;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1.25rem;
       align-items: stretch;
     }
-    .hero-copy,
-    .hero-side,
-    .panel {
-      background: var(--panel);
-      border: 1px solid rgba(201,214,242,0.9);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
     .hero-copy {
-      padding: 1.8rem;
-      background:
-        linear-gradient(135deg, rgba(43,91,228,0.07), rgba(17,121,93,0.03)),
-        var(--panel);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem 2rem 1.75rem;
+      background-image: radial-gradient(ellipse at 0% 0%, rgba(43,91,228,0.06) 0%, transparent 55%),
+                        radial-gradient(ellipse at 100% 100%, rgba(13,148,136,0.04) 0%, transparent 50%);
     }
     .eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      padding: 0.4rem 0.7rem;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
       border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent);
-      text-transform: uppercase;
+      font-size: 0.73rem;
       font-weight: 800;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      margin: 0 0 0.85rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
     }
-    h1, h2, h3, h4, p { margin-top: 0; }
+    .eyebrow-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
     h1 {
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-      line-height: 1.05;
-      margin-bottom: 0.85rem;
-      max-width: 16ch;
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      line-height: 1.07;
+      font-weight: 800;
+      margin-bottom: 0.9rem;
+      max-width: 18ch;
+      letter-spacing: -0.01em;
+      color: var(--ink);
     }
     .lede {
-      font-size: 1.05rem;
-      line-height: 1.7;
+      font-size: 1rem;
+      line-height: 1.72;
       color: var(--muted);
-      max-width: 60ch;
-      margin-bottom: 1.1rem;
-    }
-    .hero-flow {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.9rem;
-      margin-top: 1.25rem;
+      max-width: 58ch;
       margin-bottom: 1.4rem;
     }
-    .flow-chip {
-      padding: 1rem;
-      border-radius: 18px;
-      border: 1px solid #d5e1fb;
-      background: #f8fbff;
+    .step-chips {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
     }
-    .flow-chip strong { display: block; font-size: 0.95rem; margin-bottom: 0.3rem; }
-    .flow-chip span { display: block; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+    .step-chip {
+      padding: 0.85rem 0.9rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      position: relative;
+    }
+    .step-num {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-align: center;
+      line-height: 20px;
+      margin-bottom: 0.45rem;
+    }
+    .step-chip strong { display: block; font-size: 0.88rem; margin-bottom: 0.2rem; }
+    .step-chip span { display: block; font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+    .cta-row { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.85rem 1.5rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      border: 0;
+      text-decoration: none;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-mid));
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(43,91,228,0.28);
+    }
+    .btn-primary:hover { box-shadow: 0 12px 28px rgba(43,91,228,0.36); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+    .btn-ghost:hover { background: var(--surface); color: var(--ink); }
+    .btn svg { flex-shrink: 0; }
 
     .hero-side {
-      padding: 1.4rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
-    .pipeline-card-label {
-      display: block;
-      margin-bottom: 0.75rem;
-      font-size: 0.75rem;
+    .pipeline-label {
+      font-size: 0.73rem;
       font-weight: 800;
-      text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: var(--muted);
+      text-transform: uppercase;
+      color: var(--muted-light);
+      margin-bottom: 0.9rem;
     }
     .hero-pipeline-svg { width: 100%; height: auto; display: block; }
 
-    .button {
-      appearance: none;
-      border: 0;
-      border-radius: 999px;
-      padding: 0.92rem 1.4rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 0.95rem;
-      display: inline-flex;
+    /* ─── Tool area ─── */
+    .tool-area { padding-bottom: 3rem; }
+    .tool-divider {
+      display: flex;
       align-items: center;
+      gap: 1rem;
+      margin: 0.5rem 0 1.5rem;
     }
-    .button-primary {
-      background: linear-gradient(135deg, #2b5be4, #3d77ff);
-      color: #fff;
-      box-shadow: 0 10px 24px rgba(43,91,228,0.22);
-    }
-    .button-secondary {
-      background: #fff;
-      color: var(--accent);
-      border: 1px solid #cddafb;
+    .tool-divider-line { flex: 1; height: 1px; background: var(--line); }
+    .tool-divider-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted-light);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
-    /* Tool panels */
-    .tool-section { padding-bottom: 3rem; }
+    .col-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .col-label-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
     .main-grid {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 1.2rem;
-      padding-bottom: 1.2rem;
+      grid-template-columns: 1.12fr 0.88fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
     }
-    .stack { display: grid; gap: 1.2rem; }
-    .panel { padding: 1.35rem; }
-    .section-head {
+    .stack { display: grid; gap: 1.1rem; align-content: start; }
+
+    /* ─── Panels ─── */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 1.4rem;
+    }
+    .panel-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.1rem;
     }
-    .section-head p { color: var(--muted); max-width: 58ch; margin-bottom: 0; }
+    .panel-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .panel-icon {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .panel-icon.blue   { background: var(--accent-soft); color: var(--accent); }
+    .panel-icon.teal   { background: var(--teal-soft);   color: var(--teal); }
+    .panel-icon.purple { background: var(--purple-soft); color: var(--purple); }
+    .panel-icon.amber  { background: var(--warn-soft);   color: var(--warn); }
+    .panel-icon.green  { background: var(--success-soft); color: var(--success); }
+    .panel-icon.red    { background: var(--danger-soft); color: var(--danger); }
+
+    .panel-head-meta { flex-shrink: 0; }
+    .panel-head p { color: var(--muted); font-size: 0.875rem; line-height: 1.55; margin: 0; max-width: 52ch; }
+
     .pill {
       display: inline-flex;
       align-items: center;
-      padding: 0.35rem 0.7rem;
+      padding: 0.3rem 0.65rem;
       border-radius: 999px;
-      background: #f2f6ff;
-      border: 1px solid #d6e1fb;
-      color: var(--accent);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--muted);
       font-weight: 700;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       white-space: nowrap;
     }
+    .pill.active { background: var(--accent-soft); border-color: #b3caff; color: var(--accent); }
+    .pill.ok    { background: var(--success-soft); border-color: #a3e8cf; color: var(--success); }
+    .pill.warn  { background: var(--warn-soft);    border-color: #f2d7aa; color: var(--warn); }
+    .pill.error { background: var(--danger-soft);  border-color: #f5c0bc; color: var(--danger); }
+
+    /* ─── Dropzones ─── */
+    .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
     .dropzone {
       position: relative;
-      border: 1.5px dashed #aec3f7;
-      border-radius: 20px;
-      background:
-        linear-gradient(180deg, rgba(220,231,255,0.55), rgba(255,255,255,0.95)),
-        #fff;
-      padding: 1.35rem;
-      transition: 180ms ease;
+      border: 2px dashed #c2d3f7;
+      border-radius: 18px;
+      background: linear-gradient(160deg, #f7faff 0%, #ffffff 100%);
+      padding: 1.5rem 1.25rem 1.25rem;
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+      display: block;
+    }
+    .dropzone:hover {
+      border-color: var(--accent);
+      background: var(--accent-xsoft);
+      box-shadow: 0 0 0 4px rgba(43,91,228,0.08);
     }
     .dropzone.is-dragover {
-      transform: translateY(-2px);
       border-color: var(--accent);
-      box-shadow: 0 18px 28px rgba(43,91,228,0.13);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 6px rgba(43,91,228,0.12);
+      transform: scale(1.01);
     }
-    .dropzone h3 { margin-bottom: 0.45rem; }
-    .dropzone p { color: var(--muted); line-height: 1.6; margin-bottom: 1rem; }
-    .button-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-    .button-sm {
-      appearance: none;
-      border: 0;
+    .dz-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.9rem;
+    }
+    .dz-icon.docx { background: var(--accent-soft); color: var(--accent); }
+    .dz-icon.zip  { background: var(--teal-soft);   color: var(--teal); }
+    .dz-badge {
+      display: inline-block;
+      padding: 0.18rem 0.52rem;
       border-radius: 999px;
-      padding: 0.75rem 1.1rem;
+      font-size: 0.68rem;
       font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 0.9rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.55rem;
     }
-    .button-sm.primary {
-      background: linear-gradient(135deg, #2b5be4, #3d77ff);
+    .dz-badge.required { background: var(--accent-soft); color: var(--accent); }
+    .dz-badge.optional { background: var(--teal-soft);   color: var(--teal); }
+    .dropzone h3 { font-size: 0.92rem; margin-bottom: 0.35rem; }
+    .dropzone p  { font-size: 0.82rem; color: var(--muted); line-height: 1.55; margin-bottom: 0.9rem; }
+    .dz-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: var(--accent);
       color: #fff;
-      box-shadow: 0 8px 18px rgba(43,91,228,0.2);
+      box-shadow: 0 4px 12px rgba(43,91,228,0.22);
+      pointer-events: none;
     }
-    .button-sm.secondary {
-      background: #fff;
-      color: var(--accent);
-      border: 1px solid #cddafb;
-    }
+    .dz-cta.teal { background: var(--teal); box-shadow: 0 4px 12px rgba(13,148,136,0.22); }
     .file-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-top: 1rem;
+      gap: 0.4rem 0.75rem;
+      margin-top: 0.9rem;
+      font-size: 0.8rem;
       color: var(--muted);
-      font-size: 0.92rem;
+      border-top: 1px solid var(--line);
+      padding-top: 0.75rem;
     }
-    input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
+    .file-meta span strong { color: var(--ink-2); }
+    input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    /* ─── Content areas ─── */
+    .empty-state {
+      padding: 1.6rem 1.2rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px dashed #cdd9f8;
+      background: var(--surface);
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .empty-state-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--line);
+      margin: 0 auto 0.7rem;
+      color: var(--muted-light);
     }
 
-    .preview-box,
-    .warning-list,
-    .empty-state,
-    .output-list,
-    .block-list,
-    .scorm-grid,
-    .media-list {
-      display: grid;
-      gap: 0.9rem;
-    }
     .preview-box {
-      max-height: 480px;
+      max-height: 400px;
       overflow: auto;
-      padding: 1rem;
-      background: #fbfdff;
-      border: 1px solid #dce6fb;
-      border-radius: 18px;
+      padding: 1rem 1.1rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
       white-space: pre-wrap;
-      line-height: 1.7;
-      color: #243a62;
+      font-size: 0.83rem;
+      line-height: 1.75;
+      color: var(--ink-2);
+      font-family: "Cascadia Code", Consolas, monospace;
     }
-    .empty-state {
+
+    /* ─── Block / output cards ─── */
+    .block-list, .output-list, .warning-list, .media-list, .scorm-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .scorm-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .block-card, .output-card, .scorm-card, .warning-card, .media-card {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius-sm);
       padding: 1rem;
-      border-radius: 18px;
-      border: 1px dashed #c5d6f8;
-      background: #f8fbff;
-      color: var(--muted);
+      transition: box-shadow 140ms ease;
     }
-    .block-card,
-    .output-card,
-    .scorm-card,
-    .warning-card,
-    .media-card {
-      border: 1px solid #d8e3fb;
-      background: #fbfdff;
-      border-radius: 18px;
-      padding: 1rem;
-    }
+    .block-card:hover, .output-card:hover { box-shadow: var(--shadow-sm); }
+
+    .card-top,
     .block-top,
     .output-top {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 0.75rem;
-      margin-bottom: 0.85rem;
+      margin-bottom: 0.8rem;
     }
+    .card-top h3,
+    .block-top h3,
+    .output-top h3 { font-size: 0.92rem; margin: 0; }
+    .card-top p,
+    .block-top p,
+    .output-top p  { font-size: 0.8rem; color: var(--muted); margin: 0.15rem 0 0; }
+    .tag-row,
     .block-meta,
-    .output-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-    }
+    .output-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
     .mini-tag {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       border-radius: 999px;
-      padding: 0.34rem 0.68rem;
-      font-size: 0.8rem;
-      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
       background: var(--accent-soft);
       color: var(--accent);
+      white-space: nowrap;
     }
     .mini-tag.success { background: var(--success-soft); color: var(--success); }
-    .mini-tag.warn { background: var(--warn-soft); color: var(--warn); }
-    .mini-tag.danger { background: var(--danger-soft); color: var(--danger); }
+    .mini-tag.warn    { background: var(--warn-soft);    color: var(--warn); }
+    .mini-tag.danger  { background: var(--danger-soft);  color: var(--danger); }
+    .mini-tag.purple  { background: var(--purple-soft);  color: var(--purple); }
+    .mini-tag.teal    { background: var(--teal-soft);    color: var(--teal); }
+
     .excerpt {
-      background: #fff;
-      border: 1px solid #e0e8fb;
-      border-radius: 14px;
-      padding: 0.9rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      font-size: 0.8rem;
       line-height: 1.65;
-      color: #243a62;
+      color: var(--ink-2);
       white-space: pre-wrap;
     }
     .meta-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.75rem;
-      margin-top: 0.9rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
     }
     .meta-box {
-      background: #fff;
-      border: 1px solid #e0e8fb;
-      border-radius: 14px;
-      padding: 0.8rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
     }
     .meta-box strong {
       display: block;
-      font-size: 0.84rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin-bottom: 0.28rem;
+      letter-spacing: 0.07em;
+      color: var(--muted-light);
+      margin-bottom: 0.2rem;
     }
-    .scorm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .scorm-card p,
-    .warning-card p,
-    .output-card p,
-    .block-card p,
-    .media-card p { color: var(--muted); line-height: 1.55; margin-bottom: 0; }
-    .warning-card.warn { background: #fffaf1; border-color: #f2d7aa; }
-    .warning-card.danger { background: #fff5f5; border-color: #f1c2c2; }
+    .meta-box div, .meta-box code { font-size: 0.82rem; }
+    .media-inline-note { margin-top: 0.6rem; font-size: 0.78rem; color: var(--muted-light); }
+
+    .scorm-card p, .warning-card p, .output-card p, .block-card p, .media-card p {
+      color: var(--muted); font-size: 0.82rem; line-height: 1.55; margin-bottom: 0;
+    }
+    .warning-card.warn   { background: #fffdf5; border-color: #f0d9aa; }
+    .warning-card.danger { background: #fff6f6; border-color: #f0c2be; }
+
+    .status-banner {
+      grid-column: 1 / -1;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .status-banner strong { display: block; color: var(--ink); margin-bottom: 0.25rem; font-size: 0.9rem; }
+
     .media-summary {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 0.95rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+      margin-bottom: 0.85rem;
     }
     .media-stat {
-      background: #fff;
-      border: 1px solid #e0e8fb;
-      border-radius: 14px;
-      padding: 0.8rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.7rem;
     }
-    .media-stat strong { display: block; font-size: 1.2rem; margin-bottom: 0.2rem; }
-    .media-stat span { color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
-    .media-link-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.85rem;
-    }
-    .media-link-row .download-link { padding: 0.45rem 0.75rem; font-size: 0.82rem; }
-    .media-inline-note { margin-top: 0.75rem; font-size: 0.86rem; color: var(--muted); }
-    .upload-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-    .status-banner {
-      padding: 1rem;
-      border-radius: 18px;
-      border: 1px solid #dce6fb;
-      background: linear-gradient(180deg, #f7faff, #ffffff);
-      color: var(--muted);
-    }
-    .status-banner strong { display: block; color: var(--ink); margin-bottom: 0.35rem; }
+    .media-stat strong { display: block; font-size: 1.15rem; margin-bottom: 0.15rem; color: var(--ink); }
+    .media-stat span   { color: var(--muted); font-size: 0.78rem; line-height: 1.4; }
+    .media-link-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.75rem; }
+    .media-link-row .download-link { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
 
-    .action-panel,
-    .generated-panel { margin-bottom: 2rem; }
-    .action-panel[hidden],
-    .generated-panel[hidden] { display: none; }
-    .action-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.85rem;
-      margin-top: 1rem;
+    /* ─── Action panel ─── */
+    .action-panel, .generated-panel { margin-bottom: 1.25rem; }
+    .action-panel[hidden], .generated-panel[hidden] { display: none; }
+
+    .action-panel {
+      background: linear-gradient(135deg, rgba(43,91,228,0.04), rgba(13,148,136,0.02)), var(--panel);
+      border: 1.5px solid #c8d9ff;
     }
+
+    .action-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
     .action-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
       appearance: none;
       border: 0;
       border-radius: 999px;
-      padding: 0.95rem 1.2rem;
+      padding: 0.85rem 1.4rem;
       font-weight: 800;
+      font-size: 0.9rem;
       cursor: pointer;
-      background: linear-gradient(135deg, #2b5be4, #3d77ff);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+      background: linear-gradient(135deg, var(--accent), var(--accent-mid));
       color: #fff;
-      box-shadow: 0 10px 22px rgba(43,91,228,0.18);
+      box-shadow: 0 8px 20px rgba(43,91,228,0.22);
     }
+    .action-button:not([disabled]):hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(43,91,228,0.3); }
     .action-button.secondary {
-      background: #fff;
+      background: var(--panel);
       color: var(--accent);
-      border: 1px solid #cddafb;
+      border: 1.5px solid #c8d9ff;
       box-shadow: none;
     }
-    .action-button[disabled] { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
-    .action-note { margin-top: 0.9rem; color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
-    .generated-list { display: grid; gap: 0.9rem; }
+    .action-button.secondary:not([disabled]):hover { background: var(--accent-xsoft); box-shadow: none; }
+    .action-button[disabled] { opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none; }
+    .action-note { margin-top: 0.9rem; font-size: 0.83rem; color: var(--muted); line-height: 1.65; }
+
+    /* ─── Generated panel ─── */
+    .generated-list { display: grid; gap: 0.75rem; }
     .generated-card {
-      border: 1px solid #d8e3fb;
-      border-radius: 18px;
-      padding: 1rem;
-      background: #fbfdff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.1rem;
+      background: var(--surface);
     }
     .generated-card-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 0.8rem;
-      margin-bottom: 0.8rem;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
     }
-    .generated-card p { margin-bottom: 0; color: var(--muted); line-height: 1.55; }
+    .generated-card-top h3 { font-size: 0.92rem; margin: 0 0 0.2rem; }
+    .generated-card-top p  { font-size: 0.8rem; color: var(--muted); margin: 0; }
+    .generated-card-meta { display: flex; gap: 0.5rem; margin-top: 0.45rem; flex-wrap: wrap; }
+
     .download-link {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 0.55rem 0.85rem;
+      gap: 0.35rem;
+      padding: 0.5rem 0.9rem;
       border-radius: 999px;
       text-decoration: none;
       font-weight: 700;
+      font-size: 0.82rem;
       background: var(--accent-soft);
       color: var(--accent);
-      border: 1px solid #cddafb;
+      border: 1px solid #b3caff;
       white-space: nowrap;
+      transition: background 120ms ease;
     }
+    .download-link:hover { background: #d0e0ff; }
 
-    @media (max-width: 1040px) {
-      .hero-grid,
-      .main-grid { grid-template-columns: 1fr; }
+    /* ─── Responsive ─── */
+    @media (max-width: 1060px) {
+      .hero-grid, .main-grid { grid-template-columns: 1fr; }
+      .hero-side { display: none; }
     }
-    @media (max-width: 760px) {
-      .wrap { width: min(100% - 1rem, 1180px); }
-      .brand-row { border-radius: 24px; }
-      .hero-copy, .hero-side, .panel { padding: 1rem; }
-      .hero-flow,
-      .meta-grid,
-      .scorm-grid,
-      .upload-grid,
-      .media-summary { grid-template-columns: 1fr; }
-      .section-head,
-      .block-top,
-      .output-top,
-      .generated-card-top { flex-direction: column; align-items: flex-start; }
-      .button-row .button-sm,
-      .action-button,
-      .download-link { width: 100%; text-align: center; }
+    @media (max-width: 720px) {
+      .wrap { width: calc(100% - 1.5rem); }
+      .brand-row { border-radius: 18px; padding: 0.75rem 1rem; }
+      .hero-copy { padding: 1.4rem; }
+      .panel { padding: 1.1rem; }
+      .step-chips, .upload-grid, .meta-grid, .scorm-grid, .media-summary { grid-template-columns: 1fr; }
+      .cta-row .btn { width: 100%; justify-content: center; }
+      .action-button, .download-link { width: 100%; justify-content: center; }
+      .generated-card { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
+
+  <!-- ── Header ── -->
   <header class="site-header">
     <div class="wrap">
       <div class="brand-row">
         <a class="brand" href="index.html">Document Splitter</a>
-        <span class="brand-tag">Tagged DOCX → structured outputs + SCORM bundle</span>
+        <span class="brand-sep">/</span>
+        <span class="brand-sub">Tagged DOCX → structured outputs + SCORM bundle</span>
+        <span class="brand-badge">Live Tool</span>
       </div>
     </div>
   </header>
 
   <main class="wrap">
 
-    <!-- Hero -->
+    <!-- ── Hero ── -->
     <section class="hero">
       <div class="hero-grid">
+
         <div class="hero-copy">
-          <p class="eyebrow">Document Splitter</p>
-          <h1>One source document becomes checked outputs through a simple pipeline.</h1>
+          <p class="eyebrow"><span class="eyebrow-dot"></span>Document Splitter</p>
+          <h1>One source document. Every output, automatically.</h1>
           <p class="lede">
-            Upload a tagged Word document and an optional companion media ZIP. The tool analyses every tagged block,
-            classifies it, builds the output files, and packages everything — including a SCORM manifest — ready to download.
+            Upload a tagged Word document and an optional companion media ZIP. The tool detects every
+            tagged block, classifies it, builds the output files, and packages everything — including
+            a SCORM manifest — ready to download.
           </p>
 
-          <div class="hero-flow">
-            <div class="flow-chip">
-              <strong>1. Upload</strong>
-              <span>Drop a tagged <code>.docx</code> and optionally a companion media <code>.zip</code>.</span>
+          <div class="step-chips">
+            <div class="step-chip">
+              <div class="step-num">1</div>
+              <strong>Upload</strong>
+              <span>Drop a tagged <code>.docx</code> and an optional media <code>.zip</code>.</span>
             </div>
-            <div class="flow-chip">
-              <strong>2. Analyse</strong>
-              <span>Blocks are detected, classified, and checked for filenames and media references.</span>
+            <div class="step-chip">
+              <div class="step-num">2</div>
+              <strong>Analyse</strong>
+              <span>Blocks are detected, classified, and checked for media.</span>
             </div>
-            <div class="flow-chip">
-              <strong>3. Build</strong>
-              <span>Output files are generated and packaged for download as a SCORM-ready bundle.</span>
+            <div class="step-chip">
+              <div class="step-num">3</div>
+              <strong>Build</strong>
+              <span>All outputs and a SCORM bundle are generated for download.</span>
             </div>
           </div>
 
-          <a class="button button-primary" href="#tool">Start splitting ↓</a>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#tool">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Start splitting
+            </a>
+            <a class="btn btn-ghost" href="../scorm-example/" target="_blank" rel="noopener">View archive (v1)</a>
+          </div>
         </div>
 
         <aside class="hero-side">
-          <span class="pipeline-card-label">Pipeline</span>
-          <svg viewBox="0 0 300 155" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-pipeline-svg" aria-label="Diagram: source DOCX feeds 32 tagged blocks through analysis into 2 built outputs">
-            <!-- Source document -->
+          <p class="pipeline-label">Pipeline</p>
+          <svg viewBox="0 0 300 155" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-pipeline-svg" aria-label="Diagram: source DOCX feeds tagged blocks through analysis into built outputs">
             <rect x="8" y="14" width="68" height="86" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
             <path d="M58 14 L76 30 H58 Z" fill="#bfdbfe"/>
             <line x1="58" y1="14" x2="76" y2="30" stroke="#93c5fd" stroke-width="1.2"/>
-            <!-- Tagged block lines in document -->
             <rect x="16" y="38" width="42" height="7" rx="3" fill="#3b82f6"/>
             <rect x="16" y="50" width="32" height="5" rx="2.5" fill="#bfdbfe"/>
             <rect x="16" y="60" width="42" height="7" rx="3" fill="#7c3aed" opacity="0.75"/>
@@ -533,14 +713,12 @@
             <rect x="16" y="82" width="42" height="7" rx="3" fill="#059669" opacity="0.75"/>
             <rect x="16" y="94" width="18" height="4" rx="2" fill="#d1fae5"/>
             <text x="42" y="112" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">· · ·</text>
-            <text x="42" y="127" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui, sans-serif">Source DOCX</text>
-            <text x="42" y="140" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui, sans-serif">1 file</text>
-            <!-- Animated connector 1 -->
+            <text x="42" y="127" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui">Source DOCX</text>
+            <text x="42" y="140" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">1 file</text>
             <line x1="80" y1="57" x2="112" y2="57" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
               <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite"/>
             </line>
             <path d="M110 53 L118 57 L110 61" fill="#3b82f6"/>
-            <!-- Analysis box -->
             <rect x="118" y="22" width="72" height="72" rx="8" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.5"/>
             <rect x="126" y="31" width="56" height="10" rx="3" fill="#dbeafe"/>
             <rect x="126" y="31" width="22" height="10" rx="3" fill="#3b82f6"/>
@@ -552,17 +730,14 @@
             <text x="154" y="87" text-anchor="middle" fill="white" font-size="8.5" font-weight="700" font-family="system-ui">32 blocks</text>
             <text x="154" y="113" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui">Analysis</text>
             <text x="154" y="126" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">tags classified</text>
-            <!-- Animated connector 2 -->
             <line x1="194" y1="57" x2="224" y2="57" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
               <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite" begin="0.6s"/>
             </line>
             <path d="M222 53 L230 57 L222 61" fill="#3b82f6"/>
-            <!-- HTML output -->
             <rect x="232" y="12" width="60" height="48" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
             <path d="M272 12 L292 30 H272 Z" fill="#a7f3d0"/>
             <text x="252" y="36" fill="#065f46" font-size="11" font-weight="700" font-family="monospace">&lt;/&gt;</text>
             <text x="262" y="50" text-anchor="middle" fill="#6b7280" font-size="8.5" font-family="system-ui">H1.html</text>
-            <!-- DOC output -->
             <rect x="232" y="70" width="60" height="48" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
             <path d="M272 70 L292 88 H272 Z" fill="#ddd6fe"/>
             <text x="253" y="94" fill="#5b21b6" font-size="11" font-weight="700" font-family="monospace">DOC</text>
@@ -571,32 +746,56 @@
             <text x="262" y="140" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">2 built</text>
           </svg>
         </aside>
+
       </div>
     </section>
 
-    <!-- Tool -->
-    <div id="tool" class="tool-section">
+    <!-- ── Tool ── -->
+    <div id="tool" class="tool-area">
 
-      <section class="main-grid">
+      <div class="tool-divider">
+        <div class="tool-divider-line"></div>
+        <span class="tool-divider-label">Tool</span>
+        <div class="tool-divider-line"></div>
+      </div>
+
+      <div class="main-grid">
+
+        <!-- Left: Source -->
         <div class="stack">
+          <p class="col-label">
+            <span class="col-label-dot" style="background:var(--accent)"></span>
+            Source &amp; input
+          </p>
 
+          <!-- Upload -->
           <section class="panel">
-            <div class="section-head">
-              <div>
-                <h2>Upload</h2>
-                <p>Select a tagged Word file and, if needed, a companion media ZIP. Everything is parsed inside the browser.</p>
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <div class="panel-icon blue">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <div>
+                  <h2>Upload</h2>
+                  <p>Accepts <code>.docx</code> + optional <code>.zip</code> media bundle</p>
+                </div>
               </div>
               <span class="pill">Accepts <code>.docx</code> + <code>.zip</code></span>
             </div>
 
             <div class="upload-grid">
+
               <label class="dropzone" id="dropzone">
                 <input id="fileInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-                <h3>Drop a <code>.docx</code> here or click to browse</h3>
-                <p>Example: <code>CP4807 - Introduction to microcontrollers 05 04 26.docx</code></p>
-                <div class="button-row">
-                  <span class="button-sm primary">Choose DOCX</span>
-                  <span class="button-sm secondary">Source file</span>
+                <div class="dz-icon docx">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <span class="dz-badge required">Required</span>
+                <h3>Drop your <code>.docx</code> here</h3>
+                <p>The tagged Word source document. Blocks must use <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, or <code>&lt;document&gt;</code> tags.</p>
+                <div class="dz-cta">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M4 6l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Choose DOCX
                 </div>
                 <div class="file-meta" id="fileMeta">
                   <span>No source file loaded yet.</span>
@@ -605,129 +804,219 @@
 
               <label class="dropzone" id="mediaDropzone">
                 <input id="mediaInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
-                <h3>Drop a media <code>.zip</code> here or click to browse</h3>
-                <p>Upload the companion media folder as a ZIP. Media is matched via explicit tags like <code>&lt;image&gt;name.jpg&lt;/image&gt;</code>.</p>
-                <div class="button-row">
-                  <span class="button-sm primary">Choose ZIP</span>
-                  <span class="button-sm secondary">Media bundle</span>
+                <div class="dz-icon zip">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <span class="dz-badge optional">Optional</span>
+                <h3>Drop your media <code>.zip</code> here</h3>
+                <p>A compressed folder of images, videos, and other assets. Matched via explicit tags like <code>&lt;image&gt;photo.jpg&lt;/image&gt;</code>.</p>
+                <div class="dz-cta teal">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M4 6l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Choose ZIP
                 </div>
                 <div class="file-meta" id="mediaMeta">
                   <span>No media ZIP loaded yet.</span>
                 </div>
               </label>
+
             </div>
           </section>
 
+          <!-- Document preview -->
           <section class="panel">
-            <div class="section-head">
-              <div>
-                <h2>Document preview</h2>
-                <p>Readable text extracted from the uploaded Word file.</p>
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <div class="panel-icon blue">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div>
+                  <h2>Document preview</h2>
+                  <p>Readable text extracted from the uploaded Word file</p>
+                </div>
               </div>
-              <span class="pill" id="previewStatus">Waiting for upload</span>
+              <span class="pill" id="previewStatus">Waiting</span>
             </div>
             <div id="previewBox" class="empty-state">
-              Upload a tagged <code>.docx</code> to see the extracted document text here.
+              <div class="empty-state-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              Upload a tagged <code>.docx</code> to preview the extracted text here.
             </div>
           </section>
 
+          <!-- Detected blocks -->
           <section class="panel">
-            <div class="section-head">
-              <div>
-                <h2>Detected blocks</h2>
-                <p>Tagged blocks listed in source order.</p>
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <div class="panel-icon blue">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </div>
+                <div>
+                  <h2>Detected blocks</h2>
+                  <p>Tagged blocks in source order</p>
+                </div>
               </div>
               <span class="pill" id="blocksCount">0 blocks</span>
             </div>
             <div id="blocksList" class="empty-state">
-              No blocks yet. Upload a document to detect <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, and <code>&lt;document&gt;</code> sections.
+              <div class="empty-state-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
+              Blocks will appear here once a document is uploaded. Detected tag types: <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, <code>&lt;document&gt;</code>.
             </div>
           </section>
 
         </div>
 
+        <!-- Right: Results -->
         <div class="stack">
+          <p class="col-label">
+            <span class="col-label-dot" style="background:var(--teal)"></span>
+            Analysis &amp; outputs
+          </p>
 
+          <!-- Outputs -->
           <section class="panel">
-            <div class="section-head">
-              <div>
-                <h2>Outputs</h2>
-                <p>Valid blocks produce output files in their destination folders.</p>
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <div class="panel-icon teal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </div>
+                <div>
+                  <h2>Outputs</h2>
+                  <p>Files that will be built from valid tagged blocks</p>
+                </div>
               </div>
               <span class="pill" id="outputsCount">0 outputs</span>
             </div>
             <div id="outputsList" class="empty-state">
-              Outputs will appear here after tags and filenames are detected.
+              <div class="empty-state-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+              </div>
+              Output files will appear here after blocks with valid filenames are detected.
             </div>
           </section>
 
+          <!-- SCORM -->
           <section class="panel">
-            <div class="section-head">
-              <div>
-                <h2>SCORM readiness</h2>
-                <p>What is present and what is still missing for packaging.</p>
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <div class="panel-icon purple">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </div>
+                <div>
+                  <h2>SCORM readiness</h2>
+                  <p>Present signals and missing packaging decisions</p>
+                </div>
               </div>
               <span class="pill" id="scormStatus">Not assessed</span>
             </div>
             <div id="scormPanel" class="empty-state">
-              Upload a source document to inspect SCORM-related notes and missing decisions.
+              <div class="empty-state-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              </div>
+              SCORM readiness will be assessed once a source document is uploaded.
             </div>
           </section>
 
+          <!-- Media -->
           <section class="panel">
-            <div class="section-head">
-              <div>
-                <h2>Media</h2>
-                <p>Media tags found in the source, matched against the uploaded ZIP.</p>
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <div class="panel-icon teal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <div>
+                  <h2>Media</h2>
+                  <p>Tags in source matched against uploaded ZIP</p>
+                </div>
               </div>
               <span class="pill" id="mediaCount">0 references</span>
             </div>
             <div id="mediaList" class="empty-state">
-              Upload a source document and optional media ZIP to inspect explicit media references.
+              <div class="empty-state-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              Upload a source document and optional media ZIP to inspect media references.
             </div>
           </section>
 
+          <!-- Warnings -->
           <section class="panel">
-            <div class="section-head">
-              <div>
-                <h2>Errors and warnings</h2>
-                <p>Invalid files, missing filenames, and malformed tags.</p>
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <div class="panel-icon amber">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div>
+                  <h2>Errors &amp; warnings</h2>
+                  <p>Missing filenames, malformed tags, and file errors</p>
+                </div>
               </div>
               <span class="pill" id="warningsCount">0 warnings</span>
             </div>
             <div id="warningsList" class="empty-state">
-              No warnings yet.
+              <div class="empty-state-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              No warnings yet. Errors and tag issues will appear here.
             </div>
           </section>
 
         </div>
-      </section>
+      </div>
 
+      <!-- Action panel -->
       <section class="panel action-panel" id="actionsPanel" hidden>
-        <div class="section-head">
-          <div>
-            <h2>Build and download outputs</h2>
-            <p>Once analysed, generate all output files and download them individually or as a complete bundle.</p>
+        <div class="panel-head">
+          <div class="panel-title-row">
+            <div class="panel-icon green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <h2>Build and download outputs</h2>
+              <p>Generate all output files and download individually or as a complete SCORM bundle</p>
+            </div>
           </div>
           <span class="pill" id="actionStatus">Ready after analysis</span>
         </div>
         <div class="action-bar">
-          <button class="action-button" id="generateBtn" type="button" disabled>Build Outputs</button>
-          <button class="action-button secondary" id="summaryBtn" type="button" disabled>Download Summary Report</button>
-          <button class="action-button secondary" id="bundleBtn" type="button" disabled>Download Full Bundle</button>
+          <button class="action-button" id="generateBtn" type="button" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Build Outputs
+          </button>
+          <button class="action-button secondary" id="summaryBtn" type="button" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Summary Report
+          </button>
+          <button class="action-button secondary" id="bundleBtn" type="button" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Full Bundle
+          </button>
         </div>
-        <p class="action-note">HTML blocks generate learner HTML files. Worksheet and document blocks generate structured HTML outputs. The SCORM bundle includes <code>imsmanifest.xml</code> and all matched media files.</p>
+        <p class="action-note">HTML blocks → learner HTML files &nbsp;·&nbsp; Worksheet and document blocks → structured HTML outputs &nbsp;·&nbsp; Bundle includes <code>imsmanifest.xml</code> and all matched media.</p>
       </section>
 
+      <!-- Generated outputs -->
       <section class="panel generated-panel" id="generatedPanel" hidden>
-        <div class="section-head">
-          <div>
-            <h2>Generated outputs</h2>
-            <p>Download files individually or use the Full Bundle button above for a complete SCORM-ready ZIP.</p>
+        <div class="panel-head">
+          <div class="panel-title-row">
+            <div class="panel-icon green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+            <div>
+              <h2>Generated outputs</h2>
+              <p>Download individually or use the Full Bundle button for a SCORM-ready ZIP</p>
+            </div>
           </div>
-          <span class="pill" id="generatedCount">0 files</span>
+          <span class="pill ok" id="generatedCount">0 files</span>
         </div>
-        <div id="generatedList" class="empty-state">No output files generated yet.</div>
+        <div id="generatedList" class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          No output files generated yet. Click Build Outputs above.
+        </div>
       </section>
 
     </div><!-- #tool -->
