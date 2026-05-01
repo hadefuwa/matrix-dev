@@ -32,6 +32,8 @@ let currentMediaZipName = "";
 let currentMediaBundle = [];
 let currentMediaIndex = new Map();
 let currentMediaDuplicateNames = new Set();
+let currentEmbeddedMedia = [];
+let currentEmbeddedMediaIndex = new Map();
 let generatedArtefacts = [];
 let activeObjectUrls = [];
 
@@ -123,7 +125,16 @@ async function handleSourceFile(file) {
       return;
     }
 
+    await extractEmbeddedMediaFromDocx(zip);
     currentSourceText = await extractReadableTextFromDocx(zip);
+
+    fileMeta.innerHTML = `
+      <span><strong>File:</strong> ${escapeHtml(file.name)}</span>
+      <span><strong>Size:</strong> ${Math.max(1, Math.round(file.size / 1024))} KB</span>
+      <span><strong>Last modified:</strong> ${new Date(file.lastModified).toLocaleString()}</span>
+      ${currentEmbeddedMedia.length ? `<span><strong>Embedded images:</strong> ${currentEmbeddedMedia.length}</span>` : ""}
+    `;
+
     currentAnalysis = applyMediaStateToAnalysis(analyzeText(currentSourceText));
     renderAnalysis(currentSourceText, currentAnalysis);
   } catch (error) {
@@ -183,6 +194,26 @@ async function handleMediaFile(file) {
   } catch (error) {
     console.error(error);
     renderMediaError("The media ZIP could not be read. Try compressing the folder again and re-uploading it.");
+  }
+}
+
+async function extractEmbeddedMediaFromDocx(zip) {
+  currentEmbeddedMedia = [];
+  currentEmbeddedMediaIndex = new Map();
+  const mediaEntries = Object.values(zip.files).filter(
+    (entry) => !entry.dir && /^word\/media\//i.test(entry.name)
+  );
+  for (const entry of mediaEntries) {
+    const exportName = basenameOnly(entry.name);
+    if (!exportName) continue;
+    const data = await entry.async("uint8array");
+    const mime = getMimeType(exportName);
+    const blob = new Blob([data], { type: mime });
+    const url = createObjectUrl(blob);
+    const dataUrl = await blobToDataUrl(blob);
+    const item = { path: entry.name, exportName, key: normalizeMediaName(exportName), size: data.byteLength, mime, data, url, dataUrl };
+    currentEmbeddedMedia.push(item);
+    currentEmbeddedMediaIndex.set(item.key, item);
   }
 }
 
@@ -308,10 +339,17 @@ function applyMediaStateToAnalysis(analysis) {
       } else if (currentMediaIndex.has(key)) {
         status = "matched";
         matchedFile = currentMediaIndex.get(key);
-        detail = `Matched to ${matchedFile.exportName}.`;
+        detail = `Matched to ${matchedFile.exportName} (from media ZIP).`;
+        matchedKeys.add(key);
+      } else if (currentEmbeddedMediaIndex.has(key)) {
+        status = "matched";
+        matchedFile = currentEmbeddedMediaIndex.get(key);
+        detail = `Matched to ${matchedFile.exportName} (embedded in DOCX).`;
         matchedKeys.add(key);
       } else if (currentMediaBundle.length) {
         detail = `No file named ${ref.filename} was found in the uploaded media ZIP.`;
+      } else if (currentEmbeddedMedia.length) {
+        detail = `No file named ${ref.filename} was found in the DOCX embedded images or any uploaded media ZIP.`;
       }
 
       referencedNames.add(key);
@@ -326,11 +364,12 @@ function applyMediaStateToAnalysis(analysis) {
     else if (ref.status === "ambiguous") mediaWarnings.push({ level: "warn", title: "Ambiguous media file", detail: `Block ${ref.blockOrder}${ref.blockFilename ? ` (${ref.blockFilename})` : ""} references ${ref.filename} in <${ref.tag}>, but more than one ZIP entry shares that basename.` });
   });
 
-  if (!currentMediaBundle.length && references.length) mediaWarnings.unshift({ level: "warn", title: "Media ZIP not uploaded", detail: "The source document references explicit media tags, but no companion media ZIP has been loaded yet." });
+  if (!currentMediaBundle.length && !currentEmbeddedMedia.length && references.length) mediaWarnings.unshift({ level: "warn", title: "No media available", detail: "The source document references explicit media tags, but no companion media ZIP has been loaded and no images were found embedded in the DOCX." });
 
   analysis.media = {
     zipName: currentMediaZipName,
     loadedFiles: currentMediaBundle.length,
+    embeddedCount: currentEmbeddedMedia.length,
     references,
     matchedFiles: currentMediaBundle.filter((file) => matchedKeys.has(file.key)),
     missingCount: references.filter((ref) => ref.status === "missing").length,
@@ -503,7 +542,7 @@ function renderMediaPanel(analysis) {
 
   const mediaState = analysis.media;
   mediaCount.textContent = `${mediaState.references.length} reference${mediaState.references.length === 1 ? "" : "s"}`;
-  if (!mediaState.references.length && !mediaState.loadedFiles) {
+  if (!mediaState.references.length && !mediaState.loadedFiles && !mediaState.embeddedCount) {
     mediaList.className = "empty-state";
     mediaList.textContent = "No explicit media tags were found, and no media ZIP has been loaded.";
     return;
@@ -512,10 +551,10 @@ function renderMediaPanel(analysis) {
   mediaList.className = "media-list";
   mediaList.innerHTML = `
     <div class="media-summary">
+      <div class="media-stat"><strong>${mediaState.embeddedCount || 0}</strong><span>embedded in DOCX</span></div>
       <div class="media-stat"><strong>${mediaState.loadedFiles}</strong><span>files loaded from ZIP</span></div>
-      <div class="media-stat"><strong>${mediaState.references.length}</strong><span>references found in DOCX</span></div>
-      <div class="media-stat"><strong>${mediaState.matchedFiles.length}</strong><span>matched media files</span></div>
-      <div class="media-stat"><strong>${mediaState.missingCount + mediaState.ambiguousCount}</strong><span>missing or ambiguous refs</span></div>
+      <div class="media-stat"><strong>${mediaState.references.length}</strong><span>explicit media tags</span></div>
+      <div class="media-stat"><strong>${mediaState.matchedFiles.length}</strong><span>matched</span></div>
     </div>
     ${mediaState.references.length ? mediaState.references.map((ref) => `
       <article class="media-card">
@@ -729,6 +768,7 @@ function buildSummaryReport() {
     ...proposed,
     "",
     "Media summary:",
+    `- Embedded images in DOCX: ${currentAnalysis.media.embeddedCount || 0}`,
     `- Files loaded from ZIP: ${currentAnalysis.media.loadedFiles}`,
     `- Explicit media refs: ${currentAnalysis.media.references.length}`,
     `- Matched media: ${currentAnalysis.media.matchedFiles.length}`,
@@ -848,6 +888,8 @@ function resetSourceState() {
   currentSourceFile = "";
   currentSourceText = "";
   currentAnalysis = null;
+  currentEmbeddedMedia = [];
+  currentEmbeddedMediaIndex = new Map();
   generatedArtefacts = [];
   blocksCount.textContent = "0 blocks";
   outputsCount.textContent = "0 outputs";
@@ -876,7 +918,7 @@ function resetSourceState() {
 }
 
 function emptyMediaState() {
-  return { zipName: currentMediaZipName, loadedFiles: currentMediaBundle.length, references: [], matchedFiles: [], missingCount: 0, ambiguousCount: 0, unusedFiles: currentMediaBundle, warnings: [] };
+  return { zipName: currentMediaZipName, loadedFiles: currentMediaBundle.length, embeddedCount: currentEmbeddedMedia.length, references: [], matchedFiles: [], missingCount: 0, ambiguousCount: 0, unusedFiles: currentMediaBundle, warnings: [] };
 }
 
 function extractMediaReferences(body) {
