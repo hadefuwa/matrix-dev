@@ -97,12 +97,21 @@
     }
 
     /* ─── Hero ─── */
-    .hero { padding: 1.8rem 0 1.5rem; }
+    .hero {
+      padding: 2.5rem 2rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(140deg, #0f2358 0%, #1d4ed8 55%, #3b82f6 100%);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+    }
     .hero-grid {
       display: grid;
       grid-template-columns: 1.2fr 1fr;
       gap: 1.25rem;
       align-items: stretch;
+      position: relative;
+      z-index: 1;
     }
     .hero-copy {
       background: var(--panel);
@@ -110,8 +119,47 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow-lg);
       padding: 2rem 2rem 1.75rem;
-      background-image: radial-gradient(ellipse at 0% 0%, rgba(43,91,228,0.06) 0%, transparent 55%),
-                        radial-gradient(ellipse at 100% 100%, rgba(13,148,136,0.04) 0%, transparent 50%);
+    }
+
+    /* Dot grid overlay */
+    .hero-dot-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.13) 1.5px, transparent 1.5px);
+      background-size: 30px 30px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Floating orbs */
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-orb-1 {
+      width: 420px; height: 420px;
+      top: -140px; right: -80px;
+      background: radial-gradient(circle, rgba(96,165,250,0.3) 0%, transparent 65%);
+      animation: orb-drift 9s ease-in-out infinite;
+    }
+    .hero-orb-2 {
+      width: 300px; height: 300px;
+      bottom: -110px; left: -60px;
+      background: radial-gradient(circle, rgba(167,139,250,0.22) 0%, transparent 65%);
+      animation: orb-drift 12s ease-in-out infinite reverse;
+    }
+    .hero-orb-3 {
+      width: 220px; height: 220px;
+      bottom: 10px; right: 28%;
+      background: radial-gradient(circle, rgba(34,197,94,0.13) 0%, transparent 65%);
+      animation: orb-drift 7s ease-in-out infinite 2s;
+    }
+    @keyframes orb-drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(12px, -18px) scale(1.04); }
+      66%       { transform: translate(-10px, 10px) scale(0.96); }
     }
     .eyebrow {
       display: inline-flex;
@@ -207,13 +255,23 @@
 
     .hero-side {
       background: var(--panel);
-      border: 1px solid var(--line);
+      border: 1px solid rgba(255,255,255,0.5);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.12);
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-side::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #059669 100%);
+      border-radius: var(--radius) var(--radius) 0 0;
     }
     .pipeline-label {
       font-size: 0.73rem;
@@ -662,6 +720,10 @@
 
     <!-- ── Hero ── -->
     <section class="hero">
+      <div class="hero-dot-grid" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
       <div class="hero-grid">
 
         <div class="hero-copy">
