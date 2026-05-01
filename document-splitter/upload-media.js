@@ -1046,10 +1046,6 @@ function renderAnalysisReport(analysis, allWarnings) {
         <p class="ar-title">${escapeHtml(titleText)}</p>
         <p class="ar-subtitle">${escapeHtml(subtitleText)}</p>
       </div>
-      <button id="resultsBundleBtn" class="action-button build-btn" type="button" style="flex-shrink:0">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download Full Bundle
-      </button>
     </div>
     <div class="ar-stats">
       ${stats.map((s) => `<div class="ar-stat"><div class="ar-stat-value ${s.cls}">${s.value}</div><div class="ar-stat-label">${escapeHtml(s.label)}</div></div>`).join("")}
@@ -1059,7 +1055,6 @@ function renderAnalysisReport(analysis, allWarnings) {
       Expand any section below to see detail
     </p>
   `;
-  document.getElementById("resultsBundleBtn")?.addEventListener("click", () => ctaBundleBtn.click());
 }
 
 function renderBlocks(blocks) {
