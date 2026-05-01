@@ -651,20 +651,64 @@ async function buildArtefacts(blocks) {
   return artefacts;
 }
 
+// Generate a Word inline drawing paragraph for an embedded image
+function buildDrawingXml(rId, name) {
+  const escapedName = escapeXml(name);
+  const docPrId = Math.floor(Math.random() * 999000) + 1000;
+  const cx = 5486400, cy = 3657600; // 6 × 4 inches in EMU
+  return `<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="${docPrId}" name="${escapedName}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="${docPrId}" name="${escapedName}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${escapeXml(rId)}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+}
+
+// Replace <image> text-only paragraphs with real Word drawing nodes
+function resolveImageNodes(paraNodes, block) {
+  const IMAGE_RE = /^<image>([^<>]+)<\/image>$/i;
+  const result = [];
+  const extraMediaFiles = [];
+  const extraRelEntries = [];
+  let seq = 0;
+  for (const node of paraNodes) {
+    const text = extractNodeText(node).trim();
+    const m = IMAGE_RE.exec(text);
+    if (m) {
+      const key = normalizeMediaName(m[1].trim());
+      const ref = block.mediaRefs.find(
+        (r) => r.tag === "image" && normalizeMediaName(r.filename) === key && r.status === "matched" && r.matchedFile
+      );
+      if (ref) {
+        const file = ref.matchedFile;
+        const rId = `rImgInj${++seq}`;
+        try {
+          const drawingNode = new DOMParser().parseFromString(buildDrawingXml(rId, file.exportName), "application/xml").documentElement;
+          result.push(drawingNode);
+          extraMediaFiles.push({ name: file.exportName, data: file.data });
+          extraRelEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${escapeXml(file.exportName)}"/>`);
+          continue;
+        } catch (_) { /* fall through */ }
+      }
+    }
+    result.push(node);
+  }
+  return { nodes: result, extraMediaFiles, extraRelEntries };
+}
+
 // Build a self-contained DOCX in memory from a block's paragraph nodes
 async function buildMiniDocx(block) {
   if (!currentDocxZip || !currentDocXml) return null;
   try {
     const zip = new JSZip();
-    zip.file("word/document.xml",        buildBlockDocumentXml(block.contentParaNodes));
+    const { nodes, extraMediaFiles, extraRelEntries } = resolveImageNodes(block.contentParaNodes, block);
+    zip.file("word/document.xml",        buildBlockDocumentXml(nodes));
     if (currentStylesXml)    zip.file("word/styles.xml",         currentStylesXml);
     if (currentNumberingXml) zip.file("word/numbering.xml",      currentNumberingXml);
     if (currentThemeXml)     zip.file("word/theme/theme1.xml",   currentThemeXml);
-    const { relsXml, mediaFiles } = await buildBlockRels(block.contentParaNodes);
+    const { relsXml, mediaFiles } = await buildBlockRels(nodes, extraRelEntries);
     zip.file("word/_rels/document.xml.rels", relsXml);
-    for (const { name, data } of mediaFiles) zip.file(`word/media/${name}`, data);
+    const seen = new Set();
+    for (const f of [...mediaFiles, ...extraMediaFiles]) {
+      if (!seen.has(f.name)) { seen.add(f.name); zip.file(`word/media/${f.name}`, f.data); }
+    }
     zip.file("_rels/.rels",          PACKAGE_RELS_XML);
-    zip.file("[Content_Types].xml",  buildContentTypesXml(mediaFiles));
+    zip.file("[Content_Types].xml",  buildContentTypesXml([...mediaFiles, ...extraMediaFiles]));
     return zip;
   } catch (err) {
     console.error("buildMiniDocx error:", err);
@@ -700,7 +744,7 @@ function buildBlockDocumentXml(paraNodes) {
 }
 
 // Find all relationship IDs used by a set of paragraph nodes and collect the corresponding files
-async function buildBlockRels(paraNodes) {
+async function buildBlockRels(paraNodes, extraRelEntries = []) {
   const usedRids = new Set();
   const ser = new XMLSerializer();
   for (const node of paraNodes) {
@@ -764,7 +808,7 @@ async function buildBlockRels(paraNodes) {
   }
 
   return {
-    relsXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n${relEntries.join("\n")}\n</Relationships>`,
+    relsXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n${[...relEntries, ...extraRelEntries].join("\n")}\n</Relationships>`,
     mediaFiles
   };
 }
