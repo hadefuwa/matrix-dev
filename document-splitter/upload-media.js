@@ -716,10 +716,29 @@ async function buildBlockRels(paraNodes) {
   for (const [rId, rel] of currentRels) {
     if (!usedRids.has(rId)) continue;
 
+    const isImageRel = rel.type.includes("/image");
+
     if (rel.mode === "External") {
+      // Try to resolve externally-linked images from the media ZIP or embedded media
+      if (isImageRel) {
+        const fileName = rel.target.split(/[\\/]/).pop();
+        const key = normalizeMediaName(fileName);
+        const zipEntry = currentMediaIndex.get(key);
+        const embEntry = currentEmbeddedMediaIndex.get(key);
+        if (zipEntry) {
+          mediaFiles.push({ name: zipEntry.exportName, data: zipEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(zipEntry.exportName)}"/>`);
+          continue;
+        } else if (embEntry) {
+          mediaFiles.push({ name: embEntry.exportName, data: embEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(embEntry.exportName)}"/>`);
+          continue;
+        }
+      }
+      // Non-image external rel or no match — keep as external link
       relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="${escapeXml(rel.target)}" TargetMode="External"/>`);
     } else {
-      // Internal resource — copy the file into word/media/
+      // Internal resource — copy the file from the source DOCX
       const rawTarget = rel.target.replace(/^\//, "");
       const sourcePath = rawTarget.startsWith("word/") ? rawTarget : `word/${rawTarget}`;
       const fileName = rawTarget.split("/").pop();
@@ -728,6 +747,18 @@ async function buildBlockRels(paraNodes) {
         const data = await sourceEntry.async("uint8array");
         mediaFiles.push({ name: fileName, data });
         relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(fileName)}"/>`);
+      } else if (isImageRel) {
+        // File missing from DOCX — try ZIP and embedded media as fallback
+        const key = normalizeMediaName(fileName);
+        const zipEntry = currentMediaIndex.get(key);
+        const embEntry = currentEmbeddedMediaIndex.get(key);
+        if (zipEntry) {
+          mediaFiles.push({ name: zipEntry.exportName, data: zipEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(zipEntry.exportName)}"/>`);
+        } else if (embEntry) {
+          mediaFiles.push({ name: embEntry.exportName, data: embEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(embEntry.exportName)}"/>`);
+        }
       }
     }
   }
