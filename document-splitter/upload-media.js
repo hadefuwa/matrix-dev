@@ -232,6 +232,10 @@ async function handleMediaFile(file) {
     currentMediaIndex = indexed.index;
     currentMediaDuplicateNames = indexed.duplicates;
 
+    // Pre-patch the source XML: rewrite r:link → r:embed for all resolvable
+    // external images so every block output inherits clean embedded references.
+    patchSourceXmlForEmbeddedImages();
+
     if (currentAnalysis) {
       currentAnalysis = applyMediaStateToAnalysis(currentAnalysis);
       renderAnalysis(currentSourceText, currentAnalysis);
@@ -270,6 +274,82 @@ async function extractEmbeddedMediaFromDocx(zip) {
     const item = { path: entry.name, exportName, key: normalizeMediaName(exportName), size: data.byteLength, mime, data, url, dataUrl };
     currentEmbeddedMedia.push(item);
     currentEmbeddedMediaIndex.set(item.key, item);
+  }
+}
+
+// ─── Pre-patch: embed external images into source XML at media-load time ────
+
+// Called once after currentMediaIndex is populated.  For every External image
+// relationship in currentRels that can be matched in the media ZIP or embedded
+// media, this function:
+//   1. Replaces r:link="rId" → r:embed="rId" directly in currentDocXml
+//   2. Marks the relationship as Internal and attaches the resolved file
+//   3. Rebuilds paragraph xmlNode references from the patched XML
+//
+// After this runs, buildBlockDocumentXml gets clean nodes with r:embed already
+// present, and buildBlockRels finds _resolvedFile on the relationship so it
+// knows which bytes to copy into word/media/.
+function patchSourceXmlForEmbeddedImages() {
+  if (!currentDocXml || !currentRels.size) return;
+  let patched = currentDocXml;
+  let count = 0;
+
+  for (const [rId, rel] of currentRels) {
+    if (rel.mode !== "External" || !rel.type.includes("/image")) continue;
+    const rawFileName = rel.target.split(/[\\/]/).pop();
+    const fileName = (() => { try { return decodeURIComponent(rawFileName); } catch (_) { return rawFileName; } })();
+    const key = normalizeMediaName(fileName);
+    const resolved = currentMediaIndex.get(key) || currentEmbeddedMediaIndex.get(key);
+    if (!resolved) {
+      console.warn(`[DOCX-IMG] pre-patch: no match for "${fileName}" (rId=${rId})`);
+      continue;
+    }
+    const escapedId = escapeXml(rId);
+    const safeId = escapedId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const before = patched;
+    patched = patched.replace(new RegExp(`(\\w[\\w-]*):link="${safeId}"`, "g"), `$1:embed="${escapedId}"`);
+    if (patched !== before) {
+      currentRels.set(rId, { ...rel, mode: "Internal", target: `media/${resolved.exportName}`, _resolvedFile: resolved });
+      count++;
+      console.log(`[DOCX-IMG] pre-patched ${rId} → ${resolved.exportName}`);
+    } else {
+      console.warn(`[DOCX-IMG] pre-patch: r:link="${rId}" not found in source XML — swap skipped`);
+    }
+  }
+
+  if (count > 0) {
+    currentDocXml = patched;
+    reparseParagraphNodes();
+    console.log(`[DOCX-IMG] source XML patched: ${count} external image(s) promoted to r:embed`);
+  }
+}
+
+// Rebuild xmlNode references in currentParagraphs from the current (possibly
+// patched) currentDocXml.  Index positions are preserved — only the DOM node
+// objects are refreshed so they reflect the new attribute values.
+function reparseParagraphNodes() {
+  const bodyDoc = new DOMParser().parseFromString(currentDocXml, "application/xml");
+  const bodyEl = bodyDoc.getElementsByTagNameNS("*", "body")[0];
+  if (!bodyEl) return;
+  let i = 0;
+  for (const child of bodyEl.childNodes) {
+    if (child.nodeType !== 1) continue;
+    const ln = child.localName;
+    if (ln === "p" || ln === "tbl") {
+      if (currentParagraphs[i]) currentParagraphs[i].xmlNode = child;
+      i++;
+    } else if (ln === "sdt") {
+      const content = child.getElementsByTagNameNS("*", "sdtContent")[0];
+      if (content) {
+        for (const sdtChild of content.childNodes) {
+          if (sdtChild.nodeType !== 1) continue;
+          if (sdtChild.localName === "p" || sdtChild.localName === "tbl") {
+            if (currentParagraphs[i]) currentParagraphs[i].xmlNode = sdtChild;
+            i++;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -696,11 +776,12 @@ async function buildMiniDocx(block) {
   if (!currentDocxZip || !currentDocXml) return null;
   try {
     const zip = new JSZip();
-    const { nodes, extraMediaFiles, extraRelEntries } = resolveImageNodes(block.contentParaNodes, block);
-    // Resolve relationships first so we know which r:link IDs were embedded from the ZIP.
+    // Always re-extract paragraph nodes from currentParagraphs at build time.
+    // This ensures we pick up any patched xmlNode references (e.g. after
+    // patchSourceXmlForEmbeddedImages rewrites currentDocXml and rebuilds nodes).
+    const freshParaNodes = extractContentParaNodes(block, currentParagraphs);
+    const { nodes, extraMediaFiles, extraRelEntries } = resolveImageNodes(freshParaNodes, block);
     const { relsXml, mediaFiles, linkedToEmbeddedIds } = await buildBlockRels(nodes, extraRelEntries);
-    // Build document XML with r:link → r:embed promotion applied via DOM mutation (not string replace)
-    // so it works regardless of how XMLSerializer chooses to emit namespace prefixes.
     zip.file("word/document.xml", buildBlockDocumentXml(nodes, linkedToEmbeddedIds));
     if (currentStylesXml)    zip.file("word/styles.xml",         currentStylesXml);
     if (currentNumberingXml) zip.file("word/numbering.xml",      currentNumberingXml);
@@ -837,7 +918,15 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
       }
       relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="${escapeXml(rel.target)}" TargetMode="External"/>`);
     } else {
-      // Internal resource — copy the file from the source DOCX
+      // Internal resource — check for pre-resolved file first (set by patchSourceXmlForEmbeddedImages)
+      if (isImageRel && rel._resolvedFile) {
+        const f = rel._resolvedFile;
+        mediaFiles.push({ name: f.exportName, data: f.data });
+        relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(f.exportName)}"/>`);
+        console.log(`[DOCX-IMG]   → pre-resolved: ${f.exportName}`);
+        continue;
+      }
+      // Copy the file from the source DOCX
       const rawTarget = rel.target.replace(/^\//, "");
       const sourcePath = rawTarget.startsWith("word/") ? rawTarget : `word/${rawTarget}`;
       const fileName = rawTarget.split("/").pop();
