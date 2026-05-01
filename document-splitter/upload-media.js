@@ -765,7 +765,8 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
     if (rel.mode === "External") {
       // Try to resolve externally-linked images from the media ZIP or embedded media
       if (isImageRel) {
-        const fileName = rel.target.split(/[\\/]/).pop();
+        const rawFileName = rel.target.split(/[\\/]/).pop();
+        const fileName = (() => { try { return decodeURIComponent(rawFileName); } catch (_) { return rawFileName; } })();
         const key = normalizeMediaName(fileName);
         const zipEntry = currentMediaIndex.get(key);
         const embEntry = currentEmbeddedMediaIndex.get(key);
