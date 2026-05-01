@@ -1,0 +1,49 @@
+SOURCE BLOCK EXTRACTION
+=======================
+Source file:    source/CP4807 - Introduction to microcontrollers 05 04 26.docx
+Tag type:       <worksheet>
+Filename tag:   "CP4807-1.doc"
+Block:          Second occurrence (Worksheet 1 — learner content)
+Classification: Learner content
+Extracted:      2026-04-06
+Note:           First occurrence of CP4807-1.doc (preparation notes) is flagged as a
+                duplicate filename warning in analysis-report.md. This extraction covers
+                the learner-facing worksheet block only.
+
+---
+
+Worksheet 1
+First program
+Introduction to microcontrollers
+
+This first program introduces you to several programming commands: OUTPUT, LOOP and DELAY.
+
+In this first program you explore how to get a single output on the microcontroller turning on and off using these commands.
+
+Video resource: https://youtu.be/h8-7BsXBpLc
+
+Over to you:
+
+Watch the video "Flowcode Embedded: first program" on the Flowcode YouTube site.
+
+Load the file "First program". Set up the hardware appropriately, download it, and make sure you understand it.
+
+The program flashes a single LED on the combo board.
+
+Challenges:
+
+Delay: alter the delay period. Make sure you understand how the Delay command works.
+
+Output: change the output to work with port A and port B. Output: Select Advanced options and alter the bit that is flashed.
+
+Loop: experiment with the loop dialogue box. Flash the LED for only 10 times.
+
+Alter the program so that it flashes Port 1 bit 0 for 10 times, then Port 2 bit 1 for 9 times then port 2 bit 2 for 8 times.
+
+Hints:
+
+You can use three loops one after the other. Alter the Loop count in each one.
+
+Use the Advanced options in the Output icon to control which output bit is used.
+
+The examples are available directly from within the Flowcode package. From within Flowcode select: FILE > NEW PROJECT > OPEN EXAMPLE OR TEMPLATE and select the appropriate example.

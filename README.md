@@ -10,9 +10,11 @@ Central hub for Matrix TSL internal web applications. All apps are served from a
 
 | App | Route | Description |
 |-----|-------|-------------|
-| Dashboard | `/` | Matrix Apps home — links to all apps |
-| Scheme of Work Generator | `/sow-generator` | Plan and generate engineering course SoWs |
-| IM Teachers Portal | `/teachers/` | Resources and lesson materials for IM programme teachers |
+| Dashboard | `/` | Matrix Apps home page (served from `dashboard/index.html`) |
+| Scheme of Work Generator | `/sow-generator` | Build and review Scheme of Work content |
+| SCORM Example Builder | `/scorm-example` | Build SCORM package examples and related outputs |
+| SF2 Portal | `/sf2-portal/` | Static SF2 portal app |
+| IM Portal | `/im-portal/` | Static IM portal app |
 
 ---
 
@@ -20,19 +22,24 @@ Central hub for Matrix TSL internal web applications. All apps are served from a
 
 ```
 matrixtsl.dev/
-├── /                  → index.html        (Dashboard)
-├── /sow-generator     → sow.html          (SOW Generator app)
-├── /review.html       → review.html       (SOW review/edit step)
-├── /admin.html        → admin.html        (Topic Editor — admin only)
-├── /hardware.html     → hardware.html     (Hardware Editor — admin only)
-├── /teachers/         → teachers/         (IM Teachers Portal — static)
-├── /api/topics        → data/topics.json  (GET/PUT)
-├── /api/hardware      → data/hardware.json(GET/PUT)
-├── /api/templates     → data/templates.json (GET/PUT)
-└── /api/upload-image  → assets/uploads/   (POST — admin only)
+├── /                      → dashboard/index.html
+├── /sow-generator         → sow-generator/index.html
+├── /review.html           → sow-generator/review.html
+├── /admin.html            → sow-generator/admin.html
+├── /hardware.html         → sow-generator/hardware.html
+├── /scorm-example         → scorm-example/index.html
+├── /scorm-example/*       → scorm-example/* (static files)
+├── /sf2-portal/*          → sf2-portal/* (static files)
+├── /im-portal/*           → im-portal/* (static files)
+├── /api/topics            → data/topics.json (GET/PUT)
+├── /api/hardware          → data/hardware.json (GET/PUT)
+├── /api/templates         → data/templates.json (GET/PUT)
+├── /api/upload-image      → assets/uploads/ (POST — admin only)
+├── /api/sow/chat          → Gemini-backed SOW assistant
+└── /api/eblocks/chat      → Gemini-backed E-blocks assistant
 ```
 
-One Railway service. One domain. No subdomains or external URLs.
+One Node.js server (`server.js`) serves all static apps and API routes.
 
 ---
 
@@ -41,46 +48,41 @@ One Railway service. One domain. No subdomains or external URLs.
 ```
 matrix-dev/
 │
-├── server.js               # Node.js HTTP server — routing, API, file serving
-├── package.json            # start: node server.js
+├── server.js                 # Main Node.js server (routing + APIs + static files)
+├── package.json              # npm scripts and dependencies
+├── README.md
 │
-├── index.html              # Dashboard (Matrix Apps home page)
-├── sow.html                # SOW Generator app entry point
-├── styles.css              # Shared styles (SOW generator)
-├── app.js                  # SOW Generator frontend logic
-├── review.html             # SOW review/edit page
-├── review.js               # Review page logic
-├── review.css              # Review page styles
-├── review-shared.js        # Shared review utilities
-├── admin.html              # Topic Editor (requires ADMIN_TOKEN)
-├── hardware.html           # Hardware Editor (requires ADMIN_TOKEN)
+├── dashboard/
+│   └── index.html            # Home page served at "/"
 │
-├── assets/
-│   ├── favicon.png         # App icon
-│   ├── matrix light.png    # Matrix TSL logo (light)
-│   ├── matrix dark.png     # Matrix TSL logo (dark)
-│   ├── hardware/           # Hardware product images
-│   ├── worksheets/         # Worksheet PDFs + extracted WebP images
-│   │   ├── *.pdf           # Source worksheet documents
-│   │   └── *-images/       # Page images extracted from each PDF (WebP)
-│   ├── uploads/            # User-uploaded images (created at runtime)
-│   └── placeholder*.jpg    # Fallback topic images
+├── sow-generator/
+│   ├── index.html            # SOW Generator app
+│   ├── app.js
+│   ├── styles.css
+│   ├── review.html
+│   ├── review.js
+│   ├── review.css
+│   ├── review-shared.js
+│   ├── admin.html            # Topic editor
+│   └── hardware.html         # Hardware editor
 │
-├── data/
-│   ├── topics.json         # All SOW topic definitions (edited via /admin.html)
-│   ├── hardware.json       # Hardware catalogue (edited via /hardware.html)
-│   └── templates.json      # SoW document templates
+├── scorm-example/            # SCORM workflow app and generated outputs
+│   ├── index.html
+│   ├── backend.html
+│   ├── upload.html
+│   ├── workflow.html
+│   ├── upload-media.js
+│   ├── source/
+│   ├── outputs/
+│   ├── reports/
+│   └── specs/
 │
-└── teachers/               # IM Teachers Portal (self-contained static app)
-    ├── index.html
-    ├── css/styles.css
-    ├── js/
-    │   ├── auth.js         # Client-side login (session-based)
-    │   └── main.js
-    └── assets/
-        ├── documents/      # Course PDFs (IM0004, IM3214, IM6930)
-        ├── images/         # Course imagery
-        └── matrix-logo.png
+├── sf2-portal/               # Static SF2 portal app
+├── im-portal/                # Static IM portal app
+├── assets/                   # Shared static assets
+├── data/                     # JSON data for API endpoints
+├── SEARCH_CONSOLE_REMOVAL_STEPS.md
+└── robots.txt
 ```
 
 ---
@@ -95,12 +97,13 @@ matrix-dev/
 ```bash
 git clone https://github.com/hadefuwa/matrix-dev.git
 cd matrix-dev
+npm install
 node server.js
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-No `npm install` needed — the server uses only Node.js built-in modules (`http`, `fs`, `path`).
+Install dependencies once with `npm install` (currently includes `tinymce`).
 
 ### Environment Variables
 
@@ -111,6 +114,8 @@ No `npm install` needed — the server uses only Node.js built-in modules (`http
 | `GEMINI_API_KEY` | *(none)* | Google AI Studio API key used by `POST /api/eblocks/chat`. Keep it server-side only. |
 | `DATA_DIR` | `./data` | Path to JSON data files directory |
 | `IMAGE_UPLOAD_DIR` | `./assets/uploads` | Path where uploaded images are saved |
+| `SITE_USERNAME` | `admin` | Username used when site auth is enabled |
+| `SITE_PASSWORD` | *(none)* | Password used when site auth is enabled |
 
 Set `ADMIN_TOKEN` to enable topic/hardware editing:
 
@@ -245,6 +250,9 @@ Gemini-backed assistant endpoint for the E-blocks IDE.
 ### GET /api/health
 Returns server status and configuration info.
 
+### POST /api/sow/chat
+Gemini-backed assistant endpoint for the SOW Generator.
+
 ---
 
 ## Adding a New App
@@ -259,7 +267,7 @@ if (pathname === "/new-app" || pathname === "/new-app/") {
 }
 ```
 
-3. **Add a card to the dashboard**: edit `index.html` and add a new `.app-card` inside `.app-grid`. Follow the existing card pattern and add a colour theme in the `<style>` block.
+3. **Add a card to the dashboard**: edit `dashboard/index.html` and add a new `.app-card` inside `.app-grid`. Follow the existing card pattern and add a colour theme in the `<style>` block.
 
 ---
 
@@ -285,5 +293,5 @@ The compression script (`compress-images.mjs`) uses `sharp` from `sow-generator-
 
 | Repo | Status | Notes |
 |------|--------|-------|
-| [sow-generator-railway](https://github.com/hadefuwa/sow-generator-railway) | Archived | Original standalone SOW Generator. Code merged into this repo. |
-| [IM-Teachers-Portal](https://github.com/hadefuwa/IM-Teachers-Portal) | Archived | Original Teachers Portal. Code merged into `teachers/` in this repo. |
+| [sow-generator-railway](https://github.com/hadefuwa/sow-generator-railway) | Archived | Original standalone SOW Generator. Code moved into this repo (`sow-generator/`). |
+| [IM-Teachers-Portal](https://github.com/hadefuwa/IM-Teachers-Portal) | Archived | Original IM portal. Code now lives in this repo (`im-portal/`). |

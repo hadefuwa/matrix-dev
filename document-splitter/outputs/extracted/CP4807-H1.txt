@@ -1,0 +1,47 @@
+SOURCE BLOCK EXTRACTION
+=======================
+Source file:    source/CP4807 - Introduction to microcontrollers 05 04 26.docx
+Tag type:       <HTML>
+Filename tag:   "CP4807-H1.html"
+Block:          Homework 1
+Classification: Homework
+Extracted:      2026-04-06
+
+---
+
+Homework 1
+First program
+Performing calculations
+Digital inputs
+Using connection points
+
+Make sure that you can replicate the examples from scratch. This makes sure that you understand them.
+
+Design brief:
+
+Design a program that controls two sets of traffic lights at a junction.
+
+Hardware:
+
+Upstream board
+
+Use a Combo board on port A and Port B where the connections to the traffic lights are represented by:
+
+Port A bit 0  GREEN
+Port A bit 1  AMBER
+Port A bit 2  RED
+Port B bit 0  GREEN
+Port B bit 1  AMBER
+Port B bit 2  RED
+
+Software
+
+Create a panel in Flowcode with the two sets of lights in the appropriate colour. You can do this using the single LED component. You can carry out this program in simulation and then try it on the hardware next lesson.
+
+Design the program so that the lights at the junction control the traffic in an appropriate sequence of:
+
+RED: 20 seconds
+AMBER: 3 seconds
+GREEN: 20 seconds
+
+When there is RED at one set of lights there must be GREEN at the other.

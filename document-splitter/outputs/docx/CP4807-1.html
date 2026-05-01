@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CP4807 — Worksheet 1: First Program</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px; line-height: 1.7; color: #1f2937;
+      background: #f1f5f9; padding: 2rem 1rem;
+    }
+    /* Simulate a printed A4 document */
+    .document {
+      max-width: 740px; margin: 0 auto;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border: 1px solid #d1d5db;
+    }
+    /* Build note banner */
+    .build-note {
+      background: #f0f9ff; border-bottom: 2px solid #7dd3fc;
+      padding: 0.55rem 1.5rem; font-size: 11px; color: #0369a1;
+      font-family: monospace;
+    }
+    /* Document header strip */
+    .doc-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      padding: 1.25rem 1.75rem 0.85rem;
+      border-bottom: 3px solid #1d4ed8;
+    }
+    .doc-header-left .module { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; }
+    .doc-header-left .ws-title { font-size: 1.5rem; font-weight: 800; color: #111827; line-height: 1.1; }
+    .doc-header-left .ws-subtitle { font-size: 0.95rem; color: #2563eb; font-weight: 600; margin-top: 0.1rem; }
+    .doc-header-right { text-align: right; }
+    .doc-header-right .series { font-size: 11px; color: #9ca3af; }
+    .doc-header-right .level { font-size: 12px; font-weight: 700; color: #2563eb; margin-top: 0.2rem; }
+
+    /* Main content area */
+    .doc-body { padding: 1.5rem 1.75rem; }
+
+    .intro-block { margin-bottom: 1.5rem; }
+    .intro-block p { font-size: 13.5px; color: #374151; margin-bottom: 0.5rem; }
+
+    .video-ref {
+      background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px;
+      padding: 0.55rem 0.85rem; font-size: 12px; color: #6b7280;
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;
+    }
+    .video-ref a { color: #2563eb; }
+
+    .section-head {
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.1em; color: white; background: #1d4ed8;
+      padding: 0.3rem 0.75rem; display: inline-block; margin-bottom: 0.6rem;
+      border-radius: 3px;
+    }
+    .section-head.challenge { background: #7c3aed; }
+    .section-head.hint { background: #0d9488; }
+
+    .instruction-block { margin-bottom: 1.25rem; }
+    .instruction-block p { font-size: 13px; color: #374151; margin-bottom: 0.4rem; }
+
+    .challenge-list { list-style: none; margin-bottom: 1.25rem; }
+    .challenge-list li {
+      font-size: 13px; color: #374151; padding: 0.5rem 0.75rem 0.5rem 2rem;
+      border-bottom: 1px solid #f3f4f6; position: relative;
+    }
+    .challenge-list li::before {
+      content: counter(ch);
+      counter-increment: ch;
+      position: absolute; left: 0; top: 0.5rem;
+      width: 1.4rem; height: 1.4rem; border-radius: 50%;
+      background: #eff6ff; color: #2563eb; font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .challenge-list { counter-reset: ch; }
+
+    .hint-list { margin: 0 0 1.25rem 1.1rem; }
+    .hint-list li { font-size: 12.5px; color: #6b7280; margin-bottom: 0.3rem; }
+
+    .note-box {
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;
+      padding: 0.75rem 1rem; margin-bottom: 1rem;
+    }
+    .note-box p { font-size: 12px; color: #78350f; margin: 0; }
+
+    /* Footer */
+    .doc-footer {
+      border-top: 2px solid #e5e7eb; padding: 0.65rem 1.75rem;
+      display: flex; justify-content: space-between;
+      font-size: 10.5px; color: #9ca3af;
+    }
+    .learner-copy { font-weight: 700; color: #d1d5db; }
+  </style>
+</head>
+<body>
+<div class="document">
+
+  <div class="build-note">
+    Build note: DOCX stand-in (HTML format) &nbsp;|&nbsp; Source tag: &lt;worksheet&gt; &nbsp;|&nbsp; Filename: CP4807-1.doc &nbsp;|&nbsp; Extracted: outputs/extracted/CP4807-1.txt &nbsp;|&nbsp; Built: 2026-04-06
+  </div>
+
+  <div class="doc-header">
+    <div class="doc-header-left">
+      <div class="module">CP4807 &nbsp;·&nbsp; Introduction to Microcontrollers</div>
+      <div class="ws-title">Worksheet 1</div>
+      <div class="ws-subtitle">First program</div>
+    </div>
+    <div class="doc-header-right">
+      <div class="series">12-worksheet series</div>
+      <div class="level">Bronze level</div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <div class="intro-block">
+      <p>This first program introduces you to several programming commands: <strong>OUTPUT</strong>, <strong>LOOP</strong> and <strong>DELAY</strong>.</p>
+      <p>In this first program you explore how to get a single output on the microcontroller turning on and off using these commands.</p>
+    </div>
+
+    <div class="video-ref">
+      ▶ Video: <a href="https://youtu.be/h8-7BsXBpLc" target="_blank">Flowcode Embedded: first program</a> &nbsp;— Flowcode YouTube site
+    </div>
+
+    <div class="section-head">Over to you</div>
+    <div class="instruction-block">
+      <p>Watch the video "Flowcode Embedded: first program" on the Flowcode YouTube site.</p>
+      <p>Load the file "First program". Set up the hardware appropriately, download it, and make sure you understand it.</p>
+      <p>The program flashes a single LED on the combo board.</p>
+    </div>
+
+    <div class="section-head challenge">Challenges</div>
+    <ul class="challenge-list">
+      <li><strong>Delay:</strong> alter the delay period. Make sure you understand how the Delay command works.</li>
+      <li><strong>Output:</strong> change the output to work with port A and port B. Select Advanced options and alter the bit that is flashed.</li>
+      <li><strong>Loop:</strong> experiment with the loop dialogue box. Flash the LED for only 10 times.</li>
+      <li>Alter the program so that it flashes Port 1 bit 0 for 10 times, then Port 2 bit 1 for 9 times, then Port 2 bit 2 for 8 times.</li>
+    </ul>
+
+    <div class="section-head hint">Hints</div>
+    <ul class="hint-list">
+      <li>You can use three loops one after the other. Alter the Loop count in each one.</li>
+      <li>Use the Advanced options in the Output icon to control which output bit is used.</li>
+    </ul>
+
+    <div class="note-box">
+      <p><strong>Finding the examples:</strong> From within Flowcode select: FILE → NEW PROJECT → OPEN EXAMPLE OR TEMPLATE and select the appropriate example. Examples are available separately for PIC, Arduino and ESP32 microcontrollers.</p>
+    </div>
+
+  </div>
+
+  <div class="doc-footer">
+    <span>CP4807 — Introduction to Microcontrollers</span>
+    <span>Worksheet 1 of 12 &nbsp;·&nbsp; Bronze</span>
+    <span class="learner-copy">Learner copy</span>
+  </div>
+
+</div>
+</body>
+</html>

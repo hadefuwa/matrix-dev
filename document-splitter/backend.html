@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Under the Hood | Course Build Prototype</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav-shell">
+      <a class="brand" href="index.html">Course Build Prototype</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Overview</a>
+        <a href="workflow.html">How it works</a>
+        <a class="is-active" href="backend.html" aria-current="page">Under the hood</a>
+        <a href="upload.html">Upload prototype</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero hero-backend">
+      <div class="wrap simple-hero simple-hero-single">
+        <div class="simple-hero-copy">
+          <p class="eyebrow">Under The Hood</p>
+          <h1>The reference page: proof, structure, warnings, and SCORM gaps.</h1>
+          <p class="lede">
+            This is where the detailed evidence lives after the front pages are simplified.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Tag Quick Reference</p>
+          <h2>30 tags. Short purpose. Direct usage.</h2>
+          <p>Use this as the fast authoring cheat sheet. Core output tags define what gets built. Content and resource tags help describe what sits inside each block.</p>
+        </div>
+
+        <div class="tag-cheatsheet">
+          <article class="card tag-mini-card">
+            <code>&lt;HTML&gt;&lt;/HTML&gt;</code>
+            <p>Learner web page.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;worksheet&gt;&lt;/worksheet&gt;</code>
+            <p>Worksheet output.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;document&gt;&lt;/document&gt;</code>
+            <p>Support document.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;filename&gt;&lt;/filename&gt;</code>
+            <p>Exact output filename.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;title&gt;&lt;/title&gt;</code>
+            <p>Visible page title.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;subtitle&gt;&lt;/subtitle&gt;</code>
+            <p>Short secondary heading.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;intro&gt;&lt;/intro&gt;</code>
+            <p>Opening explanation.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;section&gt;&lt;/section&gt;</code>
+            <p>Main content chunk.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;task&gt;&lt;/task&gt;</code>
+            <p>Learner task.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;steps&gt;&lt;/steps&gt;</code>
+            <p>Ordered process.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;question&gt;&lt;/question&gt;</code>
+            <p>Question prompt.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;answer&gt;&lt;/answer&gt;</code>
+            <p>Answer content.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;quiz&gt;&lt;/quiz&gt;</code>
+            <p>Quiz block.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;assessment&gt;&lt;/assessment&gt;</code>
+            <p>Trackable assessment.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;objective&gt;&lt;/objective&gt;</code>
+            <p>Learning objective.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;outcome&gt;&lt;/outcome&gt;</code>
+            <p>Expected result.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;hint&gt;&lt;/hint&gt;</code>
+            <p>Helpful clue.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;example&gt;&lt;/example&gt;</code>
+            <p>Worked example.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;summary&gt;&lt;/summary&gt;</code>
+            <p>Quick recap.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;extension&gt;&lt;/extension&gt;</code>
+            <p>Stretch activity.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;starter&gt;&lt;/starter&gt;</code>
+            <p>Warm-up task.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;plenary&gt;&lt;/plenary&gt;</code>
+            <p>Closing reflection.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;video&gt;&lt;/video&gt;</code>
+            <p>Video link or embed target.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;audio&gt;&lt;/audio&gt;</code>
+            <p>Audio resource.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;image&gt;&lt;/image&gt;</code>
+            <p>Image reference.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;datasheet&gt;&lt;/datasheet&gt;</code>
+            <p>Technical reference link.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;slides&gt;&lt;/slides&gt;</code>
+            <p>Slide deck link.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;link&gt;&lt;/link&gt;</code>
+            <p>General external link.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;teacher-note&gt;&lt;/teacher-note&gt;</code>
+            <p>Teacher-only guidance.</p>
+          </article>
+          <article class="card tag-mini-card">
+            <code>&lt;resource&gt;&lt;/resource&gt;</code>
+            <p>Generic support resource.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Current State</p>
+          <h2>The prototype has real evidence, but it is not the full build yet.</h2>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card status-card">
+            <table class="status-table">
+              <tbody>
+                <tr><th>Reports</th><td>5 populated reports</td></tr>
+                <tr><th>Tagged blocks</th><td>32 found</td></tr>
+                <tr><th>Extracted files</th><td>2 present</td></tr>
+                <tr><th>Built outputs</th><td>1 learner HTML and 1 prototype worksheet output</td></tr>
+                <tr><th>Validation</th><td>2 of 28 learner outputs confirmed</td></tr>
+                <tr><th>SCORM</th><td>Not ready</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="card tighten-card">
+            <p class="mini-label">Still needs tightening</p>
+            <ul class="fact-list">
+              <li>Duplicate filename `CP4807-1.doc` still needs to be resolved in the source.</li>
+              <li>`CP4807-CPDcert` still needs a file extension.</li>
+              <li>The remaining 26 learner outputs still need to be built.</li>
+              <li>SCORM version, launch structure, tracking, completion, and navigation are still undefined.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         TAGGING RULES
+         ══════════════════════════════════════════════════ -->
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Source Tagging Rules</p>
+          <h2>Every block must follow this exact pattern for the pipeline to process it correctly.</h2>
+          <p>The analysis agent scans the source document for blocks that match a known tag pattern. A block that is malformed, missing a filename, or uses an unrecognised tag will be flagged in the analysis report and skipped during extraction.</p>
+          <div class="hero-actions authoring-actions">
+            <a class="button button-primary" href="specs/source-authoring-guide.md" download="scorm-source-authoring-guide.md">Export authoring rules</a>
+            <a class="button button-secondary button-secondary-dark" href="specs/tag-rules.md" target="_blank" rel="noopener noreferrer">Open tag rules spec</a>
+          </div>
+        </div>
+
+        <div class="card authoring-brief">
+          <div class="authoring-brief-copy">
+            <p class="mini-label">Authoring goal</p>
+            <h3>Write the Word source so each learner-facing item can become a clean, packageable asset.</h3>
+            <p>The best SCORM-ready source is not just tagged. It separates learner pages cleanly, uses predictable filenames, keeps each assessment in its own HTML block, and records the five SCORM decisions explicitly instead of leaving them to be inferred later.</p>
+          </div>
+          <div class="authoring-brief-points">
+            <div><span class="about-dot"></span><span>Use one tagged block per deliverable file.</span></div>
+            <div><span class="about-dot"></span><span>Put learner pages that may be tracked in <code>&lt;HTML&gt;</code> blocks.</span></div>
+            <div><span class="about-dot"></span><span>Keep worksheets and reference documents separate from SCO content.</span></div>
+            <div><span class="about-dot"></span><span>Define SCORM version, launch, tracking, completion, and navigation in the source or a companion spec.</span></div>
+          </div>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>Authoring rules for the best SCORM-compliant resource pack</h3>
+          <p>These rules tell the course author how to prepare the Word document before the pipeline runs, so the generated browser files and later SCORM package are both easier to validate.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Structure</span>
+            <h3>Keep one real output per tagged block</h3>
+            <ul class="fact-list">
+              <li>Start every publishable item with a recognised opening tag and end it with the exact matching closing tag.</li>
+              <li>Put only one learner resource inside each block. Do not combine two assignments, two worksheets, or mixed output types in one tag pair.</li>
+              <li>Keep planning notes, teacher-only comments, and draft instructions outside publishable blocks unless they are meant to appear to learners.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Naming</span>
+            <h3>Give every block a unique, correctly typed filename</h3>
+            <ul class="fact-list">
+              <li>Add a <code>&lt;filename&gt;</code> line inside every block and wrap the filename in double quotes.</li>
+              <li>Make the filename unique across the whole document so the pipeline never has to guess which file wins.</li>
+              <li>Match the extension to the block type: <code>.html</code> for <code>&lt;HTML&gt;</code>, <code>.docx</code> for worksheets, and the intended document type for references.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">SCORM fit</span>
+            <h3>Author trackable learner pages as HTML-first content</h3>
+            <ul class="fact-list">
+              <li>Use <code>&lt;HTML&gt;</code> for pages the LMS may launch or track, especially homework, assignments, quizzes, and assessments.</li>
+              <li>Keep a clear title at the top of the block so the built page and manifest labels are human-readable.</li>
+              <li>Make each assessable item self-contained so it can become its own SCO entry if required.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Clean content</span>
+            <h3>Write source content that can publish without manual cleanup</h3>
+            <ul class="fact-list">
+              <li>Keep learner instructions, questions, tables, and reference text inside the block, but remove author reminders that should not appear in the final output.</li>
+              <li>Use stable wording for headings and task labels so generated navigation stays consistent across outputs.</li>
+              <li>Do not rely on formatting alone to signal meaning. Put key structure into the text itself so extraction does not lose it.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Boundaries</span>
+            <h3>Separate trackable content from supporting files</h3>
+            <ul class="fact-list">
+              <li>Use <code>&lt;worksheet&gt;</code> for printable or downloadable activity sheets that are not expected to be LMS-tracked.</li>
+              <li>Use <code>&lt;document&gt;</code> for certificates, reference PDFs, or supporting resources that sit alongside the course.</li>
+              <li>Do not expect worksheet or document blocks to become trackable SCOs unless they are rebuilt as HTML launchable pages.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Definitions</span>
+            <h3>Record the SCORM decisions explicitly</h3>
+            <ul class="fact-list">
+              <li>State the SCORM version, launch file, tracking model, completion model, and navigation rules in the source or a companion definitions file.</li>
+              <li>Choose a launch file that already exists as a built <code>.html</code> output.</li>
+              <li>Do not leave sequencing, tracking, or completion to the packaging step to invent. Missing decisions block packaging on purpose.</li>
+            </ul>
+          </article>
+        </div>
+
+        <!-- Block anatomy -->
+        <div class="tag-anatomy card">
+          <p class="mini-label">Anatomy of a valid tagged block</p>
+          <div class="tag-anatomy-body">
+            <div class="tag-anatomy-code">
+              <pre class="code-block tag-annotated"><code><span class="ta-open">&lt;HTML&gt;</span>
+<span class="ta-title">Homework 1</span>
+<span class="ta-fname">&lt;filename&gt;"CP4807-H1.html"&lt;/filename&gt;</span>
+
+<span class="ta-content">Design a program that controls
+two sets of traffic lights
+at a junction.</span>
+
+<span class="ta-close">&lt;/HTML&gt;</span></code></pre>
+            </div>
+            <div class="tag-anatomy-notes">
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-open">Opening tag</span>
+                <p>Sets the output type for this block. Must be one of the recognised tags listed below. The AI uses this to decide what to build.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-title">Display title</span>
+                <p>Optional. Appears as the heading in the built output. If omitted, the filename stem is used instead.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-fname">Filename tag</span>
+                <p>Required. Must be unique across the entire source document and must include a valid file extension.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-content">Block content</span>
+                <p>The learner-facing material. Teacher notes and wrapper tags are stripped during the extraction stage.</p>
+              </div>
+              <div class="anatomy-note">
+                <span class="anatomy-pill ap-close">Closing tag</span>
+                <p>Must exactly match the opening tag including case. <code>&lt;HTML&gt;</code> must close with <code>&lt;/HTML&gt;</code> — not <code>&lt;/html&gt;</code>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tag type reference -->
+        <div class="subsection-heading">
+          <h3>Recognised tag types</h3>
+          <p>The opening tag determines what the AI builds. Using an unrecognised tag causes the block to be skipped with a warning.</p>
+        </div>
+
+        <div class="grid three-up tag-type-grid">
+          <article class="card tag-type-card">
+            <code class="tag-display">&lt;HTML&gt;</code>
+            <h3>Learner HTML page</h3>
+            <p>Builds a learner-facing web page. Used for homework, assignments, assessments, and any block that needs a browser-rendered output.</p>
+            <div class="tag-type-foot">
+              <div class="tag-type-eg"><span class="mini-label" style="margin:0;display:inline">e.g.</span> <code>CP4807-H1.html</code></div>
+              <div class="tag-scorm-note">Assessment subtype becomes a SCO item in the SCORM manifest.</div>
+            </div>
+          </article>
+
+          <article class="card tag-type-card">
+            <code class="tag-display">&lt;worksheet&gt;</code>
+            <h3>Worksheet output</h3>
+            <p>Builds a structured worksheet. Used for in-class activities or any block that needs a printable, downloadable format.</p>
+            <div class="tag-type-foot">
+              <div class="tag-type-eg"><span class="mini-label" style="margin:0;display:inline">e.g.</span> <code>CP4807-1.docx</code></div>
+              <div class="tag-scorm-note tag-scorm-neutral">Not a SCO — does not become a trackable SCORM item.</div>
+            </div>
+          </article>
+
+          <article class="card tag-type-card">
+            <code class="tag-display">&lt;document&gt;</code>
+            <h3>Document output</h3>
+            <p>Builds a reference or supporting document. Used for reading resources, guidance material, and supplementary content.</p>
+            <div class="tag-type-foot">
+              <div class="tag-type-eg"><span class="mini-label" style="margin:0;display:inline">e.g.</span> <code>CP4807-CPDcert.pdf</code></div>
+              <div class="tag-scorm-note tag-scorm-neutral">Supplementary resource only — not tracked by the LMS.</div>
+            </div>
+          </article>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>Recommended authoring pattern for SCORM-ready content</h3>
+          <p>This example shows the kind of source structure that gives the packaging stage the least ambiguity later on.</p>
+        </div>
+
+        <div class="card authoring-example-card">
+          <pre class="code-block"><code>&lt;HTML&gt;
+Assessment 1: Traffic light logic
+&lt;filename&gt;"CP4807-A1.html"&lt;/filename&gt;
+
+Create a program that controls two sets of traffic lights at a junction.
+Your solution must include:
+- Red, amber, and green timing
+- A safe transition sequence
+- A short explanation of your logic
+
+&lt;/HTML&gt;
+
+scorm-version: "1.2"
+launch: "CP4807-A1.html"
+tracking: "completion-and-score"
+completion: "quiz-pass"
+navigation: "linear"</code></pre>
+          <p class="authoring-example-note">Best practice: keep the learner page in its own <code>&lt;HTML&gt;</code> block, then define the package-level SCORM settings separately so the launch page and tracking behavior are both explicit.</p>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>How to author external resources and teaching links</h3>
+          <p>This tool is designed for teachers who need to combine worksheets with linked resources. External links should be written in a consistent, explicit way so they can be turned into reliable learner-facing launch items or support links.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Videos</span>
+            <h3>YouTube links should be visible, named, and learner-safe</h3>
+            <ul class="fact-list">
+              <li>Place the link inside the learner block where it is needed, with a clear label such as <code>Video resource: https://youtu.be/...</code>.</li>
+              <li>Use a stable watch or share URL, not a temporary browser address.</li>
+              <li>Name the video in the surrounding text so the built output can show a human-readable link label.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Google files</span>
+            <h3>Google Docs and Slides links must be share-ready</h3>
+            <ul class="fact-list">
+              <li>Use viewable share links, not edit-only links tied to a teacher login.</li>
+              <li>Say what the resource is in plain text, for example <code>Teacher slides: https://docs.google.com/presentation/...</code>.</li>
+              <li>If learners need the file, place it in a learner-facing block. If it is teacher-only, keep it in a support resource block instead.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Datasheets</span>
+            <h3>Datasheet and reference links should describe the target clearly</h3>
+            <ul class="fact-list">
+              <li>Write the resource type and title before the URL, such as <code>Datasheet: PIC16F877A datasheet - https://...</code>.</li>
+              <li>Prefer direct PDF or stable vendor links over search-result URLs.</li>
+              <li>If the linked file is essential to the activity, mention that in the learner instructions so the generated page preserves the dependency.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Separation</span>
+            <h3>Keep learner links and teacher links separate</h3>
+            <ul class="fact-list">
+              <li>Learner-visible links belong inside the learner block they support.</li>
+              <li>Teacher PowerPoints, answer sheets, and delivery notes should go in a separate supporting block, usually <code>&lt;document&gt;</code> or a dedicated teacher resource page.</li>
+              <li>Do not mix teacher-only links into assessment or learner HTML blocks unless learners are meant to see them.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>How to upload images with a media ZIP</h3>
+          <p>If a source document comes with a companion media folder, the teacher should compress that folder into one <code>.zip</code> file and upload it alongside the <code>.docx</code> in the browser prototype.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Upload</span>
+            <h3>ZIP the whole media folder, then upload it with the source DOCX</h3>
+            <ul class="fact-list">
+              <li>Keep the original media filenames if possible.</li>
+              <li>Put all images into one folder, then compress that folder as a <code>.zip</code>.</li>
+              <li>Upload the tagged <code>.docx</code> first or second — the prototype can match once both files are loaded.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Matching</span>
+            <h3>Image matching is explicit, not guessed</h3>
+            <ul class="fact-list">
+              <li>The source document must name the exact image file inside an image tag.</li>
+              <li>The uploaded ZIP must contain a file with the same basename, for example <code>traffic lights.jpg</code>.</li>
+              <li>If the ZIP contains duplicate filenames, the match is flagged as ambiguous instead of being guessed.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="subsection-heading">
+          <h3>How to tag images correctly in the source document</h3>
+          <p>Put the image reference inside the learner block where the image should appear. Use the exact filename from the media folder inside an <code>&lt;image&gt;</code> tag.</p>
+        </div>
+
+        <div class="card authoring-example-card">
+          <pre class="code-block"><code>&lt;HTML&gt;
+Worksheet 4: Traffic lights
+&lt;filename&gt;"CP4807-WS4.html"&lt;/filename&gt;
+
+Study the traffic light sequence below.
+&lt;image&gt;traffic lights.jpg&lt;/image&gt;
+
+Explain what happens when the amber light is shown.
+
+&lt;/HTML&gt;</code></pre>
+          <p class="authoring-example-note">Rule: the text inside <code>&lt;image&gt;</code> must match the media filename exactly. Example: <code>&lt;image&gt;traffic lights.jpg&lt;/image&gt;</code> matches a file named <code>traffic lights.jpg</code> inside the uploaded media ZIP.</p>
+        </div>
+
+        <div class="grid two-up authoring-rule-grid">
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Good practice</span>
+            <h3>Keep image references simple and literal</h3>
+            <ul class="fact-list">
+              <li>Use the real filename including the extension, such as <code>.jpg</code>, <code>.png</code>, or <code>.svg</code>.</li>
+              <li>Keep one image tag per referenced file.</li>
+              <li>Place the tag near the learner instruction it supports so the generated page can keep the context clear.</li>
+            </ul>
+          </article>
+
+          <article class="card authoring-rule-card">
+            <span class="authoring-rule-kicker">Avoid</span>
+            <h3>Do not rely on the system to infer which image you mean</h3>
+            <ul class="fact-list">
+              <li>Do not write vague references like “use the traffic light image”.</li>
+              <li>Do not expect the system to match Word’s internal image names like <code>image1.emf</code>.</li>
+              <li>Do not rename files after tagging the source unless you also update the tag text.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="card authoring-example-card">
+          <pre class="code-block"><code>&lt;HTML&gt;
+Worksheet 3: Inputs and outputs
+&lt;filename&gt;"CP4807-WS3.html"&lt;/filename&gt;
+
+Complete the worksheet tasks below.
+
+Video resource: https://youtu.be/h8-7BsXBpLc
+Datasheet: PIC16F877A datasheet - https://www.example.com/pic16f877a.pdf
+Learner slides: https://docs.google.com/presentation/d/example/view
+
+&lt;/HTML&gt;
+
+&lt;document&gt;
+Teacher delivery pack
+&lt;filename&gt;"CP4807-Teacher-Pack.docx"&lt;/filename&gt;
+
+Teacher slides: https://docs.google.com/presentation/d/example/edit
+Teacher notes: https://docs.google.com/document/d/example/edit
+
+&lt;/document&gt;</code></pre>
+          <p class="authoring-example-note">Rule of thumb: learner-facing links stay with the learner block; teacher-only links go into a separate support output so the SCORM package does not accidentally expose staff materials.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         FILENAME RULES + COMMON ERRORS
+         ══════════════════════════════════════════════════ -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Filename Rules</p>
+          <h2>Filenames must be unique, correctly typed, and include the right extension.</h2>
+          <p>The filename tag is how the pipeline knows where to write each output. An incorrect or duplicated filename breaks the chain for that block only — the rest of the source continues to process.</p>
+        </div>
+
+        <!-- 4 filename rules -->
+        <div class="grid two-up fname-rules-grid">
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Must be unique across the whole source document</strong>
+              <p>No two blocks can share a filename. Duplicates are flagged in the analysis report and the second block is skipped.</p>
+            </div>
+          </div>
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Must include a file extension</strong>
+              <p>The extension tells the pipeline which folder to route the output to. Without one the file cannot be placed or built.</p>
+            </div>
+          </div>
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Must be wrapped in double quotes inside the tag</strong>
+              <p>The value must be quoted: <code>&lt;filename&gt;"CP4807-H1.html"&lt;/filename&gt;</code>. Unquoted filenames may not be parsed correctly.</p>
+            </div>
+          </div>
+          <div class="card fname-rule">
+            <div class="fname-rule-icon ok">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Extension should match the tag type</strong>
+              <p>An <code>&lt;HTML&gt;</code> block should use <code>.html</code> or <code>.htm</code>. A mismatch creates a routing warning in the analysis report.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Common errors -->
+        <div class="subsection-heading" style="margin-top:2.5rem;">
+          <h3>Common tagging errors — and what actually happens</h3>
+          <p>These are the three errors found in this source document. Each is flagged in the analysis report so nothing is silently dropped.</p>
+        </div>
+
+        <div class="grid three-up error-cards-grid">
+
+          <article class="card error-card">
+            <div class="error-type-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Duplicate filename
+            </div>
+            <div class="error-split">
+              <div>
+                <div class="error-badge-wrong">Wrong</div>
+                <pre class="code-block code-block-sm"><code>&lt;HTML&gt;
+&lt;filename&gt;"CP4807-1.doc"
+&lt;/filename&gt;
+&lt;/HTML&gt;
+
+&lt;worksheet&gt;
+&lt;filename&gt;"CP4807-1.doc"
+&lt;/filename&gt;
+&lt;/worksheet&gt;</code></pre>
+              </div>
+              <div class="error-fix-block">
+                <div class="error-badge-fix">Fix</div>
+                <p>Give every block a distinct filename. The second block here is flagged as a duplicate and not extracted.</p>
+                <div class="error-real-case">
+                  <strong>Found in this source:</strong> <code>CP4807-1.doc</code> appears twice.
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card error-card">
+            <div class="error-type-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Missing file extension
+            </div>
+            <div class="error-split">
+              <div>
+                <div class="error-badge-wrong">Wrong</div>
+                <pre class="code-block code-block-sm"><code>&lt;document&gt;
+&lt;filename&gt;"CP4807-CPDcert"
+&lt;/filename&gt;
+...
+&lt;/document&gt;</code></pre>
+              </div>
+              <div class="error-fix-block">
+                <div class="error-badge-fix">Fix</div>
+                <p>Add a valid extension so the pipeline knows where to route the output.</p>
+                <code class="fix-inline">"CP4807-CPDcert.pdf"</code>
+                <div class="error-real-case">
+                  <strong>Found in this source:</strong> <code>CP4807-CPDcert</code> has no extension.
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card error-card">
+            <div class="error-type-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Mismatched closing tag
+            </div>
+            <div class="error-split">
+              <div>
+                <div class="error-badge-wrong">Wrong</div>
+                <pre class="code-block code-block-sm"><code>&lt;HTML&gt;
+&lt;filename&gt;"CP4807-H1.html"
+&lt;/filename&gt;
+Content here.
+&lt;/html&gt;</code></pre>
+              </div>
+              <div class="error-fix-block">
+                <div class="error-badge-fix">Fix</div>
+                <p>The closing tag must exactly match the opening tag — including uppercase. <code>&lt;HTML&gt;</code> must close with <code>&lt;/HTML&gt;</code>.</p>
+                <div class="error-real-case">
+                  <strong>Result:</strong> Block not recognised. Content is silently skipped.
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SCORM SOURCE REQUIREMENTS
+         ══════════════════════════════════════════════════ -->
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">SCORM Source Requirements</p>
+          <h2>Five decisions must be defined before SCORM packaging can run.</h2>
+          <p>The pipeline reads these from the source document or a companion definitions file. If any are absent, packaging stops safely and the missing items are listed in the packaging report. For this prototype, SCORM 1.2 is the recommended default unless a target LMS specifically requires SCORM 2004.</p>
+        </div>
+
+        <div class="scorm-req-grid">
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">1</div>
+            <div class="scorm-req-body">
+              <h3>SCORM version</h3>
+              <p>Use <code>1.2</code> by default. Only choose <code>2004</code> if the target LMS explicitly requires it. The manifest schema, API calls, and data model differ between versions, so this still needs to be stated clearly.</p>
+              <div class="scorm-req-eg"><span>recommended</span><code>scorm-version: "1.2"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">2</div>
+            <div class="scorm-req-body">
+              <h3>Launch file</h3>
+              <p>The filename of the first page an LMS should open. Must be one of the built HTML outputs and must already exist before packaging runs.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>launch: "CP4807-H1.html"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">3</div>
+            <div class="scorm-req-body">
+              <h3>Tracking model</h3>
+              <p>Whether the LMS tracks completion, score, or both. Determines which SCORM API calls are written into the SCO and how the manifest declares them.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>tracking: "completion-only"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">4</div>
+            <div class="scorm-req-body">
+              <h3>Completion model</h3>
+              <p>How the LMS decides a learner has finished. Common options are page-view, quiz-pass, time-based, or manual. Must be explicitly chosen by the author.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>completion: "page-view"</code></div>
+            </div>
+          </article>
+
+          <article class="card scorm-req-card">
+            <div class="scorm-req-num">5</div>
+            <div class="scorm-req-body">
+              <h3>Navigation rules</h3>
+              <p>Whether learners can move freely between items or must follow a linear sequence. Affects the manifest organisation and item ordering in the LMS.</p>
+              <div class="scorm-req-eg"><span>e.g.</span><code>navigation: "free"</code></div>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="scorm-req-note card" style="margin-top:1rem;">
+          <div class="scorm-req-note-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <p>All five must be defined. The packaging prompt explicitly checks for each one and stops with a clear error listing what is missing. Partial definitions are not used — the whole packaging stage is deferred until all five are present.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">imsmanifest.xml</p>
+          <h2>The manifest is the file that turns built content into a real SCORM package.</h2>
+          <p><code>imsmanifest.xml</code> is the package map for the LMS. It tells the LMS what the course is called, which file launches first, which items are SCOs, and which resources belong inside the package.</p>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card coverage-card">
+            <h3>What the manifest must contain</h3>
+            <ul class="fact-list">
+              <li>A package identifier and basic metadata.</li>
+              <li>An organisation structure showing the launch order or item hierarchy.</li>
+              <li>Resource entries that point to real built files such as HTML pages.</li>
+              <li>SCO or asset declarations that match the chosen tracking approach.</li>
+            </ul>
+          </article>
+
+          <article class="card coverage-card">
+            <h3>What this prototype already knows</h3>
+            <ul class="fact-list">
+              <li>The intended SCORM version should default to <code>1.2</code>.</li>
+              <li><code>&lt;HTML&gt;</code> blocks are the strongest candidates for launchable SCO content.</li>
+              <li><code>&lt;filename&gt;</code> gives the exact resource href the manifest would need.</li>
+              <li>Titles and content grouping can support human-readable item labels in the LMS.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="grid two-up" style="margin-top:1rem;">
+          <article class="card fact-card">
+            <p class="mini-label">Illustrative shape</p>
+            <pre class="code-block"><code>&lt;manifest identifier="course-package"&gt;
+  &lt;organizations default="course-org"&gt;
+    &lt;organization identifier="course-org"&gt;
+      &lt;item identifier="item-a1" identifierref="res-a1"&gt;
+        &lt;title&gt;Assessment 1&lt;/title&gt;
+      &lt;/item&gt;
+    &lt;/organization&gt;
+  &lt;/organizations&gt;
+  &lt;resources&gt;
+    &lt;resource identifier="res-a1" href="CP4807-A1.html" /&gt;
+  &lt;/resources&gt;
+&lt;/manifest&gt;</code></pre>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">Why one is not generated yet</p>
+            <ul class="fact-list">
+              <li>No real launch file has been designated and built for the package yet.</li>
+              <li>The final SCO structure is still undefined.</li>
+              <li>Tracking, completion, and navigation rules are not fully locked.</li>
+              <li>Not all learner-facing files exist yet, so the resource list would be incomplete.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="scorm-req-note card" style="margin-top:1rem;">
+          <div class="scorm-req-note-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <p>This project currently describes the manifest requirements, but it does not yet contain a real <code>imsmanifest.xml</code> file. The manifest can only be generated once the package structure and resource list are explicit and complete.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">SCORM Gap List</p>
+          <h2>Packaging is blocked for clear reasons, not because the pipeline is vague.</h2>
+        </div>
+
+        <div class="grid three-up">
+          <article class="card benefit-card light-card">
+            <h3>Missing decisions</h3>
+            <p>Version, launch structure, completion, tracking, and navigation still need to be defined.</p>
+          </article>
+          <article class="card benefit-card light-card">
+            <h3>Missing package parts</h3>
+            <p>No launch file and no manifest can be created yet from the current state.</p>
+          </article>
+          <article class="card benefit-card light-card">
+            <h3>Why that is good</h3>
+            <p>The process stops safely instead of claiming SCORM compliance too early.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

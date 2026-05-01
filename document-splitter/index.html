@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview | Course Build Prototype</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-shell wrap">
+      <a class="brand" href="index.html">Course Build Prototype</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a class="is-active" href="index.html" aria-current="page">Overview</a>
+        <a href="workflow.html">How it works</a>
+        <a href="backend.html">Under the hood</a>
+        <a href="upload.html">Upload prototype</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-dot-grid" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
+      <div class="wrap simple-hero">
+        <div class="simple-hero-copy">
+          <p class="eyebrow">What This Becomes</p>
+          <h1>One source document becomes checked outputs through a simple pipeline.</h1>
+          <p class="lede">
+            The prototype already shows the pattern: analyse the tagged source, extract the block,
+            build the output, validate it, then package for SCORM only when the missing decisions are defined.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="workflow.html">See the workflow</a>
+            <a class="button button-secondary" href="backend.html">See the technical proof</a>
+          </div>
+        </div>
+
+        <aside class="hero-pipeline-card">
+          <span class="pipeline-card-label">Pipeline — live prototype</span>
+          <svg viewBox="0 0 300 155" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-pipeline-svg" aria-label="Diagram: source DOCX feeds 32 tagged blocks through analysis into 2 built outputs">
+            <!-- Source document -->
+            <rect x="8" y="14" width="68" height="86" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+            <path d="M58 14 L76 30 H58 Z" fill="#bfdbfe"/>
+            <line x1="58" y1="14" x2="76" y2="30" stroke="#93c5fd" stroke-width="1.2"/>
+            <!-- Tagged block lines in document -->
+            <rect x="16" y="38" width="42" height="7" rx="3" fill="#3b82f6"/>
+            <rect x="16" y="50" width="32" height="5" rx="2.5" fill="#bfdbfe"/>
+            <rect x="16" y="60" width="42" height="7" rx="3" fill="#7c3aed" opacity="0.75"/>
+            <rect x="16" y="72" width="24" height="5" rx="2.5" fill="#ddd6fe"/>
+            <rect x="16" y="82" width="42" height="7" rx="3" fill="#059669" opacity="0.75"/>
+            <rect x="16" y="94" width="18" height="4" rx="2" fill="#d1fae5"/>
+            <text x="42" y="112" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">· · ·</text>
+            <text x="42" y="127" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui, sans-serif">Source DOCX</text>
+            <text x="42" y="140" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui, sans-serif">1 file</text>
+            <!-- Animated connector 1 -->
+            <line x1="80" y1="57" x2="112" y2="57" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
+              <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite"/>
+            </line>
+            <path d="M110 53 L118 57 L110 61" fill="#3b82f6"/>
+            <!-- Analysis box -->
+            <rect x="118" y="22" width="72" height="72" rx="8" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.5"/>
+            <rect x="126" y="31" width="56" height="10" rx="3" fill="#dbeafe"/>
+            <rect x="126" y="31" width="22" height="10" rx="3" fill="#3b82f6"/>
+            <rect x="126" y="45" width="56" height="10" rx="3" fill="#ede9fe"/>
+            <rect x="126" y="45" width="38" height="10" rx="3" fill="#7c3aed" opacity="0.8"/>
+            <rect x="126" y="59" width="56" height="10" rx="3" fill="#d1fae5"/>
+            <rect x="126" y="59" width="30" height="10" rx="3" fill="#059669" opacity="0.8"/>
+            <rect x="128" y="77" width="52" height="13" rx="6.5" fill="#2563eb"/>
+            <text x="154" y="87" text-anchor="middle" fill="white" font-size="8.5" font-weight="700" font-family="system-ui">32 blocks</text>
+            <text x="154" y="113" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui">Analysis</text>
+            <text x="154" y="126" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">tags classified</text>
+            <!-- Animated connector 2 -->
+            <line x1="194" y1="57" x2="224" y2="57" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
+              <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite" begin="0.6s"/>
+            </line>
+            <path d="M222 53 L230 57 L222 61" fill="#3b82f6"/>
+            <!-- HTML output -->
+            <rect x="232" y="12" width="60" height="48" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+            <path d="M272 12 L292 30 H272 Z" fill="#a7f3d0"/>
+            <text x="252" y="36" fill="#065f46" font-size="11" font-weight="700" font-family="monospace">&lt;/&gt;</text>
+            <text x="262" y="50" text-anchor="middle" fill="#6b7280" font-size="8.5" font-family="system-ui">H1.html</text>
+            <!-- DOC output -->
+            <rect x="232" y="70" width="60" height="48" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+            <path d="M272 70 L292 88 H272 Z" fill="#ddd6fe"/>
+            <text x="253" y="94" fill="#5b21b6" font-size="11" font-weight="700" font-family="monospace">DOC</text>
+            <text x="262" y="108" text-anchor="middle" fill="#6b7280" font-size="8.5" font-family="system-ui">1.html</text>
+            <text x="262" y="127" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui">Outputs</text>
+            <text x="262" y="140" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">2 built</text>
+          </svg>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="proof-ribbon">
+          <article class="proof-pill">
+            <div class="proof-num">1</div>
+            <strong>source</strong>
+            <span>One tagged DOCX drives the whole flow.</span>
+          </article>
+          <article class="proof-pill">
+            <div class="proof-num">32</div>
+            <strong>blocks found</strong>
+            <span>Found and classified during analysis.</span>
+          </article>
+          <article class="proof-pill">
+            <div class="proof-num">2</div>
+            <strong>files extracted</strong>
+            <span>Real block files already present in outputs/extracted/.</span>
+          </article>
+          <article class="proof-pill">
+            <div class="proof-num">2</div>
+            <strong>outputs built</strong>
+            <span>One learner HTML page and one prototype worksheet output built.</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="about-panel">
+          <article class="card about-card">
+            <div class="section-heading narrow-heading">
+              <p class="eyebrow">About</p>
+              <h2>What this project is.</h2>
+              <p>
+                The core idea is simple: one document, one set of rules, many outputs - generated by AI agents working through a defined set of stages.
+              </p>
+            </div>
+          </article>
+
+          <aside class="card about-visual">
+            <div class="about-graphic">
+              <div class="about-flow-line" aria-hidden="true"></div>
+
+              <div class="about-node about-node-graphic">
+                <div class="about-icon">1</div>
+                <strong>One document</strong>
+                <span>Word source</span>
+              </div>
+
+              <div class="about-node about-node-graphic">
+                <div class="about-icon">#</div>
+                <strong>Rules</strong>
+                <span>tags + filenames</span>
+              </div>
+
+              <div class="about-node about-node-graphic">
+                <div class="about-icon">*</div>
+                <strong>Many outputs</strong>
+                <span>HTML, worksheet, reports</span>
+              </div>
+            </div>
+
+            <div class="about-keyline">
+              <div><span class="about-dot"></span><span>Engineer prepares the source and definitions.</span></div>
+              <div><span class="about-dot"></span><span>AI agents handle the repeated transformation work.</span></div>
+              <div><span class="about-dot"></span><span>SCORM is added only when enough information exists.</span></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Example</p>
+          <h2>One source block becoming one output.</h2>
+          <p>Homework 1 is a real example already traced through the repo.</p>
+        </div>
+
+        <div class="visual-mini-flow">
+          <article class="visual-node">
+            <h3>Source block</h3>
+            <p>Tagged in the Word source as Homework 1.</p>
+            <span class="mono">CP4807-H1.html</span>
+          </article>
+          <article class="visual-node">
+            <h3>Extracted file</h3>
+            <p>Turned into clean text for the build stage.</p>
+            <span class="mono">outputs/extracted/CP4807-H1.txt</span>
+          </article>
+          <article class="visual-node">
+            <h3>Built result</h3>
+            <p>Rendered as a learner-facing homework page.</p>
+            <span class="mono">outputs/html/CP4807-H1.html</span>
+          </article>
+        </div>
+
+        <div class="grid three-up">
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Source block</span>
+              <span class="mono">Block 17</span>
+            </div>
+            <pre class="code-block"><code>&lt;HTML&gt;
+Homework 1
+&lt;filename&gt;"CP4807-H1.html"&lt;/filename&gt;
+
+Design a program that controls
+two sets of traffic lights
+at a junction.
+&lt;/HTML&gt;</code></pre>
+            <p class="support-copy">Tag type: HTML. Classification: Homework.</p>
+            <div class="card-actions">
+              <a class="mini-action" href="source/CP4807%20-%20Introduction%20to%20microcontrollers%2005%2004%2026.docx" target="_blank" rel="noopener noreferrer">Open source DOCX</a>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Extracted output</span>
+              <span class="mono">outputs/extracted/CP4807-H1.txt</span>
+            </div>
+            <pre class="code-block"><code>Homework 1
+Design a program that controls two sets
+of traffic lights at a junction.
+
+RED: 20 seconds
+AMBER: 3 seconds
+GREEN: 20 seconds</code></pre>
+            <p class="support-copy">The source block becomes plain extracted content ready for build.</p>
+            <div class="card-actions">
+              <a class="mini-action" href="outputs/extracted/CP4807-H1.txt" target="_blank" rel="noopener noreferrer">Open extract</a>
+              <a class="mini-action" href="outputs/extracted/CP4807-H1.txt" download>Download TXT</a>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Built result</span>
+              <span class="mono">outputs/html/CP4807-H1.html</span>
+            </div>
+            <div class="browser-frame">
+              <div class="browser-bar">
+                <span></span><span></span><span></span>
+                <div>outputs/html/CP4807-H1.html</div>
+              </div>
+              <div class="browser-body">
+                <span class="mini-label" style="color:var(--accent)">Homework 1 preview</span>
+                <h3>Traffic Light Junction</h3>
+                <p>Built as a learner page with worksheets covered, design brief, hardware mapping, and timing sequence.</p>
+                <div class="callout">Wrapper tags removed. Teacher notes excluded.</div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a class="mini-action" href="outputs/html/CP4807-H1.html" target="_blank" rel="noopener noreferrer">Open output</a>
+              <a class="mini-action" href="outputs/html/CP4807-H1.html" download>Download HTML</a>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid two-up" style="margin-top:1.1rem;">
+          <article class="card fact-card">
+            <p class="mini-label">Report proof</p>
+            <ul class="fact-list">
+              <li>Analysis report: 32 tagged blocks found.</li>
+              <li>Validation report: 2 of 28 learner outputs currently built.</li>
+            </ul>
+            <div class="card-actions">
+              <a class="mini-action" href="reports/analysis-report.md" target="_blank" rel="noopener noreferrer">Open analysis report</a>
+              <a class="mini-action" href="reports/validation-report.md" target="_blank" rel="noopener noreferrer">Open validation report</a>
+            </div>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">Destination</p>
+            <ul class="fact-list">
+              <li>Source tag: `<HTML>`</li>
+              <li>Built type: learner HTML</li>
+              <li>Folder: `outputs/html/`</li>
+            </ul>
+            <div class="card-actions">
+              <a class="mini-action" href="workflow.html">See the process</a>
+              <a class="mini-action" href="backend.html">See the proof page</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section scorm-explainer">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">About SCORM</p>
+          <h2>What SCORM is — and why it changes what is possible.</h2>
+        </div>
+
+        <div class="scorm-flow-banner card">
+          <div class="scorm-flow-copy">
+            <p class="scorm-flow-tagline">Create once.<br>Deliver anywhere.</p>
+            <p>SCORM makes digital learning portable. It is the standard that lets online courses work inside compatible learning platforms — so content can be launched, tracked, and reused across systems without rebuilding from scratch.</p>
+          </div>
+          <div class="scorm-flow-diagram">
+            <svg viewBox="0 0 340 112" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Flow: Word source document becomes a SCORM package which delivers to an LMS">
+              <!-- Word document -->
+              <rect x="4" y="10" width="64" height="80" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+              <path d="M52 10 L68 26 H52 Z" fill="#bfdbfe"/>
+              <line x1="52" y1="10" x2="68" y2="26" stroke="#93c5fd" stroke-width="1"/>
+              <rect x="13" y="33" width="38" height="6" rx="3" fill="#3b82f6"/>
+              <rect x="13" y="44" width="30" height="4" rx="2" fill="#bfdbfe"/>
+              <rect x="13" y="53" width="38" height="6" rx="3" fill="#7c3aed" opacity="0.6"/>
+              <rect x="13" y="64" width="22" height="4" rx="2" fill="#ddd6fe"/>
+              <rect x="13" y="73" width="34" height="6" rx="3" fill="#059669" opacity="0.6"/>
+              <text x="36" y="103" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600" font-family="system-ui">Word source</text>
+              <!-- Arrow 1 -->
+              <line x1="72" y1="50" x2="98" y2="50" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
+                <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite"/>
+              </line>
+              <path d="M96 46 L104 50 L96 54" fill="#3b82f6"/>
+              <!-- SCORM Package -->
+              <rect x="108" y="12" width="124" height="76" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+              <rect x="108" y="12" width="124" height="22" rx="8" fill="#7c3aed" opacity="0.18"/>
+              <rect x="108" y="26" width="124" height="8" fill="#7c3aed" opacity="0.18"/>
+              <text x="170" y="27" text-anchor="middle" fill="#5b21b6" font-size="9.5" font-weight="700" font-family="system-ui">SCORM Package</text>
+              <rect x="116" y="40" width="46" height="8" rx="3" fill="#ede9fe"/>
+              <text x="139" y="47.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">imsmanifest.xml</text>
+              <rect x="167" y="40" width="56" height="8" rx="3" fill="#ede9fe"/>
+              <text x="195" y="47.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">Content files</text>
+              <rect x="116" y="53" width="46" height="8" rx="3" fill="#ede9fe"/>
+              <text x="139" y="60.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">Metadata</text>
+              <rect x="167" y="53" width="56" height="8" rx="3" fill="#ede9fe"/>
+              <text x="195" y="60.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">Launch rules</text>
+              <rect x="116" y="66" width="107" height="16" rx="4" fill="#ddd6fe"/>
+              <text x="169" y="78" text-anchor="middle" fill="#5b21b6" font-size="8" font-weight="600" font-family="system-ui">SCO items + tracking rules</text>
+              <text x="170" y="103" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600" font-family="system-ui">SCORM package</text>
+              <!-- Arrow 2 -->
+              <line x1="236" y1="50" x2="262" y2="50" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4 3">
+                <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite" begin="0.6s"/>
+              </line>
+              <path d="M260 46 L268 50 L260 54" fill="#7c3aed"/>
+              <!-- LMS screen -->
+              <rect x="270" y="14" width="66" height="52" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+              <rect x="270" y="14" width="66" height="18" rx="6" fill="#6ee7b7" opacity="0.4"/>
+              <rect x="270" y="24" width="66" height="8" fill="#6ee7b7" opacity="0.4"/>
+              <text x="303" y="27" text-anchor="middle" fill="#065f46" font-size="9" font-weight="700" font-family="system-ui">LMS</text>
+              <rect x="280" y="38" width="46" height="5" rx="2.5" fill="#d1fae5"/>
+              <rect x="280" y="47" width="34" height="4" rx="2" fill="#d1fae5"/>
+              <rect x="280" y="55" width="40" height="4" rx="2" fill="#d1fae5"/>
+              <rect x="296" y="66" width="14" height="6" rx="1" fill="#a7f3d0"/>
+              <rect x="283" y="71" width="40" height="4" rx="2" fill="#a7f3d0" opacity="0.6"/>
+              <text x="303" y="103" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600" font-family="system-ui">LMS / platform</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="grid two-up scorm-concepts">
+          <article class="card scorm-card">
+            <div class="scorm-card-icon scorm-icon-blue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <h3>What SCORM is</h3>
+            <p>The standard that makes digital learning portable. SCORM lets online courses work inside compatible platforms so content can be launched, tracked, and reused more easily across systems.</p>
+            <div class="scorm-card-insight">One standard. Many compatible platforms.</div>
+          </article>
+
+          <article class="card scorm-card">
+            <div class="scorm-card-icon scorm-icon-purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>
+                <line x1="10" y1="12" x2="14" y2="12"/>
+              </svg>
+            </div>
+            <h3>What makes a SCORM package</h3>
+            <p>Great content is only part of the picture. A SCORM package also needs launch information, package metadata, and the rules that tell a learning platform how to handle the content.</p>
+            <div class="scorm-card-insight">Content + structure + rules = a real package.</div>
+          </article>
+
+          <article class="card scorm-card">
+            <div class="scorm-card-icon scorm-icon-green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M9.5 14.5 11 16l3.5-3.5"/>
+              </svg>
+            </div>
+            <h3>Why the source document is powerful</h3>
+            <p>A tagged Word source can become the starting point for multiple polished outputs — learner-facing pages, structured course assets — while also preparing the ground for SCORM packaging later on.</p>
+            <div class="scorm-card-insight">One source. Many possibilities.</div>
+          </article>
+
+          <article class="card scorm-card">
+            <div class="scorm-card-icon scorm-icon-amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </div>
+            <h3>Why the source is not SCORM on its own</h3>
+            <p>The Word file holds the content and intent. SCORM adds the delivery structure around it — so the content can be launched, organised, and tracked inside an LMS. One is the beginning, the other is the finished package.</p>
+            <div class="scorm-card-insight">Source = content. SCORM = content + delivery structure.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tint">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">SCORM Example</p>
+          <h2>Source tags driving SCORM-compliant manifest entries.</h2>
+          <p>Assessment 1 shows how the same tagging system that builds learner HTML also supplies the data the SCORM manifest requires.</p>
+        </div>
+
+        <div class="visual-mini-flow">
+          <article class="visual-node">
+            <h3>Source block</h3>
+            <p>Tagged in the Word source as Assessment 1.</p>
+            <span class="mono">CP4807-A1.htm</span>
+          </article>
+          <article class="visual-node">
+            <h3>Tag data read</h3>
+            <p>Type, filename, and classification extracted by the agent.</p>
+            <span class="mono">tag: HTML · class: assessment</span>
+          </article>
+          <article class="visual-node">
+            <h3>Manifest entry</h3>
+            <p>Tag data becomes a real imsmanifest.xml resource and SCO item.</p>
+            <span class="mono">imsmanifest.xml</span>
+          </article>
+        </div>
+
+        <div class="grid three-up">
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Source block</span>
+              <span class="mono">Block 26</span>
+            </div>
+            <pre class="code-block"><code>&lt;HTML&gt;
+Assessment 1
+&lt;filename&gt;"CP4807-A1.htm"&lt;/filename&gt;
+
+Traffic lights — in-classroom,
+supervised, built from scratch.
+&lt;/HTML&gt;</code></pre>
+            <p class="support-copy">Tag type: HTML. Classification: Assessment. These two facts are the only source of truth the manifest needs.</p>
+            <div class="card-actions">
+              <a class="mini-action" href="reports/analysis-report.md" target="_blank" rel="noopener noreferrer">See block in analysis report</a>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Tag data → SCORM decisions</span>
+              <span class="mono">agent reads</span>
+            </div>
+            <pre class="code-block"><code>tag:        &lt;HTML&gt;
+→ resource type: webcontent
+
+filename:   CP4807-A1.htm
+→ resource href: CP4807-A1.htm
+→ identifier: RES-CP4807-A1
+
+class:      assessment
+→ item type: sco
+→ mastery scope: required</code></pre>
+            <p class="support-copy">The tag, filename, and classification together are enough to populate the manifest without guessing.</p>
+            <div class="card-actions">
+              <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">See what is still missing</a>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="output-header">
+              <span class="tag">Manifest fragment</span>
+              <span class="mono">imsmanifest.xml</span>
+            </div>
+            <pre class="code-block"><code>&lt;item identifier="ITEM-A1"
+  identifierref="RES-CP4807-A1"&gt;
+  &lt;title&gt;Assessment 1:
+    Traffic Lights&lt;/title&gt;
+&lt;/item&gt;
+
+&lt;resource identifier="RES-CP4807-A1"
+  type="webcontent"
+  adlcp:scormType="sco"
+  href="CP4807-A1.htm" /&gt;</code></pre>
+            <p class="support-copy">Every value above comes directly from the source tags. Nothing is invented.</p>
+            <div class="card-actions">
+              <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">Open packaging report</a>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid two-up" style="margin-top:1.1rem;">
+          <article class="card fact-card">
+            <p class="mini-label">What the tags provide</p>
+            <ul class="fact-list">
+              <li><code>&lt;HTML&gt;</code> → resource type is webcontent, not a binary asset.</li>
+              <li><code>&lt;filename&gt;</code> → exact href and identifier, no guessing required.</li>
+              <li>Classification "assessment" → SCO type, so the LMS can track completion.</li>
+            </ul>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">What the tags cannot provide</p>
+            <ul class="fact-list">
+              <li>SCORM version defaults to 1.2 unless the target LMS specifically requires 2004.</li>
+              <li>Completion model — not derivable from content tags alone.</li>
+              <li>Navigation rules — free vs linear must be explicitly specified.</li>
+            </ul>
+            <div class="card-actions">
+              <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">See full gap list</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Example Outputs</p>
+          <h2>Three visible results explain the prototype.</h2>
+        </div>
+
+        <div class="grid three-up">
+          <article class="card showcase-card">
+            <div class="output-tile">
+              <span class="tag">Learner HTML</span>
+              <h3>CP4807-H1.html</h3>
+              <p>Homework 1 built as a real learner-facing page.</p>
+              <div class="card-actions">
+                <a class="mini-action" href="outputs/html/CP4807-H1.html" target="_blank" rel="noopener noreferrer">Pop out</a>
+              </div>
+            </div>
+            <div class="showcase-preview">
+              <div class="mini-browser">
+                <div class="mini-browser-top">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="mini-browser-body">
+                  <h4>Traffic Light Junction</h4>
+                  <p>Worksheets covered, design brief, hardware mapping, timing sequence.</p>
+                  <div class="mini-chip-row">
+                    <span class="mini-chip">brief</span>
+                    <span class="mini-chip">hardware</span>
+                    <span class="mini-chip">timing</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card showcase-card">
+            <div class="output-tile">
+              <span class="tag">Prototype worksheet output</span>
+              <h3>CP4807-1.html</h3>
+              <p>Worksheet 1 shown here as the prototype output representing the worksheet build.</p>
+              <div class="card-actions">
+                <a class="mini-action" href="outputs/docx/CP4807-1.html" target="_blank" rel="noopener noreferrer">Pop out</a>
+              </div>
+            </div>
+            <div class="showcase-preview">
+              <div class="mini-doc-sheet">
+                <h4>Worksheet 1</h4>
+                <p>OUTPUT, LOOP, DELAY, video reference, challenge list, hints.</p>
+                <div class="mini-doc-points">
+                  <div><span class="doc-bullet"></span><span>Output task steps</span></div>
+                  <div><span class="doc-bullet"></span><span>Loop and delay prompts</span></div>
+                  <div><span class="doc-bullet"></span><span>Video reference</span></div>
+                  <div><span class="doc-bullet"></span><span>Challenge and hints</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card showcase-card">
+            <div class="output-tile">
+              <span class="tag">SCORM readiness</span>
+              <h3>Packaging blocked safely</h3>
+              <p>Packaging waits until the missing launch, version, tracking, completion, and navigation decisions are defined.</p>
+              <div class="card-actions">
+                <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">Open packaging report</a>
+              </div>
+            </div>
+            <div class="showcase-preview">
+              <div class="mini-report-sheet">
+                <h4>SCORM readiness</h4>
+                <p>Blocked safely until version, launch, tracking, completion, and navigation are defined.</p>
+                <div class="mini-report-points">
+                  <div><span class="report-dot ok"></span><span>Tag structure available</span></div>
+                  <div><span class="report-dot warn"></span><span>Launch file not defined</span></div>
+                  <div><span class="report-dot warn"></span><span>Completion model missing</span></div>
+                  <div><span class="report-dot warn"></span><span>Navigation rules missing</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Original Goal</p>
+          <h2>Use one master DOCX as the source for multiple generated outputs.</h2>
+          <p>The homepage shows that goal with a visible example instead of just describing it.</p>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card quote-card">
+            <span class="mini-label">Project rule</span>
+            <blockquote>This project uses one master DOCX file as the source for multiple generated outputs.</blockquote>
+            <div class="card-actions">
+              <a class="mini-action" href="backend.html">See evidence</a>
+            </div>
+          </article>
+
+          <article class="card fact-card">
+            <p class="mini-label">Real source context</p>
+            <div class="goal-map">
+              <div class="goal-row">
+                <span class="goal-label">Source</span>
+                <div class="goal-bar">`source/CP4807 - Introduction to microcontrollers 05 04 26.docx`</div>
+              </div>
+              <div class="goal-row">
+                <span class="goal-label">Extract</span>
+                <div class="goal-bar">`outputs/extracted/CP4807-H1.txt`</div>
+              </div>
+              <div class="goal-row">
+                <span class="goal-label">Build</span>
+                <div class="goal-bar">`outputs/html/CP4807-H1.html` and `outputs/docx/CP4807-1.html`</div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a class="mini-action" href="outputs/extracted/CP4807-H1.txt" target="_blank" rel="noopener noreferrer">Open extract</a>
+              <a class="mini-action" href="outputs/html/CP4807-H1.html" target="_blank" rel="noopener noreferrer">Open built page</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Why This Is Useful</p>
+          <h2>It turns one messy authoring source into something visible, trackable, and safer to ship.</h2>
+        </div>
+
+        <div class="benefit-band card">
+          <div class="benefit-band-copy">
+            <span class="mini-label">The practical value</span>
+            <h3>John does not have to trust a black box.</h3>
+            <p>He can see the source, the extracted file, the built result, and the SCORM status as one connected chain.</p>
+          </div>
+          <div class="benefit-chain" aria-label="Source to status chain">
+            <div class="benefit-node">
+              <strong>Source</strong>
+              <span>Word block</span>
+            </div>
+            <div class="benefit-arrow">-></div>
+            <div class="benefit-node">
+              <strong>Build</strong>
+              <span>HTML or worksheet</span>
+            </div>
+            <div class="benefit-arrow">-></div>
+            <div class="benefit-node">
+              <strong>Status</strong>
+              <span>validated or blocked</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid three-up benefit-grid">
+          <article class="card benefit-card benefit-card-strong">
+            <div class="benefit-icon">01</div>
+            <h3>Clear proof</h3>
+            <p>The same page shows the source snippet, extracted file, built output, and packaging status together.</p>
+            <div class="benefit-detail">No hand-waving. No hidden processing.</div>
+          </article>
+          <article class="card benefit-card benefit-card-strong">
+            <div class="benefit-icon">02</div>
+            <h3>Less manual rework</h3>
+            <p>One structured source can drive learner HTML, worksheet-style outputs, reports, and later packaging decisions.</p>
+            <div class="benefit-detail">Change the source once, then rebuild from there.</div>
+          </article>
+          <article class="card benefit-card benefit-card-strong">
+            <div class="benefit-icon">03</div>
+            <h3>Safer SCORM path</h3>
+            <p>The prototype shows what can be automated now and what still needs an explicit human decision before packaging.</p>
+            <div class="benefit-detail">Blocked safely is better than guessed badly.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark">
+      <div class="wrap">
+        <div class="section-heading narrow-heading">
+          <p class="eyebrow">Next</p>
+          <h2>Go deeper only if needed.</h2>
+        </div>
+
+        <div class="grid link-grid">
+          <a class="card link-card" href="workflow.html">
+            <span class="mini-label">Page 2</span>
+            <h3>How it works</h3>
+            <p>See the simple stage-by-stage process.</p>
+          </a>
+          <a class="card link-card" href="backend.html">
+            <span class="mini-label">Page 3</span>
+            <h3>Under the hood</h3>
+            <p>See the reports, repo structure, warnings, and SCORM gaps.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
