@@ -80,6 +80,16 @@ mediaInput.addEventListener("change", (event) => {
 attachDropzone(dropzone, handleSourceFile);
 attachDropzone(mediaDropzone, handleMediaFile);
 
+document.getElementById("heroStartBtn").addEventListener("click", () => fileInput.click());
+
+// Collapsible panel toggle (event delegation)
+document.addEventListener("click", (e) => {
+  const head = e.target.closest(".panel-toggle");
+  if (!head) return;
+  const panel = head.closest("[data-collapsible]");
+  if (panel) panel.classList.toggle("is-collapsed");
+});
+
 buildAllBtn.addEventListener("click", async () => {
   if (!currentAnalysis) return;
   buildAllBtn.disabled = true;
@@ -606,11 +616,13 @@ function analyzeScorm(text, blocks) {
     { label: "Tracking model",         ok: /tracking|suspend_data|bookmark|progress/i.test(text),                  missing: "Define what learner progress should be tracked." },
     { label: "Navigation / sequencing",ok: /sequencing|navigation|next|previous/i.test(text),                     missing: "Define learner navigation and sequencing rules." }
   ];
+  const hasScormContent = lower.includes("scorm");
   const ready = checks.every((item) => item.ok) && blocks.some((block) => block.filename);
   return {
     checks,
     ready,
-    summary: ready ? "This prototype found the main decisions needed for packaging, but a real build would still need package validation." : lower.includes("scorm") ? "Some SCORM-related notes were found, but important packaging decisions are still missing." : "No clear SCORM specification was found in the uploaded document."
+    hasScormContent,
+    summary: ready ? "This prototype found the main decisions needed for packaging, but a real build would still need package validation." : hasScormContent ? "Some SCORM-related notes were found, but important packaging decisions are still missing." : "No SCORM specification found in this document."
   };
 }
 
@@ -1030,19 +1042,24 @@ function renderAnalysisReport(analysis, allWarnings) {
   analysisReport.innerHTML = `
     <div class="ar-header">
       <div class="ar-status-icon ${iconClass}">${iconSvg}</div>
-      <div>
+      <div style="flex:1">
         <p class="ar-title">${escapeHtml(titleText)}</p>
         <p class="ar-subtitle">${escapeHtml(subtitleText)}</p>
       </div>
+      <button id="resultsBundleBtn" class="action-button build-btn" type="button" style="flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Full Bundle
+      </button>
     </div>
     <div class="ar-stats">
       ${stats.map((s) => `<div class="ar-stat"><div class="ar-stat-value ${s.cls}">${s.value}</div><div class="ar-stat-label">${escapeHtml(s.label)}</div></div>`).join("")}
     </div>
     <p class="ar-hint">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-      Scroll down to see blocks, outputs, warnings, and media detail
+      Expand any section below to see detail
     </p>
   `;
+  document.getElementById("resultsBundleBtn")?.addEventListener("click", () => ctaBundleBtn.click());
 }
 
 function renderBlocks(blocks) {
@@ -1105,10 +1122,16 @@ function renderOutputs(blocks) {
 }
 
 function renderScorm(scorm) {
-  scormStatus.textContent = scorm.ready ? "Potentially packageable" : "Not ready";
+  if (!scorm.hasScormContent) {
+    scormStatus.textContent = "Not applicable";
+    scormPanel.className = "empty-state";
+    scormPanel.innerHTML = `<div class="empty-state-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>No SCORM specification found in this document. If you need SCORM packaging, add version, launch file, tracking, and completion notes to the source.`;
+    return;
+  }
+  scormStatus.textContent = scorm.ready ? "Potentially packageable" : "Incomplete";
   scormPanel.className = "scorm-grid";
   scormPanel.innerHTML = `
-    <div class="status-banner" style="grid-column: 1 / -1;"><strong>${escapeHtml(scorm.summary)}</strong>This prototype highlights missing decisions. It does not claim SCORM compliance.</div>
+    <div class="status-banner" style="grid-column: 1 / -1;"><strong>${escapeHtml(scorm.summary)}</strong>This tool highlights present signals and missing decisions. It does not produce a validated SCORM package.</div>
     ${scorm.checks.map((item) => `<article class="scorm-card"><div class="block-top"><h3>${escapeHtml(item.label)}</h3><span class="mini-tag ${item.ok ? "success" : "warn"}">${item.ok ? "Found" : "Missing"}</span></div><p>${item.ok ? "Relevant wording or signals were found in the uploaded document." : escapeHtml(item.missing)}</p></article>`).join("")}
   `;
 }
@@ -1153,39 +1176,53 @@ function renderMediaPanel(analysis) {
 
 function renderWarnings(primaryWarnings, extraWarnings) {
   const allWarnings = dedupeWarnings([...primaryWarnings, ...extraWarnings]);
+  const warningsPanel = document.getElementById("warningsPanel");
   warningsCount.textContent = `${allWarnings.length} warning${allWarnings.length === 1 ? "" : "s"}`;
   if (!allWarnings.length) {
-    warningsList.className = "empty-state";
-    warningsList.innerHTML = "No obvious problems were detected.";
+    if (warningsPanel) warningsPanel.hidden = true;
+    warningsList.innerHTML = "";
     return;
   }
-  warningsList.className = "warning-list";
-  warningsList.innerHTML = allWarnings.map((warning) => `<article class="warning-card ${warning.level}"><div class="block-top"><h3>${escapeHtml(warning.title)}</h3><span class="mini-tag ${warning.level === "danger" ? "danger" : "warn"}">${warning.level === "danger" ? "Error" : "Warning"}</span></div><p>${escapeHtml(warning.detail)}</p></article>`).join("");
+  if (warningsPanel) warningsPanel.hidden = false;
+  warningsList.innerHTML = allWarnings.map((w) => `
+    <div class="warn-row">
+      <span class="mini-tag ${w.level === "danger" ? "danger" : "warn"}">${w.level === "danger" ? "Error" : "Warning"}</span>
+      <div class="warn-row-text">
+        <strong>${escapeHtml(w.title)}</strong>
+        <span>${escapeHtml(w.detail)}</span>
+      </div>
+    </div>`).join("");
 }
 
 function renderGeneratedOutputs(files) {
-  generatedPanel.hidden = false;
   generatedCount.textContent = `${files.length} file${files.length === 1 ? "" : "s"}`;
   if (!files.length) {
-    generatedList.className = "empty-state";
-    generatedList.textContent = "No output files were generated from this source.";
+    generatedList.innerHTML = `<p style="color:var(--muted);font-size:0.85rem;margin:0">No output files were generated from this source.</p>`;
     return;
   }
-  generatedList.className = "generated-list";
-  generatedList.innerHTML = files.map((file) => `<article class="generated-card"><div class="generated-card-top"><div><h3>${escapeHtml(file.filename)}</h3><p>${escapeHtml(file.outputLabel)}</p></div><a class="download-link" href="${escapeHtml(file.url)}" download="${escapeHtml(file.filename)}">Download</a></div><div class="meta-grid"><div class="meta-box"><strong>Source block</strong><div>${escapeHtml(file.tagType)}</div></div><div class="meta-box"><strong>Status</strong><div>${escapeHtml(file.status)}</div></div></div></article>`).join("");
+  const fileIconHtml = (tagType) => tagType.toLowerCase() === "html"
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  generatedList.innerHTML = files.map((file) => `
+    <div class="file-row">
+      <div class="file-row-left">
+        ${fileIconHtml(file.tagType)}
+        <div>
+          <div class="file-row-name">${escapeHtml(file.filename)}</div>
+          <div class="file-row-type">${escapeHtml(file.outputLabel)}</div>
+        </div>
+      </div>
+      <a class="download-link" href="${escapeHtml(file.url)}" download="${escapeHtml(file.filename)}">Download</a>
+    </div>`).join("");
 }
 
 function renderError(message) {
   previewStatus.textContent = "Upload failed";
   previewBox.className = "empty-state";
   previewBox.textContent = message;
-  blocksList.className = "empty-state";
   blocksList.textContent = "No blocks available.";
-  outputsList.className = "empty-state";
   outputsList.textContent = "No outputs available.";
-  scormPanel.className = "empty-state";
   scormPanel.textContent = "SCORM readiness could not be assessed.";
-  mediaList.className = "empty-state";
   mediaList.textContent = currentMediaBundle.length ? "Media ZIP is loaded. Upload a valid source document to match explicit media tags." : "Upload a source document and optional media ZIP to inspect explicit media references.";
   renderWarnings([{ level: "danger", title: "File could not be processed", detail: message }], []);
 }
@@ -1370,6 +1407,9 @@ function resetSourceState() {
   ctaBundleBtn.disabled   = true;
   resultsArea.hidden      = true;
 
+  // Re-collapse all detail panels
+  document.querySelectorAll("[data-collapsible]").forEach((p) => p.classList.add("is-collapsed"));
+
   blocksCount.textContent  = "0 blocks";
   outputsCount.textContent = "0 outputs";
   warningsCount.textContent = "0 warnings";
@@ -1384,10 +1424,10 @@ function resetSourceState() {
   outputsList.textContent  = "Proposed outputs will appear here after tags and filenames are detected.";
   scormPanel.className     = "empty-state";
   scormPanel.textContent   = "Upload a source document to inspect SCORM-related notes and missing decisions.";
-  warningsList.className   = "empty-state";
-  warningsList.textContent = "No warnings yet.";
-  generatedList.className  = "empty-state";
-  generatedList.textContent = "No output files generated yet.";
+  warningsList.innerHTML   = "";
+  const warningsPanel = document.getElementById("warningsPanel");
+  if (warningsPanel) warningsPanel.hidden = true;
+  generatedList.innerHTML  = "";
   generatedCount.textContent = "0 files";
   fileMeta.innerHTML       = "<span>No source file loaded yet.</span>";
   renderMediaPanel(null);

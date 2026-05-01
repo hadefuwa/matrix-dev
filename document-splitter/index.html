@@ -66,7 +66,7 @@
     }
 
     /* ─── Layout ─── */
-    .wrap { width: min(1220px, calc(100% - 2.5rem)); margin: 0 auto; }
+    .wrap { width: calc(100% - 2.5rem); margin: 0 auto; }
     main.wrap { padding-top: 1rem; }
 
     /* ─── Header ─── */
@@ -694,7 +694,7 @@
     .ar-hint { margin-top: 0.85rem; font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; }
 
     /* ── Upload area (standalone, centred) ── */
-    .upload-area { max-width: 900px; margin: 0 auto 1.5rem; }
+    .upload-area { margin: 0 0 1.5rem; }
 
     /* ── Build CTA ── */
     .build-cta {
@@ -738,6 +738,43 @@
     #resultsArea[hidden] { display: none; }
     .detail-label { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0.25rem 0 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
     .detail-label::before, .detail-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+    /* ── File rows (generated outputs) ── */
+    .file-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid var(--line); }
+    .file-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .file-row:first-child { padding-top: 0; }
+    .file-row-left { display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
+    .file-row-name { font-weight: 600; font-size: 0.88rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-row-type { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* ── Warning rows ── */
+    .warn-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
+    .warn-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .warn-row:first-child { padding-top: 0; }
+    .warn-row-text strong { display: block; color: var(--ink); margin-bottom: 0.1rem; }
+    .warn-row-text span { color: var(--ink-2); line-height: 1.5; }
+    .warn-row .mini-tag { flex-shrink: 0; margin-top: 0.1rem; }
+
+    /* ── Technical detail accordion ── */
+    .tech-detail { margin-top: 0.5rem; }
+    .tech-detail-summary { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); list-style: none; padding: 0.5rem 0; user-select: none; }
+    .tech-detail-summary::-webkit-details-marker { display: none; }
+    .tech-detail-summary svg { transition: transform 200ms ease; }
+    .tech-detail[open] .tech-detail-summary svg { transform: rotate(0deg); }
+    .tech-detail:not([open]) .tech-detail-summary svg { transform: rotate(-90deg); }
+    .warnings-panel[hidden] { display: none; }
+
+    /* ── Collapsible panels ── */
+    [data-collapsible] .panel-head { cursor: pointer; user-select: none; }
+    [data-collapsible] .panel-head:hover { opacity: 0.85; }
+    .panel-chevron { color: var(--muted); flex-shrink: 0; transition: transform 200ms ease; }
+    .is-collapsed .panel-chevron { transform: rotate(-90deg); }
+    .is-collapsed .panel-head { margin-bottom: 0; }
+    .is-collapsed .panel-body { display: none; }
+    .panel-body { /* no extra styles needed */ }
+
+    /* ── Download bundle button in results ── */
+    .results-download-row { display: flex; justify-content: flex-end; margin-bottom: 1rem; }
 
     /* ── Generated panel ── */
     .generated-panel { margin-bottom: 1.25rem; }
@@ -825,7 +862,7 @@
       .hero { padding: 2rem 1.5rem; }
     }
     @media (max-width: 720px) {
-      .wrap { width: calc(100% - 1.5rem); }
+      .wrap { width: calc(100% - 1rem); }
       .brand-row { border-radius: 18px; padding: 0.65rem 1rem 0.65rem 1.2rem; }
       .brand-sub { display: none; }
       .hero-copy { padding: 1.2rem 0; }
@@ -895,10 +932,10 @@
           </div>
 
           <div class="cta-row">
-            <a class="btn btn-primary" href="#tool">
+            <button class="btn btn-primary" id="heroStartBtn" type="button">
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Start splitting
-            </a>
+            </button>
             <a class="btn btn-ghost" href="source/CP4807 - Introduction to microcontrollers 05 04 26.docx" download="Example Source Document.docx">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3v7M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Example Source Document
@@ -1054,7 +1091,7 @@
         <!-- Quick report -->
         <section class="panel analysis-report-panel" id="analysisReport"></section>
 
-        <!-- Generated outputs -->
+        <!-- Generated outputs: simple download list -->
         <section class="panel generated-panel" id="generatedPanel">
           <div class="panel-head">
             <div class="panel-title-row">
@@ -1063,163 +1100,118 @@
               </div>
               <div>
                 <h2>Generated outputs</h2>
-                <p>Download individually or use the Full Bundle button above for a SCORM-ready ZIP</p>
+                <p>Download files individually or use the Full Bundle button above</p>
               </div>
             </div>
             <span class="pill ok" id="generatedCount">0 files</span>
           </div>
-          <div id="generatedList" class="empty-state">
-            <div class="empty-state-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            </div>
-            No output files generated yet.
-          </div>
+          <div id="generatedList"></div>
         </section>
 
-        <!-- Detail panels -->
-        <p class="detail-label">Detail</p>
-        <div class="main-grid">
-
-          <div class="stack">
-
-            <!-- Detected blocks -->
-            <section class="panel">
-              <div class="panel-head">
-                <div class="panel-title-row">
-                  <div class="panel-icon blue">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                  </div>
-                  <div>
-                    <h2>Detected blocks</h2>
-                    <p>Tagged blocks in source order</p>
-                  </div>
-                </div>
-                <span class="pill" id="blocksCount">0 blocks</span>
+        <!-- Warnings: only shown when there are issues -->
+        <section class="panel warnings-panel" id="warningsPanel" hidden>
+          <div class="panel-head">
+            <div class="panel-title-row">
+              <div class="panel-icon amber">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               </div>
-              <div id="blocksList" class="empty-state">
-                <div class="empty-state-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                </div>
-                Blocks will appear here after building. Detected tag types: <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, <code>&lt;document&gt;</code>.
+              <div>
+                <h2>Errors &amp; warnings</h2>
+                <p>Issues found in the source document</p>
               </div>
-            </section>
-
-            <!-- Document preview -->
-            <section class="panel">
-              <div class="panel-head">
-                <div class="panel-title-row">
-                  <div class="panel-icon blue">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </div>
-                  <div>
-                    <h2>Document preview</h2>
-                    <p>Readable text extracted from the uploaded Word file</p>
-                  </div>
-                </div>
-                <span class="pill" id="previewStatus">Waiting</span>
-              </div>
-              <div id="previewBox" class="empty-state">
-                <div class="empty-state-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </div>
-                Upload a tagged <code>.docx</code> to preview the extracted text here.
-              </div>
-            </section>
-
+            </div>
+            <span class="pill warn" id="warningsCount">0 warnings</span>
           </div>
+          <div id="warningsList"></div>
+        </section>
 
-          <div class="stack">
+        <!-- Technical detail: everything else, hidden by default -->
+        <details class="tech-detail">
+          <summary class="tech-detail-summary">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            Technical detail
+          </summary>
+          <div class="main-grid" style="margin-top:1rem;">
 
-            <!-- Outputs -->
-            <section class="panel">
-              <div class="panel-head">
-                <div class="panel-title-row">
-                  <div class="panel-icon teal">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  </div>
-                  <div>
-                    <h2>Outputs</h2>
-                    <p>Files built from valid tagged blocks</p>
-                  </div>
-                </div>
-                <span class="pill" id="outputsCount">0 outputs</span>
-              </div>
-              <div id="outputsList" class="empty-state">
-                <div class="empty-state-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
-                </div>
-                Output files will appear here after blocks with valid filenames are detected.
-              </div>
-            </section>
+            <div class="stack">
 
-            <!-- Warnings -->
-            <section class="panel">
-              <div class="panel-head">
-                <div class="panel-title-row">
-                  <div class="panel-icon amber">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <section class="panel is-collapsed" data-collapsible>
+                <div class="panel-head panel-toggle">
+                  <div class="panel-title-row">
+                    <div class="panel-icon blue"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+                    <div><h2>Detected blocks</h2><p>Tagged blocks in source order</p></div>
                   </div>
-                  <div>
-                    <h2>Errors &amp; warnings</h2>
-                    <p>Missing filenames, malformed tags, and file errors</p>
+                  <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;">
+                    <span class="pill" id="blocksCount">0 blocks</span>
+                    <svg class="panel-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
-                <span class="pill" id="warningsCount">0 warnings</span>
-              </div>
-              <div id="warningsList" class="empty-state">
-                <div class="empty-state-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                </div>
-                No warnings yet. Errors and tag issues will appear here.
-              </div>
-            </section>
+                <div class="panel-body"><div id="blocksList" class="empty-state">Blocks will appear here after building.</div></div>
+              </section>
 
-            <!-- Media -->
-            <section class="panel">
-              <div class="panel-head">
-                <div class="panel-title-row">
-                  <div class="panel-icon teal">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <section class="panel is-collapsed" data-collapsible>
+                <div class="panel-head panel-toggle">
+                  <div class="panel-title-row">
+                    <div class="panel-icon blue"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                    <div><h2>Document preview</h2><p>Readable text from the source file</p></div>
                   </div>
-                  <div>
-                    <h2>Media</h2>
-                    <p>Tags in source matched against uploaded ZIP</p>
+                  <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;">
+                    <span class="pill" id="previewStatus">Waiting</span>
+                    <svg class="panel-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
-                <span class="pill" id="mediaCount">0 references</span>
-              </div>
-              <div id="mediaList" class="empty-state">
-                <div class="empty-state-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                </div>
-                Upload a source document and optional media ZIP to inspect media references.
-              </div>
-            </section>
+                <div class="panel-body"><div id="previewBox" class="empty-state">Upload a tagged <code>.docx</code> to preview text here.</div></div>
+              </section>
 
-            <!-- SCORM -->
-            <section class="panel">
-              <div class="panel-head">
-                <div class="panel-title-row">
-                  <div class="panel-icon purple">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                  </div>
-                  <div>
-                    <h2>SCORM readiness</h2>
-                    <p>Present signals and missing packaging decisions</p>
-                  </div>
-                </div>
-                <span class="pill" id="scormStatus">Not assessed</span>
-              </div>
-              <div id="scormPanel" class="empty-state">
-                <div class="empty-state-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                </div>
-                SCORM readiness will be assessed once a source document is uploaded.
-              </div>
-            </section>
+            </div>
 
+            <div class="stack">
+
+              <section class="panel is-collapsed" data-collapsible>
+                <div class="panel-head panel-toggle">
+                  <div class="panel-title-row">
+                    <div class="panel-icon teal"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                    <div><h2>Output detail</h2><p>Files and destinations per block</p></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;">
+                    <span class="pill" id="outputsCount">0 outputs</span>
+                    <svg class="panel-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                <div class="panel-body"><div id="outputsList" class="empty-state">Output detail will appear here.</div></div>
+              </section>
+
+              <section class="panel is-collapsed" data-collapsible>
+                <div class="panel-head panel-toggle">
+                  <div class="panel-title-row">
+                    <div class="panel-icon teal"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                    <div><h2>Media</h2><p>Tags matched against uploaded ZIP</p></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;">
+                    <span class="pill" id="mediaCount">0 references</span>
+                    <svg class="panel-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                <div class="panel-body"><div id="mediaList" class="empty-state">Upload a source document and optional media ZIP.</div></div>
+              </section>
+
+              <section class="panel is-collapsed" data-collapsible>
+                <div class="panel-head panel-toggle">
+                  <div class="panel-title-row">
+                    <div class="panel-icon purple"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+                    <div><h2>SCORM readiness</h2><p>Packaging signals in source document</p></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;">
+                    <span class="pill" id="scormStatus">Not assessed</span>
+                    <svg class="panel-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                <div class="panel-body"><div id="scormPanel" class="empty-state">SCORM readiness will be assessed once a document is uploaded.</div></div>
+              </section>
+
+            </div>
           </div>
-        </div>
+        </details>
 
       </div><!-- #resultsArea -->
 
