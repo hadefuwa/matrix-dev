@@ -1208,7 +1208,6 @@ function renderGeneratedOutputs(files) {
           <div class="file-row-type">${escapeHtml(file.outputLabel)}</div>
         </div>
       </div>
-      <a class="download-link" href="${escapeHtml(file.url)}" download="${escapeHtml(file.filename)}">Download</a>
     </div>`).join("");
 }
 
