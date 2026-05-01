@@ -3,44 +3,523 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview | Course Build Prototype</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Document Splitter</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg: #eef4ff;
+      --panel: #ffffff;
+      --ink: #10213f;
+      --muted: #597096;
+      --line: #c9d6f2;
+      --accent: #2b5be4;
+      --accent-soft: #dce7ff;
+      --success: #11795d;
+      --success-soft: #dcf8ee;
+      --warn: #a55a00;
+      --warn-soft: #fff0da;
+      --danger: #a52828;
+      --danger-soft: #ffe3e3;
+      --shadow: 0 18px 40px rgba(28, 53, 109, 0.12);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, #fdf7ea 0, rgba(253,247,234,0.7) 24%, transparent 48%),
+        linear-gradient(180deg, #eff5ff 0%, #e7efff 100%);
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #edf3ff;
+      border: 1px solid #d7e2fb;
+      border-radius: 8px;
+      padding: 0.12rem 0.42rem;
+      font-size: 0.92em;
+    }
+
+    .wrap { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; }
+
+    /* Header */
+    .site-header { padding: 1rem 0 0; }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(201,214,242,0.8);
+      border-radius: 999px;
+      padding: 0.75rem 1.25rem;
+      backdrop-filter: blur(18px);
+    }
+    .brand { font-weight: 800; letter-spacing: 0.02em; text-decoration: none; font-size: 1rem; }
+    .brand-tag {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* Hero */
+    .hero { padding: 2rem 0 1.4rem; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 1.3rem;
+      align-items: stretch;
+    }
+    .hero-copy,
+    .hero-side,
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(201,214,242,0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-copy {
+      padding: 1.8rem;
+      background:
+        linear-gradient(135deg, rgba(43,91,228,0.07), rgba(17,121,93,0.03)),
+        var(--panel);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      margin: 0 0 0.85rem;
+    }
+    h1, h2, h3, h4, p { margin-top: 0; }
+    h1 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      line-height: 1.05;
+      margin-bottom: 0.85rem;
+      max-width: 16ch;
+    }
+    .lede {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 60ch;
+      margin-bottom: 1.1rem;
+    }
+    .hero-flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-top: 1.25rem;
+      margin-bottom: 1.4rem;
+    }
+    .flow-chip {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid #d5e1fb;
+      background: #f8fbff;
+    }
+    .flow-chip strong { display: block; font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .flow-chip span { display: block; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+
+    .hero-side {
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .pipeline-card-label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .hero-pipeline-svg { width: 100%; height: auto; display: block; }
+
+    .button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.92rem 1.4rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+    }
+    .button-primary {
+      background: linear-gradient(135deg, #2b5be4, #3d77ff);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(43,91,228,0.22);
+    }
+    .button-secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid #cddafb;
+    }
+
+    /* Tool panels */
+    .tool-section { padding-bottom: 3rem; }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.2rem;
+      padding-bottom: 1.2rem;
+    }
+    .stack { display: grid; gap: 1.2rem; }
+    .panel { padding: 1.35rem; }
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .section-head p { color: var(--muted); max-width: 58ch; margin-bottom: 0; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: #f2f6ff;
+      border: 1px solid #d6e1fb;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .dropzone {
+      position: relative;
+      border: 1.5px dashed #aec3f7;
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(220,231,255,0.55), rgba(255,255,255,0.95)),
+        #fff;
+      padding: 1.35rem;
+      transition: 180ms ease;
+    }
+    .dropzone.is-dragover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 18px 28px rgba(43,91,228,0.13);
+    }
+    .dropzone h3 { margin-bottom: 0.45rem; }
+    .dropzone p { color: var(--muted); line-height: 1.6; margin-bottom: 1rem; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .button-sm {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.75rem 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .button-sm.primary {
+      background: linear-gradient(135deg, #2b5be4, #3d77ff);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(43,91,228,0.2);
+    }
+    .button-sm.secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid #cddafb;
+    }
+    .file-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .preview-box,
+    .warning-list,
+    .empty-state,
+    .output-list,
+    .block-list,
+    .scorm-grid,
+    .media-list {
+      display: grid;
+      gap: 0.9rem;
+    }
+    .preview-box {
+      max-height: 480px;
+      overflow: auto;
+      padding: 1rem;
+      background: #fbfdff;
+      border: 1px solid #dce6fb;
+      border-radius: 18px;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      color: #243a62;
+    }
+    .empty-state {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px dashed #c5d6f8;
+      background: #f8fbff;
+      color: var(--muted);
+    }
+    .block-card,
+    .output-card,
+    .scorm-card,
+    .warning-card,
+    .media-card {
+      border: 1px solid #d8e3fb;
+      background: #fbfdff;
+      border-radius: 18px;
+      padding: 1rem;
+    }
+    .block-top,
+    .output-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+    .block-meta,
+    .output-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+    .mini-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.34rem 0.68rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .mini-tag.success { background: var(--success-soft); color: var(--success); }
+    .mini-tag.warn { background: var(--warn-soft); color: var(--warn); }
+    .mini-tag.danger { background: var(--danger-soft); color: var(--danger); }
+    .excerpt {
+      background: #fff;
+      border: 1px solid #e0e8fb;
+      border-radius: 14px;
+      padding: 0.9rem;
+      line-height: 1.65;
+      color: #243a62;
+      white-space: pre-wrap;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.9rem;
+    }
+    .meta-box {
+      background: #fff;
+      border: 1px solid #e0e8fb;
+      border-radius: 14px;
+      padding: 0.8rem;
+    }
+    .meta-box strong {
+      display: block;
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.28rem;
+    }
+    .scorm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .scorm-card p,
+    .warning-card p,
+    .output-card p,
+    .block-card p,
+    .media-card p { color: var(--muted); line-height: 1.55; margin-bottom: 0; }
+    .warning-card.warn { background: #fffaf1; border-color: #f2d7aa; }
+    .warning-card.danger { background: #fff5f5; border-color: #f1c2c2; }
+    .media-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 0.95rem;
+    }
+    .media-stat {
+      background: #fff;
+      border: 1px solid #e0e8fb;
+      border-radius: 14px;
+      padding: 0.8rem;
+    }
+    .media-stat strong { display: block; font-size: 1.2rem; margin-bottom: 0.2rem; }
+    .media-stat span { color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+    .media-link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+    }
+    .media-link-row .download-link { padding: 0.45rem 0.75rem; font-size: 0.82rem; }
+    .media-inline-note { margin-top: 0.75rem; font-size: 0.86rem; color: var(--muted); }
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .status-banner {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid #dce6fb;
+      background: linear-gradient(180deg, #f7faff, #ffffff);
+      color: var(--muted);
+    }
+    .status-banner strong { display: block; color: var(--ink); margin-bottom: 0.35rem; }
+
+    .action-panel,
+    .generated-panel { margin-bottom: 2rem; }
+    .action-panel[hidden],
+    .generated-panel[hidden] { display: none; }
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .action-button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.95rem 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2b5be4, #3d77ff);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(43,91,228,0.18);
+    }
+    .action-button.secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid #cddafb;
+      box-shadow: none;
+    }
+    .action-button[disabled] { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+    .action-note { margin-top: 0.9rem; color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+    .generated-list { display: grid; gap: 0.9rem; }
+    .generated-card {
+      border: 1px solid #d8e3fb;
+      border-radius: 18px;
+      padding: 1rem;
+      background: #fbfdff;
+    }
+    .generated-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .generated-card p { margin-bottom: 0; color: var(--muted); line-height: 1.55; }
+    .download-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 0.85rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid #cddafb;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1040px) {
+      .hero-grid,
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 1rem, 1180px); }
+      .brand-row { border-radius: 24px; }
+      .hero-copy, .hero-side, .panel { padding: 1rem; }
+      .hero-flow,
+      .meta-grid,
+      .scorm-grid,
+      .upload-grid,
+      .media-summary { grid-template-columns: 1fr; }
+      .section-head,
+      .block-top,
+      .output-top,
+      .generated-card-top { flex-direction: column; align-items: flex-start; }
+      .button-row .button-sm,
+      .action-button,
+      .download-link { width: 100%; text-align: center; }
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
-    <div class="nav-shell wrap">
-      <a class="brand" href="index.html">Course Build Prototype</a>
-      <nav class="site-nav" aria-label="Primary">
-        <a class="is-active" href="index.html" aria-current="page">Overview</a>
-        <a href="workflow.html">How it works</a>
-        <a href="backend.html">Under the hood</a>
-        <a href="upload.html">Upload prototype</a>
-      </nav>
+    <div class="wrap">
+      <div class="brand-row">
+        <a class="brand" href="index.html">Document Splitter</a>
+        <span class="brand-tag">Tagged DOCX → structured outputs + SCORM bundle</span>
+      </div>
     </div>
   </header>
 
-  <main>
+  <main class="wrap">
+
+    <!-- Hero -->
     <section class="hero">
-      <div class="hero-dot-grid" aria-hidden="true"></div>
-      <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
-      <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
-      <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
-      <div class="wrap simple-hero">
-        <div class="simple-hero-copy">
-          <p class="eyebrow">What This Becomes</p>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Document Splitter</p>
           <h1>One source document becomes checked outputs through a simple pipeline.</h1>
           <p class="lede">
-            The prototype already shows the pattern: analyse the tagged source, extract the block,
-            build the output, validate it, then package for SCORM only when the missing decisions are defined.
+            Upload a tagged Word document and an optional companion media ZIP. The tool analyses every tagged block,
+            classifies it, builds the output files, and packages everything — including a SCORM manifest — ready to download.
           </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="workflow.html">See the workflow</a>
-            <a class="button button-secondary" href="backend.html">See the technical proof</a>
+
+          <div class="hero-flow">
+            <div class="flow-chip">
+              <strong>1. Upload</strong>
+              <span>Drop a tagged <code>.docx</code> and optionally a companion media <code>.zip</code>.</span>
+            </div>
+            <div class="flow-chip">
+              <strong>2. Analyse</strong>
+              <span>Blocks are detected, classified, and checked for filenames and media references.</span>
+            </div>
+            <div class="flow-chip">
+              <strong>3. Build</strong>
+              <span>Output files are generated and packaged for download as a SCORM-ready bundle.</span>
+            </div>
           </div>
+
+          <a class="button button-primary" href="#tool">Start splitting ↓</a>
         </div>
 
-        <aside class="hero-pipeline-card">
-          <span class="pipeline-card-label">Pipeline — live prototype</span>
+        <aside class="hero-side">
+          <span class="pipeline-card-label">Pipeline</span>
           <svg viewBox="0 0 300 155" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-pipeline-svg" aria-label="Diagram: source DOCX feeds 32 tagged blocks through analysis into 2 built outputs">
             <!-- Source document -->
             <rect x="8" y="14" width="68" height="86" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
@@ -95,629 +574,166 @@
       </div>
     </section>
 
-    <section class="section">
-      <div class="wrap">
-        <div class="proof-ribbon">
-          <article class="proof-pill">
-            <div class="proof-num">1</div>
-            <strong>source</strong>
-            <span>One tagged DOCX drives the whole flow.</span>
-          </article>
-          <article class="proof-pill">
-            <div class="proof-num">32</div>
-            <strong>blocks found</strong>
-            <span>Found and classified during analysis.</span>
-          </article>
-          <article class="proof-pill">
-            <div class="proof-num">2</div>
-            <strong>files extracted</strong>
-            <span>Real block files already present in outputs/extracted/.</span>
-          </article>
-          <article class="proof-pill">
-            <div class="proof-num">2</div>
-            <strong>outputs built</strong>
-            <span>One learner HTML page and one prototype worksheet output built.</span>
-          </article>
-        </div>
-      </div>
-    </section>
+    <!-- Tool -->
+    <div id="tool" class="tool-section">
 
-    <section class="section section-tint">
-      <div class="wrap">
-        <div class="about-panel">
-          <article class="card about-card">
-            <div class="section-heading narrow-heading">
-              <p class="eyebrow">About</p>
-              <h2>What this project is.</h2>
-              <p>
-                The core idea is simple: one document, one set of rules, many outputs - generated by AI agents working through a defined set of stages.
-              </p>
-            </div>
-          </article>
+      <section class="main-grid">
+        <div class="stack">
 
-          <aside class="card about-visual">
-            <div class="about-graphic">
-              <div class="about-flow-line" aria-hidden="true"></div>
-
-              <div class="about-node about-node-graphic">
-                <div class="about-icon">1</div>
-                <strong>One document</strong>
-                <span>Word source</span>
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <h2>Upload</h2>
+                <p>Select a tagged Word file and, if needed, a companion media ZIP. Everything is parsed inside the browser.</p>
               </div>
-
-              <div class="about-node about-node-graphic">
-                <div class="about-icon">#</div>
-                <strong>Rules</strong>
-                <span>tags + filenames</span>
-              </div>
-
-              <div class="about-node about-node-graphic">
-                <div class="about-icon">*</div>
-                <strong>Many outputs</strong>
-                <span>HTML, worksheet, reports</span>
-              </div>
+              <span class="pill">Accepts <code>.docx</code> + <code>.zip</code></span>
             </div>
 
-            <div class="about-keyline">
-              <div><span class="about-dot"></span><span>Engineer prepares the source and definitions.</span></div>
-              <div><span class="about-dot"></span><span>AI agents handle the repeated transformation work.</span></div>
-              <div><span class="about-dot"></span><span>SCORM is added only when enough information exists.</span></div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Example</p>
-          <h2>One source block becoming one output.</h2>
-          <p>Homework 1 is a real example already traced through the repo.</p>
-        </div>
-
-        <div class="visual-mini-flow">
-          <article class="visual-node">
-            <h3>Source block</h3>
-            <p>Tagged in the Word source as Homework 1.</p>
-            <span class="mono">CP4807-H1.html</span>
-          </article>
-          <article class="visual-node">
-            <h3>Extracted file</h3>
-            <p>Turned into clean text for the build stage.</p>
-            <span class="mono">outputs/extracted/CP4807-H1.txt</span>
-          </article>
-          <article class="visual-node">
-            <h3>Built result</h3>
-            <p>Rendered as a learner-facing homework page.</p>
-            <span class="mono">outputs/html/CP4807-H1.html</span>
-          </article>
-        </div>
-
-        <div class="grid three-up">
-          <article class="card output-card">
-            <div class="output-header">
-              <span class="tag">Source block</span>
-              <span class="mono">Block 17</span>
-            </div>
-            <pre class="code-block"><code>&lt;HTML&gt;
-Homework 1
-&lt;filename&gt;"CP4807-H1.html"&lt;/filename&gt;
-
-Design a program that controls
-two sets of traffic lights
-at a junction.
-&lt;/HTML&gt;</code></pre>
-            <p class="support-copy">Tag type: HTML. Classification: Homework.</p>
-            <div class="card-actions">
-              <a class="mini-action" href="source/CP4807%20-%20Introduction%20to%20microcontrollers%2005%2004%2026.docx" target="_blank" rel="noopener noreferrer">Open source DOCX</a>
-            </div>
-          </article>
-
-          <article class="card output-card">
-            <div class="output-header">
-              <span class="tag">Extracted output</span>
-              <span class="mono">outputs/extracted/CP4807-H1.txt</span>
-            </div>
-            <pre class="code-block"><code>Homework 1
-Design a program that controls two sets
-of traffic lights at a junction.
-
-RED: 20 seconds
-AMBER: 3 seconds
-GREEN: 20 seconds</code></pre>
-            <p class="support-copy">The source block becomes plain extracted content ready for build.</p>
-            <div class="card-actions">
-              <a class="mini-action" href="outputs/extracted/CP4807-H1.txt" target="_blank" rel="noopener noreferrer">Open extract</a>
-              <a class="mini-action" href="outputs/extracted/CP4807-H1.txt" download>Download TXT</a>
-            </div>
-          </article>
-
-          <article class="card output-card">
-            <div class="output-header">
-              <span class="tag">Built result</span>
-              <span class="mono">outputs/html/CP4807-H1.html</span>
-            </div>
-            <div class="browser-frame">
-              <div class="browser-bar">
-                <span></span><span></span><span></span>
-                <div>outputs/html/CP4807-H1.html</div>
-              </div>
-              <div class="browser-body">
-                <span class="mini-label" style="color:var(--accent)">Homework 1 preview</span>
-                <h3>Traffic Light Junction</h3>
-                <p>Built as a learner page with worksheets covered, design brief, hardware mapping, and timing sequence.</p>
-                <div class="callout">Wrapper tags removed. Teacher notes excluded.</div>
-              </div>
-            </div>
-            <div class="card-actions">
-              <a class="mini-action" href="outputs/html/CP4807-H1.html" target="_blank" rel="noopener noreferrer">Open output</a>
-              <a class="mini-action" href="outputs/html/CP4807-H1.html" download>Download HTML</a>
-            </div>
-          </article>
-        </div>
-
-        <div class="grid two-up" style="margin-top:1.1rem;">
-          <article class="card fact-card">
-            <p class="mini-label">Report proof</p>
-            <ul class="fact-list">
-              <li>Analysis report: 32 tagged blocks found.</li>
-              <li>Validation report: 2 of 28 learner outputs currently built.</li>
-            </ul>
-            <div class="card-actions">
-              <a class="mini-action" href="reports/analysis-report.md" target="_blank" rel="noopener noreferrer">Open analysis report</a>
-              <a class="mini-action" href="reports/validation-report.md" target="_blank" rel="noopener noreferrer">Open validation report</a>
-            </div>
-          </article>
-
-          <article class="card fact-card">
-            <p class="mini-label">Destination</p>
-            <ul class="fact-list">
-              <li>Source tag: `<HTML>`</li>
-              <li>Built type: learner HTML</li>
-              <li>Folder: `outputs/html/`</li>
-            </ul>
-            <div class="card-actions">
-              <a class="mini-action" href="workflow.html">See the process</a>
-              <a class="mini-action" href="backend.html">See the proof page</a>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section scorm-explainer">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">About SCORM</p>
-          <h2>What SCORM is — and why it changes what is possible.</h2>
-        </div>
-
-        <div class="scorm-flow-banner card">
-          <div class="scorm-flow-copy">
-            <p class="scorm-flow-tagline">Create once.<br>Deliver anywhere.</p>
-            <p>SCORM makes digital learning portable. It is the standard that lets online courses work inside compatible learning platforms — so content can be launched, tracked, and reused across systems without rebuilding from scratch.</p>
-          </div>
-          <div class="scorm-flow-diagram">
-            <svg viewBox="0 0 340 112" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Flow: Word source document becomes a SCORM package which delivers to an LMS">
-              <!-- Word document -->
-              <rect x="4" y="10" width="64" height="80" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
-              <path d="M52 10 L68 26 H52 Z" fill="#bfdbfe"/>
-              <line x1="52" y1="10" x2="68" y2="26" stroke="#93c5fd" stroke-width="1"/>
-              <rect x="13" y="33" width="38" height="6" rx="3" fill="#3b82f6"/>
-              <rect x="13" y="44" width="30" height="4" rx="2" fill="#bfdbfe"/>
-              <rect x="13" y="53" width="38" height="6" rx="3" fill="#7c3aed" opacity="0.6"/>
-              <rect x="13" y="64" width="22" height="4" rx="2" fill="#ddd6fe"/>
-              <rect x="13" y="73" width="34" height="6" rx="3" fill="#059669" opacity="0.6"/>
-              <text x="36" y="103" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600" font-family="system-ui">Word source</text>
-              <!-- Arrow 1 -->
-              <line x1="72" y1="50" x2="98" y2="50" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
-                <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite"/>
-              </line>
-              <path d="M96 46 L104 50 L96 54" fill="#3b82f6"/>
-              <!-- SCORM Package -->
-              <rect x="108" y="12" width="124" height="76" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
-              <rect x="108" y="12" width="124" height="22" rx="8" fill="#7c3aed" opacity="0.18"/>
-              <rect x="108" y="26" width="124" height="8" fill="#7c3aed" opacity="0.18"/>
-              <text x="170" y="27" text-anchor="middle" fill="#5b21b6" font-size="9.5" font-weight="700" font-family="system-ui">SCORM Package</text>
-              <rect x="116" y="40" width="46" height="8" rx="3" fill="#ede9fe"/>
-              <text x="139" y="47.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">imsmanifest.xml</text>
-              <rect x="167" y="40" width="56" height="8" rx="3" fill="#ede9fe"/>
-              <text x="195" y="47.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">Content files</text>
-              <rect x="116" y="53" width="46" height="8" rx="3" fill="#ede9fe"/>
-              <text x="139" y="60.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">Metadata</text>
-              <rect x="167" y="53" width="56" height="8" rx="3" fill="#ede9fe"/>
-              <text x="195" y="60.5" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="600" font-family="system-ui">Launch rules</text>
-              <rect x="116" y="66" width="107" height="16" rx="4" fill="#ddd6fe"/>
-              <text x="169" y="78" text-anchor="middle" fill="#5b21b6" font-size="8" font-weight="600" font-family="system-ui">SCO items + tracking rules</text>
-              <text x="170" y="103" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600" font-family="system-ui">SCORM package</text>
-              <!-- Arrow 2 -->
-              <line x1="236" y1="50" x2="262" y2="50" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4 3">
-                <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite" begin="0.6s"/>
-              </line>
-              <path d="M260 46 L268 50 L260 54" fill="#7c3aed"/>
-              <!-- LMS screen -->
-              <rect x="270" y="14" width="66" height="52" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
-              <rect x="270" y="14" width="66" height="18" rx="6" fill="#6ee7b7" opacity="0.4"/>
-              <rect x="270" y="24" width="66" height="8" fill="#6ee7b7" opacity="0.4"/>
-              <text x="303" y="27" text-anchor="middle" fill="#065f46" font-size="9" font-weight="700" font-family="system-ui">LMS</text>
-              <rect x="280" y="38" width="46" height="5" rx="2.5" fill="#d1fae5"/>
-              <rect x="280" y="47" width="34" height="4" rx="2" fill="#d1fae5"/>
-              <rect x="280" y="55" width="40" height="4" rx="2" fill="#d1fae5"/>
-              <rect x="296" y="66" width="14" height="6" rx="1" fill="#a7f3d0"/>
-              <rect x="283" y="71" width="40" height="4" rx="2" fill="#a7f3d0" opacity="0.6"/>
-              <text x="303" y="103" text-anchor="middle" fill="#6b7280" font-size="9" font-weight="600" font-family="system-ui">LMS / platform</text>
-            </svg>
-          </div>
-        </div>
-
-        <div class="grid two-up scorm-concepts">
-          <article class="card scorm-card">
-            <div class="scorm-card-icon scorm-icon-blue">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
-            </div>
-            <h3>What SCORM is</h3>
-            <p>The standard that makes digital learning portable. SCORM lets online courses work inside compatible platforms so content can be launched, tracked, and reused more easily across systems.</p>
-            <div class="scorm-card-insight">One standard. Many compatible platforms.</div>
-          </article>
-
-          <article class="card scorm-card">
-            <div class="scorm-card-icon scorm-icon-purple">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>
-                <line x1="10" y1="12" x2="14" y2="12"/>
-              </svg>
-            </div>
-            <h3>What makes a SCORM package</h3>
-            <p>Great content is only part of the picture. A SCORM package also needs launch information, package metadata, and the rules that tell a learning platform how to handle the content.</p>
-            <div class="scorm-card-insight">Content + structure + rules = a real package.</div>
-          </article>
-
-          <article class="card scorm-card">
-            <div class="scorm-card-icon scorm-icon-green">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <path d="M9.5 14.5 11 16l3.5-3.5"/>
-              </svg>
-            </div>
-            <h3>Why the source document is powerful</h3>
-            <p>A tagged Word source can become the starting point for multiple polished outputs — learner-facing pages, structured course assets — while also preparing the ground for SCORM packaging later on.</p>
-            <div class="scorm-card-insight">One source. Many possibilities.</div>
-          </article>
-
-          <article class="card scorm-card">
-            <div class="scorm-card-icon scorm-icon-amber">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-              </svg>
-            </div>
-            <h3>Why the source is not SCORM on its own</h3>
-            <p>The Word file holds the content and intent. SCORM adds the delivery structure around it — so the content can be launched, organised, and tracked inside an LMS. One is the beginning, the other is the finished package.</p>
-            <div class="scorm-card-insight">Source = content. SCORM = content + delivery structure.</div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section-tint">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">SCORM Example</p>
-          <h2>Source tags driving SCORM-compliant manifest entries.</h2>
-          <p>Assessment 1 shows how the same tagging system that builds learner HTML also supplies the data the SCORM manifest requires.</p>
-        </div>
-
-        <div class="visual-mini-flow">
-          <article class="visual-node">
-            <h3>Source block</h3>
-            <p>Tagged in the Word source as Assessment 1.</p>
-            <span class="mono">CP4807-A1.htm</span>
-          </article>
-          <article class="visual-node">
-            <h3>Tag data read</h3>
-            <p>Type, filename, and classification extracted by the agent.</p>
-            <span class="mono">tag: HTML · class: assessment</span>
-          </article>
-          <article class="visual-node">
-            <h3>Manifest entry</h3>
-            <p>Tag data becomes a real imsmanifest.xml resource and SCO item.</p>
-            <span class="mono">imsmanifest.xml</span>
-          </article>
-        </div>
-
-        <div class="grid three-up">
-          <article class="card output-card">
-            <div class="output-header">
-              <span class="tag">Source block</span>
-              <span class="mono">Block 26</span>
-            </div>
-            <pre class="code-block"><code>&lt;HTML&gt;
-Assessment 1
-&lt;filename&gt;"CP4807-A1.htm"&lt;/filename&gt;
-
-Traffic lights — in-classroom,
-supervised, built from scratch.
-&lt;/HTML&gt;</code></pre>
-            <p class="support-copy">Tag type: HTML. Classification: Assessment. These two facts are the only source of truth the manifest needs.</p>
-            <div class="card-actions">
-              <a class="mini-action" href="reports/analysis-report.md" target="_blank" rel="noopener noreferrer">See block in analysis report</a>
-            </div>
-          </article>
-
-          <article class="card output-card">
-            <div class="output-header">
-              <span class="tag">Tag data → SCORM decisions</span>
-              <span class="mono">agent reads</span>
-            </div>
-            <pre class="code-block"><code>tag:        &lt;HTML&gt;
-→ resource type: webcontent
-
-filename:   CP4807-A1.htm
-→ resource href: CP4807-A1.htm
-→ identifier: RES-CP4807-A1
-
-class:      assessment
-→ item type: sco
-→ mastery scope: required</code></pre>
-            <p class="support-copy">The tag, filename, and classification together are enough to populate the manifest without guessing.</p>
-            <div class="card-actions">
-              <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">See what is still missing</a>
-            </div>
-          </article>
-
-          <article class="card output-card">
-            <div class="output-header">
-              <span class="tag">Manifest fragment</span>
-              <span class="mono">imsmanifest.xml</span>
-            </div>
-            <pre class="code-block"><code>&lt;item identifier="ITEM-A1"
-  identifierref="RES-CP4807-A1"&gt;
-  &lt;title&gt;Assessment 1:
-    Traffic Lights&lt;/title&gt;
-&lt;/item&gt;
-
-&lt;resource identifier="RES-CP4807-A1"
-  type="webcontent"
-  adlcp:scormType="sco"
-  href="CP4807-A1.htm" /&gt;</code></pre>
-            <p class="support-copy">Every value above comes directly from the source tags. Nothing is invented.</p>
-            <div class="card-actions">
-              <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">Open packaging report</a>
-            </div>
-          </article>
-        </div>
-
-        <div class="grid two-up" style="margin-top:1.1rem;">
-          <article class="card fact-card">
-            <p class="mini-label">What the tags provide</p>
-            <ul class="fact-list">
-              <li><code>&lt;HTML&gt;</code> → resource type is webcontent, not a binary asset.</li>
-              <li><code>&lt;filename&gt;</code> → exact href and identifier, no guessing required.</li>
-              <li>Classification "assessment" → SCO type, so the LMS can track completion.</li>
-            </ul>
-          </article>
-
-          <article class="card fact-card">
-            <p class="mini-label">What the tags cannot provide</p>
-            <ul class="fact-list">
-              <li>SCORM version defaults to 1.2 unless the target LMS specifically requires 2004.</li>
-              <li>Completion model — not derivable from content tags alone.</li>
-              <li>Navigation rules — free vs linear must be explicitly specified.</li>
-            </ul>
-            <div class="card-actions">
-              <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">See full gap list</a>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Example Outputs</p>
-          <h2>Three visible results explain the prototype.</h2>
-        </div>
-
-        <div class="grid three-up">
-          <article class="card showcase-card">
-            <div class="output-tile">
-              <span class="tag">Learner HTML</span>
-              <h3>CP4807-H1.html</h3>
-              <p>Homework 1 built as a real learner-facing page.</p>
-              <div class="card-actions">
-                <a class="mini-action" href="outputs/html/CP4807-H1.html" target="_blank" rel="noopener noreferrer">Pop out</a>
-              </div>
-            </div>
-            <div class="showcase-preview">
-              <div class="mini-browser">
-                <div class="mini-browser-top">
-                  <span></span><span></span><span></span>
+            <div class="upload-grid">
+              <label class="dropzone" id="dropzone">
+                <input id="fileInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                <h3>Drop a <code>.docx</code> here or click to browse</h3>
+                <p>Example: <code>CP4807 - Introduction to microcontrollers 05 04 26.docx</code></p>
+                <div class="button-row">
+                  <span class="button-sm primary">Choose DOCX</span>
+                  <span class="button-sm secondary">Source file</span>
                 </div>
-                <div class="mini-browser-body">
-                  <h4>Traffic Light Junction</h4>
-                  <p>Worksheets covered, design brief, hardware mapping, timing sequence.</p>
-                  <div class="mini-chip-row">
-                    <span class="mini-chip">brief</span>
-                    <span class="mini-chip">hardware</span>
-                    <span class="mini-chip">timing</span>
-                  </div>
+                <div class="file-meta" id="fileMeta">
+                  <span>No source file loaded yet.</span>
                 </div>
-              </div>
-            </div>
-          </article>
+              </label>
 
-          <article class="card showcase-card">
-            <div class="output-tile">
-              <span class="tag">Prototype worksheet output</span>
-              <h3>CP4807-1.html</h3>
-              <p>Worksheet 1 shown here as the prototype output representing the worksheet build.</p>
-              <div class="card-actions">
-                <a class="mini-action" href="outputs/docx/CP4807-1.html" target="_blank" rel="noopener noreferrer">Pop out</a>
-              </div>
-            </div>
-            <div class="showcase-preview">
-              <div class="mini-doc-sheet">
-                <h4>Worksheet 1</h4>
-                <p>OUTPUT, LOOP, DELAY, video reference, challenge list, hints.</p>
-                <div class="mini-doc-points">
-                  <div><span class="doc-bullet"></span><span>Output task steps</span></div>
-                  <div><span class="doc-bullet"></span><span>Loop and delay prompts</span></div>
-                  <div><span class="doc-bullet"></span><span>Video reference</span></div>
-                  <div><span class="doc-bullet"></span><span>Challenge and hints</span></div>
+              <label class="dropzone" id="mediaDropzone">
+                <input id="mediaInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
+                <h3>Drop a media <code>.zip</code> here or click to browse</h3>
+                <p>Upload the companion media folder as a ZIP. Media is matched via explicit tags like <code>&lt;image&gt;name.jpg&lt;/image&gt;</code>.</p>
+                <div class="button-row">
+                  <span class="button-sm primary">Choose ZIP</span>
+                  <span class="button-sm secondary">Media bundle</span>
                 </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="card showcase-card">
-            <div class="output-tile">
-              <span class="tag">SCORM readiness</span>
-              <h3>Packaging blocked safely</h3>
-              <p>Packaging waits until the missing launch, version, tracking, completion, and navigation decisions are defined.</p>
-              <div class="card-actions">
-                <a class="mini-action" href="reports/packaging-report.md" target="_blank" rel="noopener noreferrer">Open packaging report</a>
-              </div>
-            </div>
-            <div class="showcase-preview">
-              <div class="mini-report-sheet">
-                <h4>SCORM readiness</h4>
-                <p>Blocked safely until version, launch, tracking, completion, and navigation are defined.</p>
-                <div class="mini-report-points">
-                  <div><span class="report-dot ok"></span><span>Tag structure available</span></div>
-                  <div><span class="report-dot warn"></span><span>Launch file not defined</span></div>
-                  <div><span class="report-dot warn"></span><span>Completion model missing</span></div>
-                  <div><span class="report-dot warn"></span><span>Navigation rules missing</span></div>
+                <div class="file-meta" id="mediaMeta">
+                  <span>No media ZIP loaded yet.</span>
                 </div>
-              </div>
+              </label>
             </div>
-          </article>
-        </div>
-      </div>
-    </section>
+          </section>
 
-    <section class="section">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Original Goal</p>
-          <h2>Use one master DOCX as the source for multiple generated outputs.</h2>
-          <p>The homepage shows that goal with a visible example instead of just describing it.</p>
-        </div>
-
-        <div class="grid two-up">
-          <article class="card quote-card">
-            <span class="mini-label">Project rule</span>
-            <blockquote>This project uses one master DOCX file as the source for multiple generated outputs.</blockquote>
-            <div class="card-actions">
-              <a class="mini-action" href="backend.html">See evidence</a>
-            </div>
-          </article>
-
-          <article class="card fact-card">
-            <p class="mini-label">Real source context</p>
-            <div class="goal-map">
-              <div class="goal-row">
-                <span class="goal-label">Source</span>
-                <div class="goal-bar">`source/CP4807 - Introduction to microcontrollers 05 04 26.docx`</div>
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <h2>Document preview</h2>
+                <p>Readable text extracted from the uploaded Word file.</p>
               </div>
-              <div class="goal-row">
-                <span class="goal-label">Extract</span>
-                <div class="goal-bar">`outputs/extracted/CP4807-H1.txt`</div>
-              </div>
-              <div class="goal-row">
-                <span class="goal-label">Build</span>
-                <div class="goal-bar">`outputs/html/CP4807-H1.html` and `outputs/docx/CP4807-1.html`</div>
-              </div>
+              <span class="pill" id="previewStatus">Waiting for upload</span>
             </div>
-            <div class="card-actions">
-              <a class="mini-action" href="outputs/extracted/CP4807-H1.txt" target="_blank" rel="noopener noreferrer">Open extract</a>
-              <a class="mini-action" href="outputs/html/CP4807-H1.html" target="_blank" rel="noopener noreferrer">Open built page</a>
+            <div id="previewBox" class="empty-state">
+              Upload a tagged <code>.docx</code> to see the extracted document text here.
             </div>
-          </article>
-        </div>
-      </div>
-    </section>
+          </section>
 
-    <section class="section">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Why This Is Useful</p>
-          <h2>It turns one messy authoring source into something visible, trackable, and safer to ship.</h2>
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <h2>Detected blocks</h2>
+                <p>Tagged blocks listed in source order.</p>
+              </div>
+              <span class="pill" id="blocksCount">0 blocks</span>
+            </div>
+            <div id="blocksList" class="empty-state">
+              No blocks yet. Upload a document to detect <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, and <code>&lt;document&gt;</code> sections.
+            </div>
+          </section>
+
         </div>
 
-        <div class="benefit-band card">
-          <div class="benefit-band-copy">
-            <span class="mini-label">The practical value</span>
-            <h3>John does not have to trust a black box.</h3>
-            <p>He can see the source, the extracted file, the built result, and the SCORM status as one connected chain.</p>
+        <div class="stack">
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <h2>Outputs</h2>
+                <p>Valid blocks produce output files in their destination folders.</p>
+              </div>
+              <span class="pill" id="outputsCount">0 outputs</span>
+            </div>
+            <div id="outputsList" class="empty-state">
+              Outputs will appear here after tags and filenames are detected.
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <h2>SCORM readiness</h2>
+                <p>What is present and what is still missing for packaging.</p>
+              </div>
+              <span class="pill" id="scormStatus">Not assessed</span>
+            </div>
+            <div id="scormPanel" class="empty-state">
+              Upload a source document to inspect SCORM-related notes and missing decisions.
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <h2>Media</h2>
+                <p>Media tags found in the source, matched against the uploaded ZIP.</p>
+              </div>
+              <span class="pill" id="mediaCount">0 references</span>
+            </div>
+            <div id="mediaList" class="empty-state">
+              Upload a source document and optional media ZIP to inspect explicit media references.
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <h2>Errors and warnings</h2>
+                <p>Invalid files, missing filenames, and malformed tags.</p>
+              </div>
+              <span class="pill" id="warningsCount">0 warnings</span>
+            </div>
+            <div id="warningsList" class="empty-state">
+              No warnings yet.
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <section class="panel action-panel" id="actionsPanel" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Build and download outputs</h2>
+            <p>Once analysed, generate all output files and download them individually or as a complete bundle.</p>
           </div>
-          <div class="benefit-chain" aria-label="Source to status chain">
-            <div class="benefit-node">
-              <strong>Source</strong>
-              <span>Word block</span>
-            </div>
-            <div class="benefit-arrow">-></div>
-            <div class="benefit-node">
-              <strong>Build</strong>
-              <span>HTML or worksheet</span>
-            </div>
-            <div class="benefit-arrow">-></div>
-            <div class="benefit-node">
-              <strong>Status</strong>
-              <span>validated or blocked</span>
-            </div>
+          <span class="pill" id="actionStatus">Ready after analysis</span>
+        </div>
+        <div class="action-bar">
+          <button class="action-button" id="generateBtn" type="button" disabled>Build Outputs</button>
+          <button class="action-button secondary" id="summaryBtn" type="button" disabled>Download Summary Report</button>
+          <button class="action-button secondary" id="bundleBtn" type="button" disabled>Download Full Bundle</button>
+        </div>
+        <p class="action-note">HTML blocks generate learner HTML files. Worksheet and document blocks generate structured HTML outputs. The SCORM bundle includes <code>imsmanifest.xml</code> and all matched media files.</p>
+      </section>
+
+      <section class="panel generated-panel" id="generatedPanel" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Generated outputs</h2>
+            <p>Download files individually or use the Full Bundle button above for a complete SCORM-ready ZIP.</p>
           </div>
+          <span class="pill" id="generatedCount">0 files</span>
         </div>
+        <div id="generatedList" class="empty-state">No output files generated yet.</div>
+      </section>
 
-        <div class="grid three-up benefit-grid">
-          <article class="card benefit-card benefit-card-strong">
-            <div class="benefit-icon">01</div>
-            <h3>Clear proof</h3>
-            <p>The same page shows the source snippet, extracted file, built output, and packaging status together.</p>
-            <div class="benefit-detail">No hand-waving. No hidden processing.</div>
-          </article>
-          <article class="card benefit-card benefit-card-strong">
-            <div class="benefit-icon">02</div>
-            <h3>Less manual rework</h3>
-            <p>One structured source can drive learner HTML, worksheet-style outputs, reports, and later packaging decisions.</p>
-            <div class="benefit-detail">Change the source once, then rebuild from there.</div>
-          </article>
-          <article class="card benefit-card benefit-card-strong">
-            <div class="benefit-icon">03</div>
-            <h3>Safer SCORM path</h3>
-            <p>The prototype shows what can be automated now and what still needs an explicit human decision before packaging.</p>
-            <div class="benefit-detail">Blocked safely is better than guessed badly.</div>
-          </article>
-        </div>
-      </div>
-    </section>
+    </div><!-- #tool -->
 
-    <section class="section section-dark">
-      <div class="wrap">
-        <div class="section-heading narrow-heading">
-          <p class="eyebrow">Next</p>
-          <h2>Go deeper only if needed.</h2>
-        </div>
-
-        <div class="grid link-grid">
-          <a class="card link-card" href="workflow.html">
-            <span class="mini-label">Page 2</span>
-            <h3>How it works</h3>
-            <p>See the simple stage-by-stage process.</p>
-          </a>
-          <a class="card link-card" href="backend.html">
-            <span class="mini-label">Page 3</span>
-            <h3>Under the hood</h3>
-            <p>See the reports, repo structure, warnings, and SCORM gaps.</p>
-          </a>
-        </div>
-      </div>
-    </section>
   </main>
+
+  <script src="upload-media.js"></script>
 </body>
 </html>

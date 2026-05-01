@@ -60,7 +60,7 @@ generateBtn.addEventListener("click", () => {
   if (!currentAnalysis) return;
   generatedArtefacts = buildPrototypeArtefacts(currentAnalysis.blocks);
   renderGeneratedOutputs(generatedArtefacts);
-  actionStatus.textContent = "Prototype outputs generated";
+  actionStatus.textContent = "Outputs generated";
 });
 
 summaryBtn.addEventListener("click", () => {
@@ -282,7 +282,7 @@ function analyzeText(text) {
     if (count > 1) warnings.push({ level: "warn", title: "Duplicate filename", detail: `${filename} appears ${count} times across detected blocks.` });
   });
 
-  if (sawTagToken && !blocks.length) warnings.push({ level: "warn", title: "Tag-like text found but no valid blocks built", detail: "The document appears to contain tags, but the prototype could not form complete blocks from them." });
+  if (sawTagToken && !blocks.length) warnings.push({ level: "warn", title: "Tag-like text found but no valid blocks built", detail: "The document appears to contain tags, but complete blocks could not be formed from them." });
 
   blocks.sort((a, b) => a.rawOpenIndex - b.rawOpenIndex).forEach((block, index) => { block.order = index + 1; });
   return { blocks, warnings, scorm: analyzeScorm(text, blocks), media: emptyMediaState() };
@@ -533,7 +533,7 @@ function renderWarnings(primaryWarnings, extraWarnings) {
   warningsCount.textContent = `${allWarnings.length} warning${allWarnings.length === 1 ? "" : "s"}`;
   if (!allWarnings.length) {
     warningsList.className = "empty-state";
-    warningsList.innerHTML = "No obvious problems were detected in this prototype pass.";
+    warningsList.innerHTML = "No obvious problems were detected.";
     return;
   }
 
@@ -546,7 +546,7 @@ function renderGeneratedOutputs(files) {
   generatedCount.textContent = `${files.length} file${files.length === 1 ? "" : "s"}`;
   if (!files.length) {
     generatedList.className = "empty-state";
-    generatedList.textContent = "No prototype artefacts were generated from this source.";
+    generatedList.textContent = "No output files were generated from this source.";
     return;
   }
 
@@ -592,7 +592,7 @@ function buildPrototypeArtefacts(blocks) {
     const isHtml = tag === "html" || /\.html?$/i.test(filename);
     const content = isHtml ? buildPrototypeHtml(block, filename) : buildPrototypeText(block);
     const mime = isHtml ? "text/html;charset=utf-8" : "text/plain;charset=utf-8";
-    return { filename, tagType: block.tagType, outputLabel: isHtml ? "Prototype HTML preview" : "Prototype text preview", status: `${block.mediaRefs.filter((ref) => ref.status === "matched").length} media matched`, content, mime, url: createDownloadUrl(content, mime) };
+    return { filename, tagType: block.tagType, outputLabel: isHtml ? "HTML output" : "Text output", status: `${block.mediaRefs.filter((ref) => ref.status === "matched").length} media matched`, content, mime, url: createDownloadUrl(content, mime) };
   });
 }
 
@@ -653,16 +653,16 @@ function buildPrototypeHtml(block, filename) {
   <main>
     <div class="sheet">
       <div class="topbar">
-        <span>Prototype browser output</span>
+        <span>Document Splitter</span>
         <span>Source tag: ${escapeHtml(block.tagType)}</span>
         <span>Export file: ${escapeHtml(filename)}</span>
       </div>
       <section class="hero">
         <div>
-          <span class="eyebrow">${block.tagType === "HTML" ? "Learner HTML prototype" : "Worksheet / document prototype"}</span>
+          <span class="eyebrow">${block.tagType === "HTML" ? "Learner HTML" : "Worksheet / document"}</span>
           <h1>${escapeHtml(display.title)}</h1>
           ${display.subtitle ? `<p class="subtitle">${escapeHtml(display.subtitle)}</p>` : ""}
-          <p class="summary">This preview was generated from the tagged DOCX source and will include any explicitly matched media files from the uploaded ZIP.</p>
+          <p class="summary">Generated from the tagged DOCX source. Matched media files from the uploaded ZIP are embedded inline.</p>
         </div>
         ${leadMedia ? `<aside class="hero-media"><span class="media-label">Lead media</span>${renderSingleMediaHtml(leadMedia)}</aside>` : `<aside class="hero-media"><span class="media-label">Lead media</span><p style="margin:0;color:#64748b;line-height:1.7;">No matched lead media was available for this block. Use an explicit tag like <code>&lt;image&gt;photo.jpg&lt;/image&gt;</code> and upload the matching file in the media ZIP.</p></aside>`}
       </section>
@@ -712,8 +712,8 @@ function buildSummaryReport() {
   const missingDecisions = currentAnalysis.scorm.checks.filter((item) => !item.ok).map((item) => `- ${item.label}: ${item.missing}`);
   const proposed = currentAnalysis.blocks.length ? currentAnalysis.blocks.map((block) => `- Block ${block.order}: ${block.filename || "(missing filename)"} -> ${block.outputType} -> ${block.destination} (lines ${block.startLine}-${block.endLine})`) : ["- No supported tagged blocks detected."];
   return [
-    "Tagged DOCX Prototype Summary",
-    "============================",
+    "Document Splitter — Output Summary",
+    "===================================",
     `Source file: ${currentSourceFile || "Unknown"}`,
     `Media ZIP: ${currentMediaZipName || "None loaded"}`,
     `Detected blocks: ${currentAnalysis.blocks.length}`,
@@ -742,8 +742,8 @@ function buildSummaryReport() {
     "Missing SCORM decisions:",
     ...(missingDecisions.length ? missingDecisions : ["- None detected by the prototype."]),
     "",
-    "Prototype note:",
-    "- Worksheet and document outputs may be represented as stand-in HTML or text previews in this browser-only demo."
+    "Output note:",
+    "- All outputs are generated in the browser from the tagged source document. Matched media files are embedded inline in HTML outputs and included in the bundle ZIP."
   ].join("\n");
 }
 function buildBasicManifest(analysis, artefacts) {
@@ -868,7 +868,7 @@ function resetSourceState() {
   actionsPanel.hidden = true;
   generatedPanel.hidden = true;
   generatedList.className = "empty-state";
-  generatedList.textContent = "No prototype artefacts generated yet.";
+  generatedList.textContent = "No output files generated yet.";
   generatedCount.textContent = "0 files";
   fileMeta.innerHTML = "<span>No source file loaded yet.</span>";
   renderMediaPanel(null);
