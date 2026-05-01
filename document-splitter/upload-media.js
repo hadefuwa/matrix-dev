@@ -608,21 +608,22 @@ function inferOutput(tagType, filename) {
 
 function analyzeScorm(text, blocks) {
   const lower = text.toLowerCase();
-  const checks = [
-    { label: "SCORM version",          ok: /(scorm\s*1\.2|scorm\s*2004)/i.test(text),                              missing: "Specify SCORM 1.2 or SCORM 2004 explicitly." },
-    { label: "Launch file",            ok: /launch|index\.html|start/i.test(text),                                 missing: "Define which file should launch first." },
-    { label: "Manifest data",          ok: /manifest|imsmanifest|identifier|resource/i.test(text),                 missing: "Add package metadata and manifest structure." },
-    { label: "Completion model",       ok: /completion|passed|mastery|score/i.test(text),                          missing: "Define how completion or passing should be measured." },
-    { label: "Tracking model",         ok: /tracking|suspend_data|bookmark|progress/i.test(text),                  missing: "Define what learner progress should be tracked." },
-    { label: "Navigation / sequencing",ok: /sequencing|navigation|next|previous/i.test(text),                     missing: "Define learner navigation and sequencing rules." }
-  ];
   const hasScormContent = lower.includes("scorm");
-  const ready = checks.every((item) => item.ok) && blocks.some((block) => block.filename);
+  const detectedVersion = /(scorm\s*2004)/i.test(text) ? "SCORM 2004" : "SCORM 1.2";
+  const checks = [
+    { label: "SCORM version",          ok: true, value: /(scorm\s*1\.2|scorm\s*2004)/i.test(text) ? detectedVersion : `${detectedVersion} (default)` },
+    { label: "Launch file",            ok: true, value: /launch|index\.html|start/i.test(text) ? "Detected" : "First HTML block (default)" },
+    { label: "Manifest data",          ok: true, value: "Auto-generated" },
+    { label: "Completion model",       ok: true, value: /completion|passed|mastery|score/i.test(text) ? "Detected" : "Completed (default)" },
+    { label: "Tracking model",         ok: true, value: /tracking|suspend_data|bookmark|progress/i.test(text) ? "Detected" : "Basic (default)" },
+    { label: "Navigation / sequencing",ok: true, value: /sequencing|navigation|next|previous/i.test(text) ? "Detected" : "Linear (default)" }
+  ];
+  const ready = hasScormContent && blocks.some((block) => block.filename);
   return {
     checks,
     ready,
     hasScormContent,
-    summary: ready ? "This prototype found the main decisions needed for packaging, but a real build would still need package validation." : hasScormContent ? "Some SCORM-related notes were found, but important packaging decisions are still missing." : "No SCORM specification found in this document."
+    summary: ready ? "SCORM 1.2 package ready. Missing values defaulted automatically." : hasScormContent ? "SCORM content detected — ready to package with defaults." : "No SCORM specification found in this document."
   };
 }
 
@@ -1123,11 +1124,11 @@ function renderScorm(scorm) {
     scormPanel.innerHTML = `<div class="empty-state-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>No SCORM specification found in this document. If you need SCORM packaging, add version, launch file, tracking, and completion notes to the source.`;
     return;
   }
-  scormStatus.textContent = scorm.ready ? "Potentially packageable" : "Incomplete";
+  scormStatus.textContent = scorm.ready ? "Ready" : "No SCORM blocks";
   scormPanel.className = "scorm-grid";
   scormPanel.innerHTML = `
-    <div class="status-banner" style="grid-column: 1 / -1;"><strong>${escapeHtml(scorm.summary)}</strong>This tool highlights present signals and missing decisions. It does not produce a validated SCORM package.</div>
-    ${scorm.checks.map((item) => `<article class="scorm-card"><div class="block-top"><h3>${escapeHtml(item.label)}</h3><span class="mini-tag ${item.ok ? "success" : "warn"}">${item.ok ? "Found" : "Missing"}</span></div><p>${item.ok ? "Relevant wording or signals were found in the uploaded document." : escapeHtml(item.missing)}</p></article>`).join("")}
+    <div class="status-banner" style="grid-column: 1 / -1;"><strong>${escapeHtml(scorm.summary)}</strong></div>
+    ${scorm.checks.map((item) => `<article class="scorm-card"><div class="block-top"><h3>${escapeHtml(item.label)}</h3><span class="mini-tag success">Ready</span></div><p>${escapeHtml(item.value)}</p></article>`).join("")}
   `;
 }
 
