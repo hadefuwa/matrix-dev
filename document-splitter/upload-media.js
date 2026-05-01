@@ -699,14 +699,9 @@ async function buildMiniDocx(block) {
     const { nodes, extraMediaFiles, extraRelEntries } = resolveImageNodes(block.contentParaNodes, block);
     // Resolve relationships first so we know which r:link IDs were embedded from the ZIP.
     const { relsXml, mediaFiles, linkedToEmbeddedIds } = await buildBlockRels(nodes, extraRelEntries);
-    // Build document XML, then promote r:link → r:embed for any IDs we just embedded.
-    // Word treats r:link as an external reference regardless of the relationship Target,
-    // so images only appear when the attribute is r:embed.
-    let docXml = buildBlockDocumentXml(nodes);
-    for (const rId of linkedToEmbeddedIds) {
-      docXml = docXml.split(`r:link="${rId}"`).join(`r:embed="${rId}"`);
-    }
-    zip.file("word/document.xml",        docXml);
+    // Build document XML with r:link → r:embed promotion applied via DOM mutation (not string replace)
+    // so it works regardless of how XMLSerializer chooses to emit namespace prefixes.
+    zip.file("word/document.xml", buildBlockDocumentXml(nodes, linkedToEmbeddedIds));
     if (currentStylesXml)    zip.file("word/styles.xml",         currentStylesXml);
     if (currentNumberingXml) zip.file("word/numbering.xml",      currentNumberingXml);
     if (currentThemeXml)     zip.file("word/theme/theme1.xml",   currentThemeXml);
@@ -724,8 +719,11 @@ async function buildMiniDocx(block) {
   }
 }
 
-// Rebuild word/document.xml using the source document's namespace envelope but only the block's paragraphs
-function buildBlockDocumentXml(paraNodes) {
+// Rebuild word/document.xml using the source document's namespace envelope but only the block's paragraphs.
+// If linkedToEmbeddedIds is provided, r:link attributes for those IDs are promoted to r:embed in the DOM
+// before serialization — using namespace-aware DOM mutation rather than string replacement so it works
+// regardless of which prefix XMLSerializer chooses to emit.
+function buildBlockDocumentXml(paraNodes, linkedToEmbeddedIds = new Set()) {
   try {
     // Parse a fresh copy of the source document to use as the envelope
     const doc = new DOMParser().parseFromString(currentDocXml, "application/xml");
@@ -744,6 +742,12 @@ function buildBlockDocumentXml(paraNodes) {
     const wNs = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
     bodyEl.appendChild(doc.createElementNS(wNs, "w:sectPr"));
 
+    // Promote r:link → r:embed in the DOM for any IDs that were resolved to embedded files
+    if (linkedToEmbeddedIds.size > 0) {
+      const R_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+      promoteRLinkInDom(bodyEl, R_NS, linkedToEmbeddedIds);
+    }
+
     return new XMLSerializer().serializeToString(doc);
   } catch (err) {
     console.error("buildBlockDocumentXml error:", err);
@@ -751,15 +755,33 @@ function buildBlockDocumentXml(paraNodes) {
   }
 }
 
+// Recursively walk DOM elements, swapping r:link → r:embed for IDs in linkedIds
+function promoteRLinkInDom(node, R_NS, linkedIds) {
+  if (node.nodeType !== 1) return;
+  const linkVal = node.getAttributeNS(R_NS, "link");
+  if (linkVal && linkedIds.has(linkVal)) {
+    node.removeAttributeNS(R_NS, "link");
+    node.setAttributeNS(R_NS, "r:embed", linkVal);
+  }
+  for (const child of node.childNodes) promoteRLinkInDom(child, R_NS, linkedIds);
+}
+
+// Collect relationship IDs from a DOM subtree using namespace-aware attribute lookup
+function collectRelIdsFromNode(root, R_NS, out) {
+  if (root.nodeType !== 1) return;
+  for (const name of ["embed", "link", "id", "href"]) {
+    const v = root.getAttributeNS(R_NS, name);
+    if (v) out.add(v);
+  }
+  for (const child of root.childNodes) collectRelIdsFromNode(child, R_NS, out);
+}
+
 // Find all relationship IDs used by a set of paragraph nodes and collect the corresponding files
 async function buildBlockRels(paraNodes, extraRelEntries = []) {
+  const R_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
   const usedRids = new Set();
-  const ser = new XMLSerializer();
   for (const node of paraNodes) {
-    const xml = ser.serializeToString(node);
-    const rIdPattern = /r:(?:embed|id|link|href)="([^"]+)"/g;
-    let m;
-    while ((m = rIdPattern.exec(xml)) !== null) usedRids.add(m[1]);
+    collectRelIdsFromNode(node, R_NS, usedRids);
   }
 
   const relEntries = [];
