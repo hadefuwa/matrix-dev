@@ -1,9 +1,13 @@
 {
   "name": "matrix-dev",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:images": "node document-splitter/test-images.js"
   },
   "dependencies": {
     "tinymce": "^8.3.2"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.1"
   }
 }
