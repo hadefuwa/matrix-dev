@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How To Guide — Document Splitter</title>
+  <style>
+    :root {
+      --ink:          #0f1f3d;
+      --ink-2:        #2d4166;
+      --muted:        #5a7099;
+      --muted-light:  #8ba3c5;
+      --panel:        #ffffff;
+      --surface:      #f5f8ff;
+      --line:         #dde6f8;
+      --accent:       #2b5be4;
+      --accent-mid:   #3d77ff;
+      --accent-soft:  #e0eaff;
+      --accent-xsoft: #f0f4ff;
+      --teal:         #0d9488;
+      --teal-soft:    #d1faf5;
+      --success:      #11795d;
+      --success-soft: #dcf8ee;
+      --warn:         #a55a00;
+      --warn-soft:    #fff0da;
+      --danger:       #c0392b;
+      --danger-soft:  #ffe8e8;
+      --purple:       #6d28d9;
+      --purple-soft:  #ede9fe;
+      --shadow-sm:    0 2px 8px rgba(28,53,109,0.07);
+      --shadow:       0 8px 28px rgba(28,53,109,0.10);
+      --shadow-lg:    0 20px 50px rgba(28,53,109,0.13);
+      --radius:       20px;
+      --radius-sm:    14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: #edf2ff;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5, p { margin-top: 0; }
+    a { color: inherit; }
+    code {
+      font-family: "Cascadia Code", Consolas, monospace;
+      background: var(--accent-xsoft);
+      border: 1px solid #cdd9f8;
+      border-radius: 6px;
+      padding: 0.1rem 0.38rem;
+      font-size: 0.875em;
+    }
+
+    .wrap { width: min(860px, calc(100% - 2.5rem)); margin: 0 auto; }
+
+    /* ─── Header ─── */
+    .site-header { padding: 1.1rem 0 0; }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(200,215,248,0.9);
+      border-radius: 999px;
+      padding: 0.65rem 1.4rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .brand {
+      font-weight: 800;
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .brand-sep { color: var(--line); font-weight: 300; }
+    .brand-sub { font-size: 0.82rem; color: var(--muted); font-weight: 500; }
+    .nav-links {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .nav-link {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 0.32rem 0.85rem;
+      border-radius: 999px;
+      color: var(--muted);
+      transition: background 120ms ease, color 120ms ease;
+    }
+    .nav-link:hover { background: var(--accent-xsoft); color: var(--accent); }
+    .nav-link.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      padding: 2.5rem 2.5rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(140deg, #0f2358 0%, #1d4ed8 55%, #3b82f6 100%);
+      border-radius: var(--radius);
+      margin-top: 1rem;
+      margin-bottom: 2rem;
+    }
+    .hero-dot-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.13) 1.5px, transparent 1.5px);
+      background-size: 30px 30px;
+      pointer-events: none;
+    }
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero-orb-1 {
+      width: 380px; height: 380px;
+      top: -140px; right: -80px;
+      background: radial-gradient(circle, rgba(96,165,250,0.3) 0%, transparent 65%);
+      animation: orb-drift 9s ease-in-out infinite;
+    }
+    .hero-orb-2 {
+      width: 260px; height: 260px;
+      bottom: -100px; left: -60px;
+      background: radial-gradient(circle, rgba(167,139,250,0.22) 0%, transparent 65%);
+      animation: orb-drift 12s ease-in-out infinite reverse;
+    }
+    @keyframes orb-drift {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33%       { transform: translate(12px,-18px) scale(1.04); }
+      66%       { transform: translate(-10px,10px) scale(0.96); }
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 0.73rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+    .hero h1 {
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      line-height: 1.1;
+      font-weight: 800;
+      margin-bottom: 0.9rem;
+      color: #fff;
+    }
+    .hero .lede {
+      font-size: 1rem;
+      line-height: 1.72;
+      color: rgba(255,255,255,0.78);
+      max-width: 58ch;
+      margin-bottom: 0;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-top: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.88);
+    }
+    .hero-chip-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ─── Guide content ─── */
+    .guide-body { padding-bottom: 4rem; }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-light);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .guide-section {
+      margin-bottom: 2.5rem;
+    }
+    .guide-section h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+    .guide-section > p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      max-width: 70ch;
+    }
+
+    /* ─── Tag cards ─── */
+    .tag-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .tag-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .tag-card-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+      flex-shrink: 0;
+    }
+    .tag-card-icon.blue   { background: var(--accent-soft);  color: var(--accent); }
+    .tag-card-icon.purple { background: var(--purple-soft);  color: var(--purple); }
+    .tag-card-icon.teal   { background: var(--teal-soft);    color: var(--teal); }
+    .tag-card h3 {
+      font-size: 0.92rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+    }
+    .tag-card p {
+      font-size: 0.83rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .output-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .output-pill.blue   { background: var(--accent-soft);  color: var(--accent); }
+    .output-pill.purple { background: var(--purple-soft);  color: var(--purple); }
+    .output-pill.teal   { background: var(--teal-soft);    color: var(--teal); }
+
+    /* ─── Code blocks ─── */
+    .code-block {
+      background: #0f1f3d;
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.4rem;
+      margin: 1rem 0;
+      overflow-x: auto;
+    }
+    .code-block pre {
+      margin: 0;
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 0.875rem;
+      line-height: 1.75;
+      color: #c9d9ff;
+      white-space: pre;
+    }
+    .code-block .hl-tag   { color: #7dd3fc; }
+    .code-block .hl-attr  { color: #86efac; }
+    .code-block .hl-val   { color: #fde68a; }
+    .code-block .hl-text  { color: #e2e8f0; }
+    .code-block .hl-dim   { color: #64748b; }
+
+    /* ─── Callout boxes ─── */
+    .callout {
+      display: flex;
+      gap: 0.9rem;
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius-sm);
+      margin: 1.1rem 0;
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+    .callout-icon {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      margin-top: 0.1rem;
+    }
+    .callout p { margin: 0; }
+    .callout strong { display: block; margin-bottom: 0.2rem; }
+    .callout.tip  { background: var(--accent-xsoft); border: 1px solid #c8d9ff; color: var(--ink-2); }
+    .callout.tip .callout-icon { background: var(--accent-soft); color: var(--accent); }
+    .callout.warn { background: var(--warn-soft); border: 1px solid #f0d9aa; color: var(--ink-2); }
+    .callout.warn .callout-icon { background: #fde8bb; color: var(--warn); }
+    .callout.danger { background: var(--danger-soft); border: 1px solid #f0c2be; color: var(--ink-2); }
+    .callout.danger .callout-icon { background: #fdd; color: var(--danger); }
+
+    /* ─── Rule lists ─── */
+    .rule-list {
+      list-style: none;
+      margin: 0 0 1.25rem;
+      padding: 0;
+      display: grid;
+      gap: 0.6rem;
+    }
+    .rule-list li {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--ink-2);
+    }
+    .rule-icon {
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.18rem;
+    }
+    .rule-icon.ok  { background: var(--success-soft); color: var(--success); }
+    .rule-icon.bad { background: var(--danger-soft);  color: var(--danger); }
+
+    /* ─── Media tag grid ─── */
+    .media-tag-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .media-tag-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.1rem;
+    }
+    .media-tag-card h4 {
+      font-size: 0.88rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+    }
+    .media-tag-card p {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ─── Issue table ─── */
+    .issue-list { display: grid; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .issue-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.1rem;
+    }
+    .issue-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+    .issue-badge {
+      flex-shrink: 0;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .issue-badge.warn   { background: var(--warn-soft);   color: var(--warn); }
+    .issue-badge.danger { background: var(--danger-soft); color: var(--danger); }
+    .issue-card h4 { font-size: 0.9rem; font-weight: 700; margin: 0; }
+    .issue-card p  { font-size: 0.83rem; line-height: 1.65; color: var(--muted); margin: 0; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 720px) {
+      .wrap { width: calc(100% - 1.5rem); }
+      .brand-row { border-radius: 18px; padding: 0.75rem 1rem; gap: 0.7rem; }
+      .brand-sub { display: none; }
+      .tag-grid, .media-tag-grid { grid-template-columns: 1fr; }
+      .hero { padding: 1.75rem 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="site-header">
+    <div class="wrap" style="max-width: min(1220px, calc(100% - 2.5rem)); width: auto;">
+      <div class="brand-row">
+        <a class="brand" href="index.html">Document Splitter</a>
+        <span class="brand-sep">/</span>
+        <span class="brand-sub">Tagged DOCX → structured outputs + SCORM bundle</span>
+        <nav class="nav-links" aria-label="Site navigation">
+          <a class="nav-link" href="index.html">Tool</a>
+          <a class="nav-link active" href="how-to-guide.html">How To Guide</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" style="padding-top: 0;">
+
+    <!-- ── Hero ── -->
+    <section class="hero">
+      <div class="hero-dot-grid" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+      <div style="position:relative;z-index:1;">
+        <p class="eyebrow"><span class="eyebrow-dot"></span>How To Guide</p>
+        <h1>How to tag your source document</h1>
+        <p class="lede">
+          The Document Splitter reads a single Word <code style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);">.docx</code> file and turns it into every output automatically.
+          The tool knows what to do with each piece of content because you mark it up with simple tags
+          directly inside the Word document.
+        </p>
+        <div class="hero-meta">
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#7dd3fc;"></span>3 block types</span>
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#86efac;"></span>1 required tag per block</span>
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#fde68a;"></span>4 media reference tags</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="guide-body">
+
+      <!-- ── Section 1: How it works ── -->
+      <div class="section-label">The basics</div>
+
+      <div class="guide-section">
+        <h2>How the tool reads your document</h2>
+        <p>
+          Your Word document is one long file. The tool scans it from top to bottom looking for opening and
+          closing tags — pairs of angle-bracket markers like <code>&lt;HTML&gt;</code> and <code>&lt;/HTML&gt;</code>.
+          Everything between a matching pair is treated as a single block and turned into its own output file.
+          Anything outside a recognised tag pair is ignored — it is treated as planning notes or context for the author.
+        </p>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>Good to know</strong>
+          You can mix worksheets, HTML pages, and documents freely in any order. The tool handles them all in a single pass. There is no limit on how many blocks a document can contain.</p>
+        </div>
+
+        <div class="code-block"><pre><span class="hl-dim">Everything up here is ignored by the tool.
+You can write notes, planning, context — anything you like.</span>
+
+<span class="hl-tag">&lt;HTML&gt;</span>
+<span class="hl-attr">&lt;filename&gt;</span><span class="hl-val">"CP4807-H1.html"</span><span class="hl-attr">&lt;/filename&gt;</span>
+<span class="hl-text">This is the content of Homework 1. It will become an HTML file.</span>
+<span class="hl-tag">&lt;/HTML&gt;</span>
+
+<span class="hl-dim">More planning notes here — also ignored.</span>
+
+<span class="hl-tag">&lt;worksheet&gt;</span>
+<span class="hl-attr">&lt;filename&gt;</span><span class="hl-val">"CP4807-1.doc"</span><span class="hl-attr">&lt;/filename&gt;</span>
+<span class="hl-text">This is Worksheet 1. It will become a Word-compatible file.</span>
+<span class="hl-tag">&lt;/worksheet&gt;</span></pre></div>
+      </div>
+
+      <!-- ── Section 2: Block types ── -->
+      <div class="section-label">Block types</div>
+
+      <div class="guide-section">
+        <h2>The three block types</h2>
+        <p>
+          There are exactly three block-opening tags. Each one tells the tool what kind of output to produce.
+          Choose the one that matches what the content is for.
+        </p>
+
+        <div class="tag-grid">
+          <div class="tag-card">
+            <div class="tag-card-icon blue">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3><code>&lt;HTML&gt;</code> … <code>&lt;/HTML&gt;</code></h3>
+            <p>Learner-facing web page. Use for homework tasks, assessment briefs, teacher notes, or any content that should be delivered as a web page.</p>
+            <span class="output-pill blue">→ .html / .htm file</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon purple">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <h3><code>&lt;worksheet&gt;</code> … <code>&lt;/worksheet&gt;</code></h3>
+            <p>Printable worksheet. Use for step-by-step practical tasks, lab activities, or any content students will work through on paper or screen as a document.</p>
+            <span class="output-pill purple">→ .doc / .docx file</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon teal">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+            </div>
+            <h3><code>&lt;document&gt;</code> … <code>&lt;/document&gt;</code></h3>
+            <p>Reference or supporting document. Use for certificates, data sheets, specification documents, or any standalone file that is not a worksheet or web page.</p>
+            <span class="output-pill teal">→ .docx file</span>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-icon">!</div>
+          <p><strong>Tags are case-sensitive</strong>
+          <code>&lt;HTML&gt;</code> must close with <code>&lt;/HTML&gt;</code> — not <code>&lt;/html&gt;</code>.
+          <code>&lt;worksheet&gt;</code> must close with <code>&lt;/worksheet&gt;</code>.
+          <code>&lt;document&gt;</code> must close with <code>&lt;/document&gt;</code>.
+          A mismatched case means the block will not be recognised.</p>
+        </div>
+      </div>
+
+      <!-- ── Section 3: filename tag ── -->
+      <div class="section-label">Required tag</div>
+
+      <div class="guide-section">
+        <h2>The <code>&lt;filename&gt;</code> tag — required in every block</h2>
+        <p>
+          Every block must contain exactly one <code>&lt;filename&gt;</code> tag. This is how the tool knows
+          what to call the output file. The filename goes between the tags, wrapped in double quotes.
+        </p>
+
+        <div class="code-block"><pre><span class="hl-tag">&lt;HTML&gt;</span>
+<span class="hl-attr">&lt;filename&gt;</span><span class="hl-val">"CP4807-H1.html"</span><span class="hl-attr">&lt;/filename&gt;</span>
+<span class="hl-text">Content goes here…</span>
+<span class="hl-tag">&lt;/HTML&gt;</span></pre></div>
+
+        <ul class="rule-list">
+          <li>
+            <span class="rule-icon ok">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg>
+            </span>
+            <span>Always include a <strong>file extension</strong> — e.g. <code>.html</code>, <code>.htm</code>, <code>.doc</code>, <code>.docx</code>.</span>
+          </li>
+          <li>
+            <span class="rule-icon ok">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg>
+            </span>
+            <span>Wrap the filename in <strong>straight double quotes</strong> — <code>"filename.html"</code> — not curly/smart quotes (<code>"</code> <code>"</code>) which Word sometimes inserts automatically.</span>
+          </li>
+          <li>
+            <span class="rule-icon ok">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg>
+            </span>
+            <span>Filenames must be <strong>unique</strong> across the whole document — two blocks with the same filename means the second will overwrite the first.</span>
+          </li>
+          <li>
+            <span class="rule-icon bad">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+            </span>
+            <span>Do <strong>not</strong> use spaces in filenames. Use hyphens or underscores instead — e.g. <code>CP4807-marking-scheme.htm</code> not <code>CP4807 marking scheme.htm</code>.</span>
+          </li>
+          <li>
+            <span class="rule-icon bad">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+            </span>
+            <span>Do <strong>not</strong> use a block without a <code>&lt;filename&gt;</code> tag. The tool will flag it as a warning and cannot produce the output file.</span>
+          </li>
+        </ul>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>Word autocorrects your quotes</strong>
+          When you type <code>"filename.html"</code> in Word, autocorrect often changes the straight quotes to curly ones. Go to <strong>File → Options → Proofing → AutoCorrect Options → AutoFormat As You Type</strong> and uncheck <em>"Straight quotes" with "smart quotes"</em> before writing your filename tags.</p>
+        </div>
+      </div>
+
+      <!-- ── Section 4: Complete block example ── -->
+      <div class="section-label">Full example</div>
+
+      <div class="guide-section">
+        <h2>A complete block</h2>
+        <p>
+          Here is what a fully-tagged block looks like in practice. The block type sets the output format,
+          the filename tag names the file, and all the content sits between the opening and closing block tags.
+        </p>
+
+        <div class="code-block"><pre><span class="hl-tag">&lt;worksheet&gt;</span>
+<span class="hl-attr">&lt;filename&gt;</span><span class="hl-val">"CP4807-3.doc"</span><span class="hl-attr">&lt;/filename&gt;</span>
+
+<span class="hl-text">Worksheet 3: Using connection points
+
+Learning objectives:
+- Understand how connection points link flowchart components
+- Use a loop to repeat a sequence of steps
+
+Step 1: Open Flowcode and create a new project…</span>
+
+<span class="hl-tag">&lt;/worksheet&gt;</span></pre></div>
+      </div>
+
+      <!-- ── Section 5: Media tags ── -->
+      <div class="section-label">Media references</div>
+
+      <div class="guide-section">
+        <h2>Referencing media inside a block</h2>
+        <p>
+          If your content needs images, videos, audio files, or data sheets, reference them by filename
+          using a media tag inside the block. The tool will match these references against the media files
+          you upload alongside your document.
+        </p>
+
+        <div class="media-tag-grid">
+          <div class="media-tag-card">
+            <h4><code>&lt;image&gt;</code> … <code>&lt;/image&gt;</code></h4>
+            <p>A photograph, diagram, or illustration. Supports JPEG, PNG, GIF, SVG, and WebP.</p>
+            <code style="font-size:0.82rem;">&lt;image&gt;traffic-lights.jpg&lt;/image&gt;</code>
+          </div>
+          <div class="media-tag-card">
+            <h4><code>&lt;video&gt;</code> … <code>&lt;/video&gt;</code></h4>
+            <p>A video clip. Supports MP4, WebM, and MOV.</p>
+            <code style="font-size:0.82rem;">&lt;video&gt;intro.mp4&lt;/video&gt;</code>
+          </div>
+          <div class="media-tag-card">
+            <h4><code>&lt;audio&gt;</code> … <code>&lt;/audio&gt;</code></h4>
+            <p>An audio file. Supports MP3, WAV, and OGG.</p>
+            <code style="font-size:0.82rem;">&lt;audio&gt;narration.mp3&lt;/audio&gt;</code>
+          </div>
+          <div class="media-tag-card">
+            <h4><code>&lt;datasheet&gt;</code> … <code>&lt;/datasheet&gt;</code></h4>
+            <p>A reference PDF or data sheet linked as a download.</p>
+            <code style="font-size:0.82rem;">&lt;datasheet&gt;spec-sheet.pdf&lt;/datasheet&gt;</code>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>Two ways to supply media</strong>
+          If you embed images directly into your Word document, the tool will extract them automatically — no ZIP needed. If you keep media files separately (e.g. high-resolution photos, videos), upload a <code>.zip</code> containing all the files via the media dropzone. The tool checks your embedded images first, then the ZIP.</p>
+        </div>
+
+        <div class="code-block"><pre><span class="hl-tag">&lt;HTML&gt;</span>
+<span class="hl-attr">&lt;filename&gt;</span><span class="hl-val">"CP4807-H1.html"</span><span class="hl-attr">&lt;/filename&gt;</span>
+
+<span class="hl-text">Homework 1: Traffic lights design brief
+
+Look at the circuit diagram below and answer the questions.</span>
+
+<span class="hl-attr">&lt;image&gt;</span><span class="hl-val">traffic-lights.jpg</span><span class="hl-attr">&lt;/image&gt;</span>
+
+<span class="hl-text">Watch the video introduction before starting:</span>
+
+<span class="hl-attr">&lt;video&gt;</span><span class="hl-val">intro.mp4</span><span class="hl-attr">&lt;/video&gt;</span>
+
+<span class="hl-tag">&lt;/HTML&gt;</span></pre></div>
+      </div>
+
+      <!-- ── Section 6: Common mistakes ── -->
+      <div class="section-label">Common mistakes</div>
+
+      <div class="guide-section">
+        <h2>Things to watch out for</h2>
+        <p>
+          These are the most common issues found in source documents. The tool will warn you about all
+          of them, but it is quicker to get them right from the start.
+        </p>
+
+        <div class="issue-list">
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge danger">Blocks broken</span>
+              <h4>Opening a block with two block tags at once</h4>
+            </div>
+            <p>
+              Starting a block with <code>&lt;HTML&gt; &lt;worksheet&gt;</code> on the same line confuses the tool —
+              it cannot be both at once. The tool will flag a warning and pick one, but the result may not be
+              what you intended. <strong>Fix:</strong> delete the tag you do not want.
+            </p>
+          </div>
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge warn">Files overwritten</span>
+              <h4>Two blocks sharing the same filename</h4>
+            </div>
+            <p>
+              If two blocks both have <code>&lt;filename&gt;"CP4807-1.doc"&lt;/filename&gt;</code>, the second
+              will silently overwrite the first in the output. <strong>Fix:</strong> give each block a unique filename —
+              for example <code>CP4807-prep.doc</code> and <code>CP4807-1.doc</code>.
+            </p>
+          </div>
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge warn">Output unnamed</span>
+              <h4>Missing file extension in <code>&lt;filename&gt;</code></h4>
+            </div>
+            <p>
+              A filename without an extension — <code>"CP4807-cert"</code> — leaves the tool unable to determine
+              the file type. It will flag a warning and make a best guess, but the output may not open correctly.
+              <strong>Fix:</strong> always include the extension — e.g. <code>"CP4807-cert.docx"</code>.
+            </p>
+          </div>
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge warn">Parser mismatch</span>
+              <h4>Curly/smart quotes in <code>&lt;filename&gt;</code> tags</h4>
+            </div>
+            <p>
+              Word's autocorrect replaces <code>"</code> with <code>"</code> and <code>"</code>. These look similar
+              but are different characters and some parsers will not read them as valid delimiters.
+              <strong>Fix:</strong> disable smart quotes in Word's AutoCorrect settings before writing filename tags,
+              or do a find-and-replace after writing the document.
+            </p>
+          </div>
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge danger">Block not found</span>
+              <h4>Wrong case on closing tag</h4>
+            </div>
+            <p>
+              <code>&lt;HTML&gt;</code> closed with <code>&lt;/html&gt;</code> will not match.
+              <code>&lt;Document&gt;</code> and <code>&lt;document&gt;</code> are also treated as different tags.
+              <strong>Fix:</strong> make sure the opening and closing tag use exactly the same capitalisation.
+            </p>
+          </div>
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge warn">Media missing</span>
+              <h4>Media reference with no matching file</h4>
+            </div>
+            <p>
+              If you write <code>&lt;image&gt;photo.jpg&lt;/image&gt;</code> but the file is not embedded in the
+              DOCX and is not in the uploaded media ZIP, the tool will warn you that the file is missing and the
+              output will have a broken reference. <strong>Fix:</strong> make sure every referenced media file is
+              either embedded in the Word document or included in your media ZIP.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Section 7: Quick reference ── -->
+      <div class="section-label">Quick reference</div>
+
+      <div class="guide-section">
+        <h2>All tags at a glance</h2>
+        <p>
+          Everything the tool recognises, in one place.
+        </p>
+
+        <div class="code-block"><pre><span class="hl-dim">─── Block types ───────────────────────────────────────────</span>
+
+<span class="hl-tag">&lt;HTML&gt;</span>       <span class="hl-dim">…content…</span>     <span class="hl-tag">&lt;/HTML&gt;</span>       <span class="hl-dim">→ HTML page</span>
+<span class="hl-tag">&lt;worksheet&gt;</span>  <span class="hl-dim">…content…</span>  <span class="hl-tag">&lt;/worksheet&gt;</span>  <span class="hl-dim">→ Word document</span>
+<span class="hl-tag">&lt;document&gt;</span>   <span class="hl-dim">…content…</span>   <span class="hl-tag">&lt;/document&gt;</span>   <span class="hl-dim">→ Word document</span>
+
+<span class="hl-dim">─── Required inside every block ───────────────────────────</span>
+
+<span class="hl-attr">&lt;filename&gt;</span><span class="hl-val">"your-file.html"</span><span class="hl-attr">&lt;/filename&gt;</span>
+
+<span class="hl-dim">─── Optional media references (inside a block) ────────────</span>
+
+<span class="hl-attr">&lt;image&gt;</span><span class="hl-val">photo.jpg</span><span class="hl-attr">&lt;/image&gt;</span>
+<span class="hl-attr">&lt;video&gt;</span><span class="hl-val">clip.mp4</span><span class="hl-attr">&lt;/video&gt;</span>
+<span class="hl-attr">&lt;audio&gt;</span><span class="hl-val">track.mp3</span><span class="hl-attr">&lt;/audio&gt;</span>
+<span class="hl-attr">&lt;datasheet&gt;</span><span class="hl-val">spec.pdf</span><span class="hl-attr">&lt;/datasheet&gt;</span></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>Download a working example</strong>
+          The example source document linked from the tool homepage is a real tagged DOCX with 32 blocks — worksheets, HTML pages, and a document block. Open it in Word to see exactly how the tags are used in practice.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

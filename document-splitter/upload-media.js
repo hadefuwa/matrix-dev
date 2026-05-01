@@ -1,4 +1,4 @@
-﻿const fileInput = document.getElementById("fileInput");
+const fileInput = document.getElementById("fileInput");
 const mediaInput = document.getElementById("mediaInput");
 const dropzone = document.getElementById("dropzone");
 const mediaDropzone = document.getElementById("mediaDropzone");
@@ -16,35 +16,57 @@ const warningsList = document.getElementById("warningsList");
 const warningsCount = document.getElementById("warningsCount");
 const fileMeta = document.getElementById("fileMeta");
 const mediaMeta = document.getElementById("mediaMeta");
-const actionsPanel = document.getElementById("actionsPanel");
-const actionStatus = document.getElementById("actionStatus");
-const generateBtn = document.getElementById("generateBtn");
-const summaryBtn = document.getElementById("summaryBtn");
-const bundleBtn = document.getElementById("bundleBtn");
-const generatedPanel = document.getElementById("generatedPanel");
+const generatedPanel    = document.getElementById("generatedPanel");
+const analysisReport    = document.getElementById("analysisReport");
+const buildCta          = document.getElementById("buildCta");
+const ctaInfo           = document.getElementById("ctaInfo");
+const buildAllBtn       = document.getElementById("buildAllBtn");
+const ctaSummaryBtn     = document.getElementById("ctaSummaryBtn");
+const ctaBundleBtn      = document.getElementById("ctaBundleBtn");
+const resultsArea       = document.getElementById("resultsArea");
 const generatedCount = document.getElementById("generatedCount");
 const generatedList = document.getElementById("generatedList");
 
+// ─── Source file state ─────────────────────────────────────────────────────
 let currentSourceFile = "";
 let currentSourceText = "";
 let currentAnalysis = null;
+let currentParagraphs = [];       // [{index, textContent, xmlNode, isTable}]
+let currentDocxZip = null;        // JSZip of the loaded source DOCX
+let currentRels = new Map();      // rId → {type, target, mode}
+let currentStylesXml = null;
+let currentNumberingXml = null;
+let currentThemeXml = null;
+let currentDocXml = null;         // raw string of word/document.xml
+
+// ─── Media state ───────────────────────────────────────────────────────────
 let currentMediaZipName = "";
 let currentMediaBundle = [];
 let currentMediaIndex = new Map();
 let currentMediaDuplicateNames = new Set();
 let currentEmbeddedMedia = [];
 let currentEmbeddedMediaIndex = new Map();
+
+// ─── Output state ──────────────────────────────────────────────────────────
 let generatedArtefacts = [];
 let activeObjectUrls = [];
+let hasBuilt = false;
+
+// ─── Constants ─────────────────────────────────────────────────────────────
+const PACKAGE_RELS_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
 
 const TAG_PATTERNS = [
-  { label: "HTML", open: /<HTML>/gi, close: /<\/HTML>/gi },
+  { label: "HTML",      open: /<HTML>/gi,      close: /<\/HTML>/gi },
   { label: "worksheet", open: /<worksheet>/gi, close: /<\/worksheet>/gi },
-  { label: "document", open: /<document>/gi, close: /<\/document>/gi }
+  { label: "document",  open: /<document>/gi,  close: /<\/document>/gi }
 ];
 
 const MEDIA_PATTERN = /<(image|video|audio|datasheet|slides|resource)>\s*([^<>\n]+?)\s*<\/\1>/gi;
 
+// ─── Event listeners ───────────────────────────────────────────────────────
 fileInput.addEventListener("change", (event) => {
   const [file] = event.target.files || [];
   if (file) handleSourceFile(file);
@@ -58,27 +80,45 @@ mediaInput.addEventListener("change", (event) => {
 attachDropzone(dropzone, handleSourceFile);
 attachDropzone(mediaDropzone, handleMediaFile);
 
-generateBtn.addEventListener("click", () => {
+buildAllBtn.addEventListener("click", async () => {
   if (!currentAnalysis) return;
-  generatedArtefacts = buildPrototypeArtefacts(currentAnalysis.blocks);
-  renderGeneratedOutputs(generatedArtefacts);
-  actionStatus.textContent = "Outputs generated";
+  buildAllBtn.disabled = true;
+  buildAllBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Building…`;
+  try {
+    generatedArtefacts = await buildArtefacts(currentAnalysis.blocks);
+    hasBuilt = true;
+    renderGeneratedOutputs(generatedArtefacts);
+    renderAnalysisReport(currentAnalysis, dedupeWarnings([...currentAnalysis.warnings, ...currentAnalysis.media.warnings]));
+    resultsArea.hidden = false;
+    ctaSummaryBtn.disabled = false;
+    ctaBundleBtn.disabled = false;
+    resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
+  } finally {
+    buildAllBtn.disabled = false;
+    buildAllBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Rebuild Outputs`;
+  }
 });
 
-summaryBtn.addEventListener("click", () => {
+ctaSummaryBtn.addEventListener("click", () => {
   if (!currentAnalysis) return;
   downloadTextFile(`${baseName(currentSourceFile) || "prototype"}-summary-report.txt`, buildSummaryReport());
 });
 
-bundleBtn.addEventListener("click", async () => {
+ctaBundleBtn.addEventListener("click", async () => {
   if (!currentAnalysis) return;
   if (!generatedArtefacts.length) {
-    generatedArtefacts = buildPrototypeArtefacts(currentAnalysis.blocks);
-    renderGeneratedOutputs(generatedArtefacts);
+    ctaBundleBtn.disabled = true;
+    try {
+      generatedArtefacts = await buildArtefacts(currentAnalysis.blocks);
+      renderGeneratedOutputs(generatedArtefacts);
+    } finally {
+      ctaBundleBtn.disabled = false;
+    }
   }
   await downloadBundle();
 });
 
+// ─── Dropzone helper ───────────────────────────────────────────────────────
 function attachDropzone(element, handler) {
   ["dragenter", "dragover"].forEach((name) => {
     element.addEventListener(name, (event) => {
@@ -86,26 +126,25 @@ function attachDropzone(element, handler) {
       element.classList.add("is-dragover");
     });
   });
-
   ["dragleave", "drop"].forEach((name) => {
     element.addEventListener(name, (event) => {
       event.preventDefault();
       element.classList.remove("is-dragover");
     });
   });
-
   element.addEventListener("drop", (event) => {
     const [file] = event.dataTransfer.files || [];
     if (file) handler(file);
   });
 }
 
+// ─── Source file handler ───────────────────────────────────────────────────
 async function handleSourceFile(file) {
   resetSourceState();
   currentSourceFile = file.name;
 
   if (!file.name.toLowerCase().endsWith(".docx")) {
-    renderError("Please upload a Word .docx file. This prototype does not parse .doc or PDF files.");
+    renderError("Please upload a Word .docx file. This tool does not parse .doc or PDF files.");
     return;
   }
 
@@ -114,7 +153,6 @@ async function handleSourceFile(file) {
     <span><strong>Size:</strong> ${Math.max(1, Math.round(file.size / 1024))} KB</span>
     <span><strong>Last modified:</strong> ${new Date(file.lastModified).toLocaleString()}</span>
   `;
-
   previewStatus.textContent = "Reading DOCX";
 
   try {
@@ -126,6 +164,7 @@ async function handleSourceFile(file) {
     }
 
     await extractEmbeddedMediaFromDocx(zip);
+    await parseDocxStructure(zip);
     currentSourceText = await extractReadableTextFromDocx(zip);
 
     fileMeta.innerHTML = `
@@ -135,14 +174,16 @@ async function handleSourceFile(file) {
       ${currentEmbeddedMedia.length ? `<span><strong>Embedded images:</strong> ${currentEmbeddedMedia.length}</span>` : ""}
     `;
 
-    currentAnalysis = applyMediaStateToAnalysis(analyzeText(currentSourceText));
+    currentAnalysis = applyMediaStateToAnalysis(analyzeText(currentParagraphs));
     renderAnalysis(currentSourceText, currentAnalysis);
+    showBuildCta();
   } catch (error) {
     console.error(error);
     renderError("Something went wrong while reading the document. Try another .docx file or save the source again from Word.");
   }
 }
 
+// ─── Media ZIP handler ─────────────────────────────────────────────────────
 async function handleMediaFile(file) {
   if (!file.name.toLowerCase().endsWith(".zip")) {
     renderMediaError("Please upload a .zip file for the companion media folder.");
@@ -168,7 +209,6 @@ async function handleMediaFile(file) {
       if (entry.dir || entry.name.startsWith("__MACOSX/")) return;
       const exportName = basenameOnly(entry.name);
       if (!exportName) return;
-
       const data = await entry.async("uint8array");
       const mime = getMimeType(exportName);
       const blob = new Blob([data], { type: mime });
@@ -185,11 +225,16 @@ async function handleMediaFile(file) {
     if (currentAnalysis) {
       currentAnalysis = applyMediaStateToAnalysis(currentAnalysis);
       renderAnalysis(currentSourceText, currentAnalysis);
-      generatedArtefacts = buildPrototypeArtefacts(currentAnalysis.blocks);
-      renderGeneratedOutputs(generatedArtefacts);
+      showBuildCta();
+      if (hasBuilt) {
+        generatedArtefacts = await buildArtefacts(currentAnalysis.blocks);
+        renderGeneratedOutputs(generatedArtefacts);
+        renderAnalysisReport(currentAnalysis, dedupeWarnings([...currentAnalysis.warnings, ...currentAnalysis.media.warnings]));
+      } else {
+        generatedArtefacts = [];
+      }
     } else {
       renderMediaPanel(null);
-      actionStatus.textContent = "Media ZIP loaded";
     }
   } catch (error) {
     console.error(error);
@@ -197,6 +242,7 @@ async function handleMediaFile(file) {
   }
 }
 
+// ─── Extract embedded media from DOCX ─────────────────────────────────────
 async function extractEmbeddedMediaFromDocx(zip) {
   currentEmbeddedMedia = [];
   currentEmbeddedMediaIndex = new Map();
@@ -217,6 +263,85 @@ async function extractEmbeddedMediaFromDocx(zip) {
   }
 }
 
+// ─── Parse DOCX structure (XML paragraph nodes + relationships + styles) ───
+async function parseDocxStructure(zip) {
+  currentDocxZip = zip;
+  currentParagraphs = [];
+  currentRels = new Map();
+  currentStylesXml = null;
+  currentNumberingXml = null;
+  currentThemeXml = null;
+  currentDocXml = null;
+
+  // Parse relationships
+  const relsXmlStr = await zip.file("word/_rels/document.xml.rels")?.async("string");
+  if (relsXmlStr) {
+    const relsDoc = new DOMParser().parseFromString(relsXmlStr, "application/xml");
+    for (const rel of relsDoc.getElementsByTagName("Relationship")) {
+      const id = rel.getAttribute("Id");
+      if (!id) continue;
+      currentRels.set(id, {
+        type: rel.getAttribute("Type") || "",
+        target: rel.getAttribute("Target") || "",
+        mode: rel.getAttribute("TargetMode") || "Internal"
+      });
+    }
+  }
+
+  // Store structural XML (copied wholesale into mini-DOCXes)
+  currentStylesXml    = await zip.file("word/styles.xml")?.async("string")        || null;
+  currentNumberingXml = await zip.file("word/numbering.xml")?.async("string")     || null;
+  currentThemeXml     = await zip.file("word/theme/theme1.xml")?.async("string")  || null;
+
+  // Parse body paragraphs
+  currentDocXml = await zip.file("word/document.xml")?.async("string");
+  if (!currentDocXml) return;
+
+  const bodyDoc = new DOMParser().parseFromString(currentDocXml, "application/xml");
+  const bodyEl  = bodyDoc.getElementsByTagNameNS("*", "body")[0];
+  if (!bodyEl) return;
+
+  let index = 0;
+  for (const child of bodyEl.childNodes) {
+    if (child.nodeType !== 1) continue;
+    const ln = child.localName;
+    if (ln === "p" || ln === "tbl") {
+      currentParagraphs.push({
+        index: index++,
+        textContent: extractNodeText(child),
+        xmlNode: child,
+        isTable: ln === "tbl"
+      });
+    } else if (ln === "sdt") {
+      // Unwrap structured document tags
+      const content = child.getElementsByTagNameNS("*", "sdtContent")[0];
+      if (content) {
+        for (const sdtChild of content.childNodes) {
+          if (sdtChild.nodeType !== 1) continue;
+          const sln = sdtChild.localName;
+          if (sln === "p" || sln === "tbl") {
+            currentParagraphs.push({
+              index: index++,
+              textContent: extractNodeText(sdtChild),
+              xmlNode: sdtChild,
+              isTable: sln === "tbl"
+            });
+          }
+        }
+      }
+    }
+    // sectPr, bookmarkStart/End, proofErr etc. are ignored
+  }
+}
+
+function extractNodeText(node) {
+  const tNodes = node.getElementsByTagNameNS("*", "t");
+  let text = "";
+  for (const t of tNodes) text += t.textContent || "";
+  return text.replace(/ /g, " ").trim();
+}
+
+// ─── Plain text extraction (for preview panel) ─────────────────────────────
 async function extractReadableTextFromDocx(zip) {
   const xmlEntries = Object.keys(zip.files)
     .filter((name) => /^word\/(document|header\d+|footer\d+|footnotes|endnotes)\.xml$/i.test(name))
@@ -229,7 +354,6 @@ async function extractReadableTextFromDocx(zip) {
     const extracted = extractReadableText(xmlString);
     if (extracted) parts.push(extracted);
   }
-
   return parts.join("\n\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
@@ -238,20 +362,39 @@ function extractReadableText(xmlString) {
   const xml = parser.parseFromString(xmlString, "application/xml");
   const paragraphs = [];
   const nodes = xml.getElementsByTagNameNS("*", "p");
-
   for (const paragraph of nodes) {
     const textNodes = paragraph.getElementsByTagNameNS("*", "t");
     let line = "";
     for (const node of textNodes) line += node.textContent || "";
     const tabNodes = paragraph.getElementsByTagNameNS("*", "tab");
     for (const node of tabNodes) line += node.textContent || " ";
-    line = line.replace(/\u00a0/g, " ").trim();
+    line = line.replace(/ /g, " ").trim();
     if (line) paragraphs.push(line);
   }
-
   return paragraphs.join("\n");
 }
-function analyzeText(text) {
+
+// ─── Block analysis (operates on paragraph objects) ────────────────────────
+function analyzeText(paragraphs) {
+  // Build joined text from paragraphs for SCORM/classification analysis and token scanning
+  const text = paragraphs.map((p) => p.textContent).join("\n");
+
+  // Build character-offset → paragraph-index mapping
+  const paraOffsets = [];
+  let off = 0;
+  for (const p of paragraphs) {
+    paraOffsets.push(off);
+    off += p.textContent.length + 1; // +1 for the \n separator
+  }
+  const charToParaIndex = (charPos) => {
+    let lo = 0, hi = paraOffsets.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (paraOffsets[mid] <= charPos) lo = mid; else hi = mid - 1;
+    }
+    return lo;
+  };
+
   const warnings = [];
   const blocks = [];
   const duplicateMap = new Map();
@@ -263,13 +406,14 @@ function analyzeText(text) {
 
   while ((match = tokenPattern.exec(text)) !== null) {
     const tokenIndex = match.index ?? 0;
-    const between = text.slice(lastIndex, tokenIndex);
+    const paraIndex  = charToParaIndex(tokenIndex);
+    const between    = text.slice(lastIndex, tokenIndex);
     if (currentBlock && between) currentBlock.bodyParts.push(between);
 
     const filenameValue = match[1];
-    const openTag = match[2];
-    const closeTag = match[3];
-    const lineNumber = lineNumberAt(text, tokenIndex);
+    const openTag       = match[2];
+    const closeTag      = match[3];
+    const lineNumber    = lineNumberAt(text, tokenIndex);
 
     if (filenameValue) {
       sawTagToken = true;
@@ -282,31 +426,31 @@ function analyzeText(text) {
       sawTagToken = true;
       if (currentBlock) {
         warnings.push({ level: "danger", title: `Nested or interrupted ${currentBlock.tagType} block`, detail: `A new <${openTag}> tag was found at line ${lineNumber} before <${currentBlock.tagType}> was closed${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.` });
-        finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+        finalizeBlock(currentBlock, blocks, warnings, duplicateMap, paragraphs);
       }
-      currentBlock = { tagType: openTag, filename: "", bodyParts: [], rawOpenIndex: tokenIndex, startLine: lineNumber };
+      currentBlock = { tagType: openTag, filename: "", bodyParts: [], rawOpenIndex: tokenIndex, startLine: lineNumber, openParaIndex: paraIndex, closeParaIndex: paragraphs.length - 1 };
     } else if (closeTag) {
       sawTagToken = true;
       if (!currentBlock) {
         warnings.push({ level: "warn", title: `Extra closing ${closeTag} tag`, detail: `A closing </${closeTag}> tag was found at line ${lineNumber} with no matching opening tag.` });
       } else if (currentBlock.tagType.toLowerCase() !== closeTag.toLowerCase()) {
         warnings.push({ level: "danger", title: "Mismatched closing tag", detail: `Line ${lineNumber} closes </${closeTag}> while the open block is <${currentBlock.tagType}>${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.` });
-        finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+        finalizeBlock(currentBlock, blocks, warnings, duplicateMap, paragraphs);
         currentBlock = null;
       } else {
         currentBlock.endLine = lineNumber;
-        finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+        currentBlock.closeParaIndex = paraIndex;
+        finalizeBlock(currentBlock, blocks, warnings, duplicateMap, paragraphs);
         currentBlock = null;
       }
     }
-
     lastIndex = tokenPattern.lastIndex;
   }
 
   if (currentBlock) {
     currentBlock.bodyParts.push(text.slice(lastIndex));
     warnings.push({ level: "danger", title: `Unclosed ${currentBlock.tagType} block`, detail: `The <${currentBlock.tagType}> block${currentBlock.filename ? ` for ${currentBlock.filename}` : ""} starts at line ${currentBlock.startLine} but has no matching closing tag.` });
-    finalizeBlock(currentBlock, blocks, warnings, duplicateMap);
+    finalizeBlock(currentBlock, blocks, warnings, duplicateMap, paragraphs);
   }
 
   duplicateMap.forEach((count, filename) => {
@@ -315,7 +459,7 @@ function analyzeText(text) {
 
   if (sawTagToken && !blocks.length) warnings.push({ level: "warn", title: "Tag-like text found but no valid blocks built", detail: "The document appears to contain tags, but complete blocks could not be formed from them." });
 
-  blocks.sort((a, b) => a.rawOpenIndex - b.rawOpenIndex).forEach((block, index) => { block.order = index + 1; });
+  blocks.sort((a, b) => a.rawOpenIndex - b.rawOpenIndex).forEach((block, i) => { block.order = i + 1; });
   return { blocks, warnings, scorm: analyzeScorm(text, blocks), media: emptyMediaState() };
 }
 
@@ -337,13 +481,11 @@ function applyMediaStateToAnalysis(analysis) {
         status = "ambiguous";
         detail = `Multiple files named ${ref.filename} were found in the media ZIP.`;
       } else if (currentMediaIndex.has(key)) {
-        status = "matched";
-        matchedFile = currentMediaIndex.get(key);
+        status = "matched"; matchedFile = currentMediaIndex.get(key);
         detail = `Matched to ${matchedFile.exportName} (from media ZIP).`;
         matchedKeys.add(key);
       } else if (currentEmbeddedMediaIndex.has(key)) {
-        status = "matched";
-        matchedFile = currentEmbeddedMediaIndex.get(key);
+        status = "matched"; matchedFile = currentEmbeddedMediaIndex.get(key);
         detail = `Matched to ${matchedFile.exportName} (embedded in DOCX).`;
         matchedKeys.add(key);
       } else if (currentMediaBundle.length) {
@@ -351,7 +493,6 @@ function applyMediaStateToAnalysis(analysis) {
       } else if (currentEmbeddedMedia.length) {
         detail = `No file named ${ref.filename} was found in the DOCX embedded images or any uploaded media ZIP.`;
       }
-
       referencedNames.add(key);
       const enriched = { ...ref, status, matchedFile, detail };
       references.push({ ...enriched, blockOrder: block.order, blockFilename: block.filename || "(missing filename)" });
@@ -360,7 +501,7 @@ function applyMediaStateToAnalysis(analysis) {
   });
 
   references.forEach((ref) => {
-    if (ref.status === "missing") mediaWarnings.push({ level: "warn", title: "Missing media file", detail: `Block ${ref.blockOrder}${ref.blockFilename ? ` (${ref.blockFilename})` : ""} references ${ref.filename} in <${ref.tag}> but no matching media file is available.` });
+    if (ref.status === "missing")    mediaWarnings.push({ level: "warn", title: "Missing media file",    detail: `Block ${ref.blockOrder}${ref.blockFilename ? ` (${ref.blockFilename})` : ""} references ${ref.filename} in <${ref.tag}> but no matching media file is available.` });
     else if (ref.status === "ambiguous") mediaWarnings.push({ level: "warn", title: "Ambiguous media file", detail: `Block ${ref.blockOrder}${ref.blockFilename ? ` (${ref.blockFilename})` : ""} references ${ref.filename} in <${ref.tag}>, but more than one ZIP entry shares that basename.` });
   });
 
@@ -380,7 +521,7 @@ function applyMediaStateToAnalysis(analysis) {
   return analysis;
 }
 
-function finalizeBlock(rawBlock, blocks, warnings, duplicateMap) {
+function finalizeBlock(rawBlock, blocks, warnings, duplicateMap, paragraphs) {
   const rawBody = sanitizeBodyText(rawBlock.bodyParts.join("").trim());
   const mediaRefs = extractMediaReferences(rawBody);
   const body = sanitizeBodyText(stripStructuralTags(stripMediaTags(rawBody)).trim());
@@ -390,6 +531,10 @@ function finalizeBlock(rawBlock, blocks, warnings, duplicateMap) {
 
   if (!filename) warnings.push({ level: "warn", title: `Missing filename in ${rawBlock.tagType} block`, detail: `The <${rawBlock.tagType}> block starting at line ${rawBlock.startLine} has no <filename> value.` });
   else duplicateMap.set(filename, (duplicateMap.get(filename) || 0) + 1);
+
+  // Collect the XML nodes for this block's content (used by mini-DOCX builder)
+  const contentParaNodes = extractContentParaNodes(rawBlock, paragraphs);
+  const embeddedImageCount = countEmbeddedImages(contentParaNodes);
 
   blocks.push({
     order: blocks.length + 1,
@@ -402,9 +547,36 @@ function finalizeBlock(rawBlock, blocks, warnings, duplicateMap) {
     destination: output.destination,
     rawOpenIndex: rawBlock.rawOpenIndex,
     mediaRefs,
+    embeddedImageCount,
     startLine: rawBlock.startLine,
-    endLine: rawBlock.endLine || rawBlock.startLine
+    endLine: rawBlock.endLine || rawBlock.startLine,
+    contentParaNodes,
+    openParaIndex: rawBlock.openParaIndex || 0,
+    closeParaIndex: rawBlock.closeParaIndex || 0
   });
+}
+
+function extractContentParaNodes(rawBlock, paragraphs) {
+  const open  = rawBlock.openParaIndex  !== undefined ? rawBlock.openParaIndex  : 0;
+  const close = rawBlock.closeParaIndex !== undefined ? rawBlock.closeParaIndex : paragraphs.length - 1;
+  const nodes = [];
+  // Exclude the tag paragraphs at open and close; include everything in between
+  for (let i = open + 1; i < close; i++) {
+    if (paragraphs[i]) nodes.push(paragraphs[i].xmlNode);
+  }
+  return nodes;
+}
+
+function countEmbeddedImages(nodes) {
+  if (!nodes.length) return 0;
+  const ser = new XMLSerializer();
+  let count = 0;
+  for (const node of nodes) {
+    const xml = ser.serializeToString(node);
+    const matches = xml.match(/r:embed="/g);
+    if (matches) count += matches.length;
+  }
+  return count;
 }
 
 function inferClassification(content, filename) {
@@ -427,12 +599,12 @@ function inferOutput(tagType, filename) {
 function analyzeScorm(text, blocks) {
   const lower = text.toLowerCase();
   const checks = [
-    { label: "SCORM version", ok: /(scorm\s*1\.2|scorm\s*2004)/i.test(text), missing: "Specify SCORM 1.2 or SCORM 2004 explicitly." },
-    { label: "Launch file", ok: /launch|index\.html|start/i.test(text), missing: "Define which file should launch first." },
-    { label: "Manifest data", ok: /manifest|imsmanifest|identifier|resource/i.test(text), missing: "Add package metadata and manifest structure." },
-    { label: "Completion model", ok: /completion|passed|mastery|score/i.test(text), missing: "Define how completion or passing should be measured." },
-    { label: "Tracking model", ok: /tracking|suspend_data|bookmark|progress/i.test(text), missing: "Define what learner progress should be tracked." },
-    { label: "Navigation / sequencing", ok: /sequencing|navigation|next|previous/i.test(text), missing: "Define learner navigation and sequencing rules." }
+    { label: "SCORM version",          ok: /(scorm\s*1\.2|scorm\s*2004)/i.test(text),                              missing: "Specify SCORM 1.2 or SCORM 2004 explicitly." },
+    { label: "Launch file",            ok: /launch|index\.html|start/i.test(text),                                 missing: "Define which file should launch first." },
+    { label: "Manifest data",          ok: /manifest|imsmanifest|identifier|resource/i.test(text),                 missing: "Add package metadata and manifest structure." },
+    { label: "Completion model",       ok: /completion|passed|mastery|score/i.test(text),                          missing: "Define how completion or passing should be measured." },
+    { label: "Tracking model",         ok: /tracking|suspend_data|bookmark|progress/i.test(text),                  missing: "Define what learner progress should be tracked." },
+    { label: "Navigation / sequencing",ok: /sequencing|navigation|next|previous/i.test(text),                     missing: "Define learner navigation and sequencing rules." }
   ];
   const ready = checks.every((item) => item.ok) && blocks.some((block) => block.filename);
   return {
@@ -442,207 +614,263 @@ function analyzeScorm(text, blocks) {
   };
 }
 
-function renderAnalysis(text, analysis) {
-  previewStatus.textContent = "Preview ready";
-  previewBox.className = "preview-box";
-  previewBox.textContent = text || "No readable text could be extracted.";
-  renderBlocks(analysis.blocks);
-  renderOutputs(analysis.blocks);
-  renderScorm(analysis.scorm);
-  renderMediaPanel(analysis);
-  const extraWarnings = [...(analysis.blocks.length === 0 && text ? [{ level: "warn", title: "No supported tags found", detail: "The document preview was extracted, but no supported custom blocks were detected." }] : []), ...analysis.media.warnings];
-  renderWarnings(analysis.warnings, extraWarnings);
-  actionsPanel.hidden = false;
-  setActionButtons(true);
-  actionStatus.textContent = "Analysis complete";
-}
-function renderBlocks(blocks) {
-  blocksCount.textContent = `${blocks.length} block${blocks.length === 1 ? "" : "s"}`;
-  if (!blocks.length) {
-    blocksList.className = "empty-state";
-    blocksList.innerHTML = "No supported tagged blocks were detected in this preview.";
-    return;
+// ─── Output builders ───────────────────────────────────────────────────────
+
+async function buildArtefacts(blocks) {
+  const artefacts = [];
+  for (const block of blocks) {
+    if (!block.filename) continue;
+    try {
+      const filename = resolveOutputFilename(block);
+      const tag = block.tagType.toLowerCase();
+
+      if (tag === "html") {
+        const art = await buildHtmlArtefact(block, filename);
+        if (art) artefacts.push(art);
+      } else {
+        const art = await buildDocxArtefact(block, filename);
+        if (art) artefacts.push(art);
+      }
+    } catch (err) {
+      console.error(`Build error for ${block.filename}:`, err);
+    }
   }
-
-  blocksList.className = "block-list";
-  blocksList.innerHTML = blocks.map((block) => `
-    <article class="block-card">
-      <div class="block-top">
-        <div><h3>Block ${block.order}</h3><p>${escapeHtml(block.outputType)}</p></div>
-        <div class="block-meta">
-          <span class="mini-tag">${escapeHtml(block.tagType)}</span>
-          <span class="mini-tag success">${escapeHtml(block.classification)}</span>
-          ${block.filename ? `<span class="mini-tag">${escapeHtml(block.filename)}</span>` : `<span class="mini-tag warn">filename missing</span>`}
-          <span class="mini-tag">lines ${block.startLine}-${block.endLine}</span>
-          ${block.mediaRefs.length ? `<span class="mini-tag">${block.mediaRefs.length} media</span>` : `<span class="mini-tag warn">no media tags</span>`}
-        </div>
-      </div>
-      <div class="excerpt">${escapeHtml(block.excerpt || "(No visible text inside block)")}</div>
-      <div class="meta-grid">
-        <div class="meta-box"><strong>Filename</strong><div>${block.filename ? `<code>${escapeHtml(block.filename)}</code>` : "No filename detected"}</div></div>
-        <div class="meta-box"><strong>Destination</strong><div><code>${escapeHtml(block.destination)}</code></div></div>
-      </div>
-      <div class="media-inline-note">${block.mediaRefs.length ? `Media refs: ${block.mediaRefs.map((ref) => `&lt;${escapeHtml(ref.tag)}&gt;${escapeHtml(ref.filename)}&lt;/${escapeHtml(ref.tag)}&gt;`).join(", ")}` : "Media debug: no explicit media tags detected in this block."}</div>
-    </article>
-  `).join("");
+  return artefacts;
 }
 
-function renderOutputs(blocks) {
-  const valid = blocks.filter((block) => block.filename);
-  outputsCount.textContent = `${valid.length} proposed`;
-  if (!valid.length) {
-    outputsList.className = "empty-state";
-    outputsList.innerHTML = "Valid outputs will appear here when blocks include usable filenames.";
-    return;
+// Build a self-contained DOCX in memory from a block's paragraph nodes
+async function buildMiniDocx(block) {
+  if (!currentDocxZip || !currentDocXml) return null;
+  try {
+    const zip = new JSZip();
+    zip.file("word/document.xml",        buildBlockDocumentXml(block.contentParaNodes));
+    if (currentStylesXml)    zip.file("word/styles.xml",         currentStylesXml);
+    if (currentNumberingXml) zip.file("word/numbering.xml",      currentNumberingXml);
+    if (currentThemeXml)     zip.file("word/theme/theme1.xml",   currentThemeXml);
+    const { relsXml, mediaFiles } = await buildBlockRels(block.contentParaNodes);
+    zip.file("word/_rels/document.xml.rels", relsXml);
+    for (const { name, data } of mediaFiles) zip.file(`word/media/${name}`, data);
+    zip.file("_rels/.rels",          PACKAGE_RELS_XML);
+    zip.file("[Content_Types].xml",  buildContentTypesXml(mediaFiles));
+    return zip;
+  } catch (err) {
+    console.error("buildMiniDocx error:", err);
+    return null;
   }
-
-  outputsList.className = "output-list";
-  outputsList.innerHTML = valid.map((block) => {
-    const matchedMedia = block.mediaRefs.filter((ref) => ref.status === "matched").length;
-    const unmatchedMedia = block.mediaRefs.length - matchedMedia;
-    return `
-      <article class="output-card">
-        <div class="output-top">
-          <div><h3>${escapeHtml(block.filename)}</h3><p>${escapeHtml(block.outputType)}</p></div>
-          <div class="output-meta"><span class="mini-tag success">${escapeHtml(block.tagType)}</span>${block.mediaRefs.length ? `<span class="mini-tag">${block.mediaRefs.length} refs</span>` : ""}</div>
-        </div>
-        <div class="meta-grid">
-          <div class="meta-box"><strong>Likely folder</strong><div><code>${escapeHtml(block.destination)}</code></div></div>
-          <div class="meta-box"><strong>Classification</strong><div>${escapeHtml(block.classification)}</div></div>
-        </div>
-        ${block.mediaRefs.length ? `<div class="meta-grid"><div class="meta-box"><strong>Matched media</strong><div>${matchedMedia}</div></div><div class="meta-box"><strong>Missing / ambiguous</strong><div>${unmatchedMedia}</div></div></div>` : ""}
-        <div class="excerpt" style="margin-top:0.9rem;">${escapeHtml(makeExcerpt(block.body, 160) || "(No visible text inside block)")}</div>
-      </article>
-    `;
-  }).join("");
 }
 
-function renderScorm(scorm) {
-  scormStatus.textContent = scorm.ready ? "Potentially packageable" : "Not ready";
-  scormPanel.className = "scorm-grid";
-  scormPanel.innerHTML = `
-    <div class="status-banner" style="grid-column: 1 / -1;"><strong>${escapeHtml(scorm.summary)}</strong>This prototype highlights missing decisions. It does not claim SCORM compliance.</div>
-    ${scorm.checks.map((item) => `<article class="scorm-card"><div class="block-top"><h3>${escapeHtml(item.label)}</h3><span class="mini-tag ${item.ok ? "success" : "warn"}">${item.ok ? "Found" : "Missing"}</span></div><p>${item.ok ? "Relevant wording or signals were found in the uploaded document." : escapeHtml(item.missing)}</p></article>`).join("")}
-  `;
-}
+// Rebuild word/document.xml using the source document's namespace envelope but only the block's paragraphs
+function buildBlockDocumentXml(paraNodes) {
+  try {
+    // Parse a fresh copy of the source document to use as the envelope
+    const doc = new DOMParser().parseFromString(currentDocXml, "application/xml");
+    const bodyEl = doc.getElementsByTagNameNS("*", "body")[0];
+    if (!bodyEl) throw new Error("No body element in document.xml");
 
-function renderMediaPanel(analysis) {
-  if (!analysis) {
-    mediaCount.textContent = currentMediaBundle.length ? `${currentMediaBundle.length} files loaded` : "0 references";
-    if (!currentMediaBundle.length) {
-      mediaList.className = "empty-state";
-      mediaList.textContent = "Upload a source document and optional media ZIP to inspect explicit media references.";
-      return;
+    // Clear all existing body content
+    while (bodyEl.firstChild) bodyEl.removeChild(bodyEl.firstChild);
+
+    // Import (deep-clone) the block's paragraph nodes into this document
+    for (const node of paraNodes) {
+      bodyEl.appendChild(doc.importNode(node, true));
     }
 
-    mediaList.className = "media-list";
-    mediaList.innerHTML = `<div class="status-banner"><strong>${escapeHtml(currentMediaZipName || "Media ZIP loaded")}</strong>${currentMediaBundle.length} files were loaded from the media ZIP. Upload a source document to match explicit media tags.</div>`;
-    return;
-  }
+    // Word requires a sectPr at the end of every body
+    const wNs = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+    bodyEl.appendChild(doc.createElementNS(wNs, "w:sectPr"));
 
-  const mediaState = analysis.media;
-  mediaCount.textContent = `${mediaState.references.length} reference${mediaState.references.length === 1 ? "" : "s"}`;
-  if (!mediaState.references.length && !mediaState.loadedFiles && !mediaState.embeddedCount) {
-    mediaList.className = "empty-state";
-    mediaList.textContent = "No explicit media tags were found, and no media ZIP has been loaded.";
-    return;
-  }
-
-  mediaList.className = "media-list";
-  mediaList.innerHTML = `
-    <div class="media-summary">
-      <div class="media-stat"><strong>${mediaState.embeddedCount || 0}</strong><span>embedded in DOCX</span></div>
-      <div class="media-stat"><strong>${mediaState.loadedFiles}</strong><span>files loaded from ZIP</span></div>
-      <div class="media-stat"><strong>${mediaState.references.length}</strong><span>explicit media tags</span></div>
-      <div class="media-stat"><strong>${mediaState.matchedFiles.length}</strong><span>matched</span></div>
-    </div>
-    ${mediaState.references.length ? mediaState.references.map((ref) => `
-      <article class="media-card">
-        <div class="block-top"><div><h3>${escapeHtml(ref.filename)}</h3><p>Block ${ref.blockOrder} • ${escapeHtml(ref.blockFilename)} • <code>&lt;${escapeHtml(ref.tag)}&gt;</code> reference</p></div><span class="mini-tag ${ref.status === "matched" ? "success" : "warn"}">${ref.status === "matched" ? "Matched" : ref.status === "ambiguous" ? "Ambiguous" : "Missing"}</span></div>
-        <p>${escapeHtml(ref.detail)}</p>
-        ${ref.matchedFile ? `<div class="meta-grid"><div class="meta-box"><strong>ZIP entry</strong><div><code>${escapeHtml(ref.matchedFile.path)}</code></div></div><div class="meta-box"><strong>Export path</strong><div><code>media/${escapeHtml(ref.matchedFile.exportName)}</code></div></div></div><div class="media-link-row"><a class="download-link" href="${escapeHtml(ref.matchedFile.url)}" download="${escapeHtml(ref.matchedFile.exportName)}">Download media</a></div>` : ""}
-      </article>
-    `).join("") : `<article class="media-card"><div class="block-top"><h3>No explicit media refs in source</h3><span class="mini-tag">${mediaState.loadedFiles} loaded</span></div><p>The media ZIP is loaded, but the current source document contains no explicit media tags such as <code>&lt;image&gt;file.jpg&lt;/image&gt;</code>.</p></article>`}
-    ${mediaState.unusedFiles.length ? `<article class="media-card"><div class="block-top"><h3>Unused media in ZIP</h3><span class="mini-tag">${mediaState.unusedFiles.length} unused</span></div><p>These files are loaded but not referenced by any explicit media tag in the source.</p><div class="excerpt">${escapeHtml(mediaState.unusedFiles.map((file) => file.exportName).join(", "))}</div></article>` : ""}
-  `;
-}
-
-function renderWarnings(primaryWarnings, extraWarnings) {
-  const allWarnings = dedupeWarnings([...primaryWarnings, ...extraWarnings]);
-  warningsCount.textContent = `${allWarnings.length} warning${allWarnings.length === 1 ? "" : "s"}`;
-  if (!allWarnings.length) {
-    warningsList.className = "empty-state";
-    warningsList.innerHTML = "No obvious problems were detected.";
-    return;
-  }
-
-  warningsList.className = "warning-list";
-  warningsList.innerHTML = allWarnings.map((warning) => `<article class="warning-card ${warning.level}"><div class="block-top"><h3>${escapeHtml(warning.title)}</h3><span class="mini-tag ${warning.level === "danger" ? "danger" : "warn"}">${warning.level === "danger" ? "Error" : "Warning"}</span></div><p>${escapeHtml(warning.detail)}</p></article>`).join("");
-}
-
-function renderGeneratedOutputs(files) {
-  generatedPanel.hidden = false;
-  generatedCount.textContent = `${files.length} file${files.length === 1 ? "" : "s"}`;
-  if (!files.length) {
-    generatedList.className = "empty-state";
-    generatedList.textContent = "No output files were generated from this source.";
-    return;
-  }
-
-  generatedList.className = "generated-list";
-  generatedList.innerHTML = files.map((file) => `<article class="generated-card"><div class="generated-card-top"><div><h3>${escapeHtml(file.filename)}</h3><p>${escapeHtml(file.outputLabel)}</p></div><a class="download-link" href="${escapeHtml(file.url)}" download="${escapeHtml(file.filename)}">Download</a></div><div class="meta-grid"><div class="meta-box"><strong>Source block</strong><div>${escapeHtml(file.tagType)}</div></div><div class="meta-box"><strong>Status</strong><div>${escapeHtml(file.status)}</div></div></div></article>`).join("");
-}
-function renderError(message) {
-  previewStatus.textContent = "Upload failed";
-  previewBox.className = "empty-state";
-  previewBox.textContent = message;
-  blocksList.className = "empty-state";
-  blocksList.textContent = "No blocks available.";
-  outputsList.className = "empty-state";
-  outputsList.textContent = "No outputs available.";
-  scormPanel.className = "empty-state";
-  scormPanel.textContent = "SCORM readiness could not be assessed.";
-  mediaList.className = "empty-state";
-  mediaList.textContent = currentMediaBundle.length ? "Media ZIP is loaded. Upload a valid source document to match explicit media tags." : "Upload a source document and optional media ZIP to inspect explicit media references.";
-  actionsPanel.hidden = false;
-  setActionButtons(false);
-  actionStatus.textContent = "Waiting for a valid file";
-  renderWarnings([{ level: "danger", title: "File could not be processed", detail: message }], []);
-}
-
-function renderMediaError(message) {
-  currentMediaZipName = "";
-  currentMediaBundle = [];
-  currentMediaIndex = new Map();
-  currentMediaDuplicateNames = new Set();
-  mediaMeta.innerHTML = `<span>${escapeHtml(message)}</span>`;
-  if (currentAnalysis) {
-    currentAnalysis = applyMediaStateToAnalysis(currentAnalysis);
-    renderAnalysis(currentSourceText, currentAnalysis);
-  } else {
-    renderMediaPanel(null);
+    return new XMLSerializer().serializeToString(doc);
+  } catch (err) {
+    console.error("buildBlockDocumentXml error:", err);
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:sectPr/></w:body></w:document>`;
   }
 }
 
-function buildPrototypeArtefacts(blocks) {
-  return blocks.filter((block) => block.filename).map((block) => {
-    const tag = block.tagType.toLowerCase();
-    const filename = resolvePrototypeFilename(block);
-    const isHtml = tag === "html" || /\.html?$/i.test(filename);
-    const content = isHtml ? buildPrototypeHtml(block, filename) : buildPrototypeText(block);
-    const mime = isHtml ? "text/html;charset=utf-8" : "text/plain;charset=utf-8";
-    return { filename, tagType: block.tagType, outputLabel: isHtml ? "HTML output" : "Text output", status: `${block.mediaRefs.filter((ref) => ref.status === "matched").length} media matched`, content, mime, url: createDownloadUrl(content, mime) };
+// Find all relationship IDs used by a set of paragraph nodes and collect the corresponding files
+async function buildBlockRels(paraNodes) {
+  const usedRids = new Set();
+  const ser = new XMLSerializer();
+  for (const node of paraNodes) {
+    const xml = ser.serializeToString(node);
+    const rIdPattern = /r:(?:embed|id|link|href)="([^"]+)"/g;
+    let m;
+    while ((m = rIdPattern.exec(xml)) !== null) usedRids.add(m[1]);
+  }
+
+  const relEntries = [];
+  const mediaFiles = [];
+
+  for (const [rId, rel] of currentRels) {
+    if (!usedRids.has(rId)) continue;
+
+    if (rel.mode === "External") {
+      relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="${escapeXml(rel.target)}" TargetMode="External"/>`);
+    } else {
+      // Internal resource — copy the file into word/media/
+      const rawTarget = rel.target.replace(/^\//, "");
+      const sourcePath = rawTarget.startsWith("word/") ? rawTarget : `word/${rawTarget}`;
+      const fileName = rawTarget.split("/").pop();
+      const sourceEntry = currentDocxZip.file(sourcePath) || currentDocxZip.file(rawTarget);
+      if (sourceEntry) {
+        const data = await sourceEntry.async("uint8array");
+        mediaFiles.push({ name: fileName, data });
+        relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(fileName)}"/>`);
+      }
+    }
+  }
+
+  return {
+    relsXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n${relEntries.join("\n")}\n</Relationships>`,
+    mediaFiles
+  };
+}
+
+function buildContentTypesXml(mediaFiles) {
+  const exts = new Set(mediaFiles.map((f) => f.name.split(".").pop().toLowerCase()).filter(Boolean));
+  const extLines = [...exts].map((ext) => `  <Default Extension="${ext}" ContentType="${getMimeType(`f.${ext}`)}"/>`);
+  return [
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`,
+    `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">`,
+    `  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>`,
+    `  <Default Extension="xml" ContentType="application/xml"/>`,
+    ...extLines,
+    `  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>`,
+    currentStylesXml    ? `  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>` : "",
+    currentNumberingXml ? `  <Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>` : "",
+    currentThemeXml     ? `  <Override PartName="/word/theme/theme1.xml" ContentType="application/vnd.openxmlformats.themes+xml"/>` : "",
+    `</Types>`
+  ].filter(Boolean).join("\n");
+}
+
+// HTML artefact: build mini-DOCX → mammoth → post-process → wrap in template
+async function buildHtmlArtefact(block, filename) {
+  const miniDocx = await buildMiniDocx(block);
+  if (!miniDocx) return buildHtmlFallback(block, filename);
+
+  // Check mammoth is available
+  if (typeof mammoth === "undefined") return buildHtmlFallback(block, filename);
+
+  try {
+    const blob        = await miniDocx.generateAsync({ type: "blob" });
+    const arrayBuffer = await blob.arrayBuffer();
+    const result      = await mammoth.convertToHtml({ arrayBuffer });
+    let html          = result.value || "";
+    html = postProcessMammothHtml(html, block);
+    const fullHtml = wrapInPageTemplate(html, filename, block);
+    const mime = "text/html;charset=utf-8";
+    const matchedTags = block.mediaRefs.filter((r) => r.status === "matched").length;
+    const statusLabel = matchedTags ? `${matchedTags} media matched` : block.embeddedImageCount ? `${block.embeddedImageCount} embedded image${block.embeddedImageCount === 1 ? "" : "s"}` : "no images";
+    return { filename, tagType: block.tagType, outputLabel: "HTML page", status: statusLabel, content: fullHtml, mime, blob: null, url: createDownloadUrl(fullHtml, mime) };
+  } catch (err) {
+    console.error("mammoth error, using fallback:", err);
+    return buildHtmlFallback(block, filename);
+  }
+}
+
+// DOCX artefact: build mini-DOCX → download as .docx
+async function buildDocxArtefact(block, filename) {
+  const miniDocx = await buildMiniDocx(block);
+  if (!miniDocx) return null;
+  try {
+    const blob = await miniDocx.generateAsync({ type: "blob" });
+    const url  = createObjectUrl(blob);
+    const matchedTags = block.mediaRefs.filter((r) => r.status === "matched").length;
+    const statusLabel = matchedTags ? `${matchedTags} media matched` : block.embeddedImageCount ? `${block.embeddedImageCount} embedded image${block.embeddedImageCount === 1 ? "" : "s"}` : "no images";
+    return { filename, tagType: block.tagType, outputLabel: block.tagType.toLowerCase() === "worksheet" ? "Word worksheet" : "Word document", status: statusLabel, content: null, mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", blob, url };
+  } catch (err) {
+    console.error("buildDocxArtefact error:", err);
+    return null;
+  }
+}
+
+// Fallback: old template-based HTML for when mammoth is unavailable or fails
+function buildHtmlFallback(block, filename) {
+  const content = buildPrototypeHtml(block, filename);
+  const mime    = "text/html;charset=utf-8";
+  return { filename, tagType: block.tagType, outputLabel: "HTML page (fallback)", status: "fallback render", content, mime, blob: null, url: createDownloadUrl(content, mime) };
+}
+
+// Post-process mammoth HTML: replace encoded explicit media tags with real elements
+function postProcessMammothHtml(html, block) {
+  return html.replace(/&lt;(image|video|audio|datasheet)&gt;([^&<]+)&lt;\/\1&gt;/gi, (match, tag, rawFilename) => {
+    const filename = rawFilename.trim();
+    const ref = block.mediaRefs.find((r) =>
+      r.tag === tag.toLowerCase() && normalizeMediaName(r.filename) === normalizeMediaName(filename)
+    );
+    if (!ref || ref.status !== "matched" || !ref.matchedFile) {
+      return `<span class="ds-missing-media">[${tag}: ${escapeHtml(filename)} — media not found]</span>`;
+    }
+    const src  = ref.matchedFile.dataUrl || buildEmbeddedMediaUrl(ref.matchedFile);
+    const name = escapeHtml(ref.matchedFile.exportName);
+    if (tag.toLowerCase() === "image")     return `<figure><img src="${src}" alt="${name}" /><figcaption>${name}</figcaption></figure>`;
+    if (tag.toLowerCase() === "video")     return `<video controls><source src="${src}" /></video>`;
+    if (tag.toLowerCase() === "audio")     return `<audio controls><source src="${src}" /></audio>`;
+    if (tag.toLowerCase() === "datasheet") return `<a href="${src}" download="${name}" class="ds-download">${name}</a>`;
+    return match;
   });
 }
 
-function resolvePrototypeFilename(block) {
-  const original = sanitizeFilenameValue(block.filename);
-  const lower = original.toLowerCase();
-  if (block.tagType.toLowerCase() === "html") return lower.endsWith(".html") || lower.endsWith(".htm") ? original : `${original}.htm`;
-  if (lower.endsWith(".html") || lower.endsWith(".htm") || lower.endsWith(".txt")) return original;
-  return `${original.replace(/\.[^.]+$/, "") || original}.html`;
+// Wrap mammoth HTML body content in a clean standalone page
+function wrapInPageTemplate(bodyHtml, filename, block) {
+  const title = escapeHtml(baseName(filename) || filename);
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${title}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.65; color: #1a1a2e; background: #f4f6fb; padding: 2rem 1rem 3rem; }
+    .page { max-width: 860px; margin: 0 auto; background: #fff; border: 1px solid #d0d9f0; border-radius: 8px; padding: 2.5rem 3rem; box-shadow: 0 4px 24px rgba(30,60,140,0.08); }
+    h1 { font-size: 1.8em; line-height: 1.2; margin: 0 0 0.6em; color: #0f2358; }
+    h2 { font-size: 1.25em; margin: 1.6em 0 0.4em; color: #1d4ed8; }
+    h3 { font-size: 1.08em; margin: 1.3em 0 0.3em; color: #2d4166; }
+    h4, h5, h6 { font-size: 1em; margin: 1.1em 0 0.3em; color: #2d4166; }
+    p { margin: 0 0 0.8em; }
+    ul, ol { margin: 0 0 0.8em; padding-left: 1.5em; }
+    li { margin-bottom: 0.35em; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95em; }
+    th, td { border: 1px solid #c8d5f0; padding: 0.5em 0.75em; text-align: left; vertical-align: top; }
+    th { background: #e8eeff; font-weight: 700; }
+    tr:nth-child(even) td { background: #f7f9ff; }
+    a { color: #1d4ed8; }
+    img { max-width: 100%; height: auto; display: block; margin: 0.75em 0; border-radius: 4px; }
+    figure { margin: 1em 0; }
+    figcaption { font-size: 0.85em; color: #5a7099; margin-top: 0.3em; font-style: italic; }
+    video, audio { max-width: 100%; margin: 0.75em 0; display: block; }
+    code { font-family: Consolas, "Cascadia Code", monospace; font-size: 0.9em; background: #f0f4ff; padding: 0.1em 0.35em; border-radius: 3px; }
+    pre  { background: #f0f4ff; border: 1px solid #cdd9f8; border-radius: 6px; padding: 1em; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    .ds-missing-media { display: inline-block; padding: 0.2em 0.5em; background: #fff0da; border: 1px solid #f0d9aa; border-radius: 4px; color: #a55a00; font-size: 0.85em; }
+    .ds-download { display: inline-flex; align-items: center; gap: 0.3em; padding: 0.3em 0.7em; background: #e0eaff; border: 1px solid #b3caff; border-radius: 4px; color: #1d4ed8; text-decoration: none; font-weight: 600; }
+    @media print { body { background: none; padding: 0; } .page { border: none; box-shadow: none; padding: 1cm 2cm; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    ${bodyHtml}
+  </div>
+</body>
+</html>`;
 }
 
+function resolveOutputFilename(block) {
+  const original = sanitizeFilenameValue(block.filename);
+  const tag = block.tagType.toLowerCase();
+  if (tag === "html") {
+    if (/\.html?$/i.test(original)) return original;
+    const stem = original.replace(/\.[^.]+$/, "") || original;
+    return `${stem}.html`;
+  }
+  // DOCX outputs — normalise .doc → .docx
+  if (/\.docx$/i.test(original)) return original;
+  if (/\.doc$/i.test(original))  return original.replace(/\.doc$/i, ".docx");
+  if (/\.[^.]+$/.test(original)) return original; // keep other extensions (e.g. .pdf placeholder)
+  return `${original}.docx`;
+}
+
+// ─── Prototype HTML fallback builder (used when mammoth is unavailable) ────
 function buildPrototypeHtml(block, filename) {
   const display = deriveDisplayContent(block, filename);
   const leadMedia = display.leadMedia;
@@ -682,10 +910,7 @@ function buildPrototypeHtml(block, filename) {
     .media-item strong { display: inline-block; margin-bottom: 0.35rem; }
     .media-item img, .media-item video, .media-item audio { width: 100%; max-width: 100%; margin-top: 0.75rem; border-radius: 12px; display: block; }
     .media-item a { color: #1d4ed8; }
-    @media (max-width: 820px) {
-      .hero { grid-template-columns: 1fr; }
-      .meta { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 820px) { .hero { grid-template-columns: 1fr; } .meta { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -701,9 +926,9 @@ function buildPrototypeHtml(block, filename) {
           <span class="eyebrow">${block.tagType === "HTML" ? "Learner HTML" : "Worksheet / document"}</span>
           <h1>${escapeHtml(display.title)}</h1>
           ${display.subtitle ? `<p class="subtitle">${escapeHtml(display.subtitle)}</p>` : ""}
-          <p class="summary">Generated from the tagged DOCX source. Matched media files from the uploaded ZIP are embedded inline.</p>
+          <p class="summary">Generated from the tagged DOCX source. Matched media files are embedded inline.</p>
         </div>
-        ${leadMedia ? `<aside class="hero-media"><span class="media-label">Lead media</span>${renderSingleMediaHtml(leadMedia)}</aside>` : `<aside class="hero-media"><span class="media-label">Lead media</span><p style="margin:0;color:#64748b;line-height:1.7;">No matched lead media was available for this block. Use an explicit tag like <code>&lt;image&gt;photo.jpg&lt;/image&gt;</code> and upload the matching file in the media ZIP.</p></aside>`}
+        ${leadMedia ? `<aside class="hero-media"><span class="media-label">Lead media</span>${renderSingleMediaHtml(leadMedia)}</aside>` : `<aside class="hero-media"><span class="media-label">Lead media</span><p style="margin:0;color:#64748b;line-height:1.7;">No matched lead media for this block.</p></aside>`}
       </section>
       <div class="meta">
         <div><strong>Source block</strong>${escapeHtml(block.tagType)}</div>
@@ -729,25 +954,261 @@ function renderPrototypeMediaHtml(mediaRefs) {
   return `<section class="media-stack">${mediaRefs.map((ref) => `<div class="media-item">${renderSingleMediaHtml(ref)}</div>`).join("")}</section>`;
 }
 
-function buildPrototypeText(block) {
-  return [
-    `Prototype output: ${block.filename}`,
-    `Source block type: ${block.tagType}`,
-    `Classification: ${block.classification}`,
-    `Proposed destination: ${block.destination}`,
-    "",
-    "Content preview:",
-    block.body,
-    "",
-    "Media references:",
-    ...(block.mediaRefs.length ? block.mediaRefs.map((ref) => `- <${ref.tag}> ${ref.filename}: ${ref.status.toUpperCase()}${ref.matchedFile ? ` -> media/${ref.matchedFile.exportName}` : ""}`) : ["- None"])
-  ].join("\n");
+// ─── Build CTA helper ──────────────────────────────────────────────────────
+function showBuildCta() {
+  if (!currentAnalysis) return;
+  const ready  = currentAnalysis.blocks.filter((b) => b.filename).length;
+  const total  = currentAnalysis.blocks.length;
+  const errors = currentAnalysis.warnings.filter((w) => w.level === "danger").length;
+  const zipLine = currentMediaZipName
+    ? `<span style="color:var(--success)">✓ ${escapeHtml(currentMediaZipName)} loaded</span>`
+    : `<span style="color:var(--muted)">No media ZIP loaded (optional)</span>`;
+
+  ctaInfo.innerHTML = `
+    <strong>${escapeHtml(currentSourceFile)}</strong> —
+    ${total} block${total === 1 ? "" : "s"} detected,
+    ${ready} ready to build${errors ? `, <span style="color:var(--danger)">${errors} error${errors === 1 ? "" : "s"}</span>` : ""}
+    &nbsp;·&nbsp; ${zipLine}
+  `;
+  buildAllBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> ${hasBuilt ? "Rebuild Outputs" : "Build Outputs"}`;
+  buildAllBtn.disabled = false;
+  buildCta.hidden = false;
 }
 
+// ─── Render functions ──────────────────────────────────────────────────────
+function renderAnalysis(text, analysis) {
+  previewStatus.textContent = "Preview ready";
+  previewBox.className = "preview-box";
+  previewBox.textContent = text || "No readable text could be extracted.";
+  renderBlocks(analysis.blocks);
+  renderOutputs(analysis.blocks);
+  renderScorm(analysis.scorm);
+  renderMediaPanel(analysis);
+  const extraWarnings = [...(analysis.blocks.length === 0 && text ? [{ level: "warn", title: "No supported tags found", detail: "The document preview was extracted, but no supported custom blocks were detected." }] : []), ...analysis.media.warnings];
+  renderWarnings(analysis.warnings, extraWarnings);
+}
+
+function renderAnalysisReport(analysis, allWarnings) {
+  const blocks      = analysis.blocks;
+  const ready       = blocks.filter((b) => b.filename).length;
+  const total       = blocks.length;
+  const errors      = allWarnings.filter((w) => w.level === "danger").length;
+  const warns       = allWarnings.filter((w) => w.level === "warn").length;
+  const embedded    = blocks.reduce((sum, b) => sum + (b.embeddedImageCount || 0), 0);
+  const mediaTags   = blocks.reduce((sum, b) => sum + b.mediaRefs.length, 0);
+
+  const hasErrors = errors > 0;
+  const hasWarns  = warns > 0;
+  const iconClass = hasErrors ? "fail" : hasWarns ? "warn" : "ok";
+
+  const iconSvg = hasErrors
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+    : hasWarns
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  const titleText = hasErrors
+    ? `${errors} error${errors === 1 ? "" : "s"} found — review before building`
+    : hasWarns
+    ? `Analysis complete — ${warns} warning${warns === 1 ? "" : "s"} to review`
+    : `Analysis complete — no issues detected`;
+
+  const subtitleText = total
+    ? `${total} block${total === 1 ? "" : "s"} detected · ${ready} ready to build · ${currentSourceFile}`
+    : `No tagged blocks found · ${currentSourceFile}`;
+
+  const stats = [
+    { value: total,    label: "Blocks",          cls: total ? "ok" : "warn" },
+    { value: ready,    label: "Ready to build",  cls: ready === total && total > 0 ? "ok" : ready > 0 ? "warn" : "fail" },
+    { value: errors,   label: "Errors",          cls: errors ? "fail" : "ok" },
+    { value: warns,    label: "Warnings",        cls: warns ? "warn" : "ok" },
+    { value: embedded, label: "Embedded images", cls: "ok" },
+    ...(mediaTags ? [{ value: mediaTags, label: "Media tags", cls: "ok" }] : [])
+  ];
+
+  analysisReport.hidden = false;
+  analysisReport.innerHTML = `
+    <div class="ar-header">
+      <div class="ar-status-icon ${iconClass}">${iconSvg}</div>
+      <div>
+        <p class="ar-title">${escapeHtml(titleText)}</p>
+        <p class="ar-subtitle">${escapeHtml(subtitleText)}</p>
+      </div>
+    </div>
+    <div class="ar-stats">
+      ${stats.map((s) => `<div class="ar-stat"><div class="ar-stat-value ${s.cls}">${s.value}</div><div class="ar-stat-label">${escapeHtml(s.label)}</div></div>`).join("")}
+    </div>
+    <p class="ar-hint">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      Scroll down to see blocks, outputs, warnings, and media detail
+    </p>
+  `;
+}
+
+function renderBlocks(blocks) {
+  blocksCount.textContent = `${blocks.length} block${blocks.length === 1 ? "" : "s"}`;
+  if (!blocks.length) {
+    blocksList.className = "empty-state";
+    blocksList.innerHTML = "No supported tagged blocks were detected in this preview.";
+    return;
+  }
+  blocksList.className = "block-list";
+  blocksList.innerHTML = blocks.map((block) => `
+    <article class="block-card">
+      <div class="block-top">
+        <div><h3>Block ${block.order}</h3><p>${escapeHtml(block.outputType)}</p></div>
+        <div class="block-meta">
+          <span class="mini-tag">${escapeHtml(block.tagType)}</span>
+          <span class="mini-tag success">${escapeHtml(block.classification)}</span>
+          ${block.filename ? `<span class="mini-tag">${escapeHtml(block.filename)}</span>` : `<span class="mini-tag warn">filename missing</span>`}
+          <span class="mini-tag">lines ${block.startLine}-${block.endLine}</span>
+          ${block.mediaRefs.length ? `<span class="mini-tag">${block.mediaRefs.length} media tags</span>` : block.embeddedImageCount ? `<span class="mini-tag success">${block.embeddedImageCount} embedded image${block.embeddedImageCount === 1 ? "" : "s"}</span>` : `<span class="mini-tag">no images</span>`}
+        </div>
+      </div>
+      <div class="excerpt">${escapeHtml(block.excerpt || "(No visible text inside block)")}</div>
+      <div class="meta-grid">
+        <div class="meta-box"><strong>Filename</strong><div>${block.filename ? `<code>${escapeHtml(block.filename)}</code>` : "No filename detected"}</div></div>
+        <div class="meta-box"><strong>Destination</strong><div><code>${escapeHtml(block.destination)}</code></div></div>
+      </div>
+      <div class="media-inline-note">${block.mediaRefs.length ? `Explicit media tags: ${block.mediaRefs.map((ref) => `&lt;${escapeHtml(ref.tag)}&gt;${escapeHtml(ref.filename)}&lt;/${escapeHtml(ref.tag)}&gt;`).join(", ")}` : block.embeddedImageCount ? `${block.embeddedImageCount} Word-embedded image${block.embeddedImageCount === 1 ? "" : "s"} — extracted automatically, no explicit tags needed.` : "No images detected in this block."}</div>
+    </article>
+  `).join("");
+}
+
+function renderOutputs(blocks) {
+  const valid = blocks.filter((block) => block.filename);
+  outputsCount.textContent = `${valid.length} proposed`;
+  if (!valid.length) {
+    outputsList.className = "empty-state";
+    outputsList.innerHTML = "Valid outputs will appear here when blocks include usable filenames.";
+    return;
+  }
+  outputsList.className = "output-list";
+  outputsList.innerHTML = valid.map((block) => {
+    const matchedMedia   = block.mediaRefs.filter((ref) => ref.status === "matched").length;
+    const unmatchedMedia = block.mediaRefs.length - matchedMedia;
+    return `
+      <article class="output-card">
+        <div class="output-top">
+          <div><h3>${escapeHtml(block.filename)}</h3><p>${escapeHtml(block.outputType)}</p></div>
+          <div class="output-meta"><span class="mini-tag success">${escapeHtml(block.tagType)}</span>${block.mediaRefs.length ? `<span class="mini-tag">${block.mediaRefs.length} refs</span>` : ""}</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-box"><strong>Likely folder</strong><div><code>${escapeHtml(block.destination)}</code></div></div>
+          <div class="meta-box"><strong>Classification</strong><div>${escapeHtml(block.classification)}</div></div>
+        </div>
+        ${block.mediaRefs.length ? `<div class="meta-grid"><div class="meta-box"><strong>Matched media</strong><div>${matchedMedia}</div></div><div class="meta-box"><strong>Missing / ambiguous</strong><div>${unmatchedMedia}</div></div></div>` : block.embeddedImageCount ? `<div class="meta-grid"><div class="meta-box" style="grid-column:1/-1"><strong>Embedded images</strong><div>${block.embeddedImageCount} image${block.embeddedImageCount === 1 ? "" : "s"} embedded in source DOCX — included automatically in outputs</div></div></div>` : ""}
+        <div class="excerpt" style="margin-top:0.9rem;">${escapeHtml(makeExcerpt(block.body, 160) || "(No visible text inside block)")}</div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderScorm(scorm) {
+  scormStatus.textContent = scorm.ready ? "Potentially packageable" : "Not ready";
+  scormPanel.className = "scorm-grid";
+  scormPanel.innerHTML = `
+    <div class="status-banner" style="grid-column: 1 / -1;"><strong>${escapeHtml(scorm.summary)}</strong>This prototype highlights missing decisions. It does not claim SCORM compliance.</div>
+    ${scorm.checks.map((item) => `<article class="scorm-card"><div class="block-top"><h3>${escapeHtml(item.label)}</h3><span class="mini-tag ${item.ok ? "success" : "warn"}">${item.ok ? "Found" : "Missing"}</span></div><p>${item.ok ? "Relevant wording or signals were found in the uploaded document." : escapeHtml(item.missing)}</p></article>`).join("")}
+  `;
+}
+
+function renderMediaPanel(analysis) {
+  if (!analysis) {
+    mediaCount.textContent = currentMediaBundle.length ? `${currentMediaBundle.length} files loaded` : "0 references";
+    if (!currentMediaBundle.length) {
+      mediaList.className = "empty-state";
+      mediaList.textContent = "Upload a source document and optional media ZIP to inspect explicit media references.";
+      return;
+    }
+    mediaList.className = "media-list";
+    mediaList.innerHTML = `<div class="status-banner"><strong>${escapeHtml(currentMediaZipName || "Media ZIP loaded")}</strong>${currentMediaBundle.length} files were loaded from the media ZIP. Upload a source document to match explicit media tags.</div>`;
+    return;
+  }
+  const mediaState = analysis.media;
+  mediaCount.textContent = `${mediaState.references.length} reference${mediaState.references.length === 1 ? "" : "s"}`;
+  if (!mediaState.references.length && !mediaState.loadedFiles && !mediaState.embeddedCount) {
+    mediaList.className = "empty-state";
+    mediaList.textContent = "No explicit media tags were found, and no media ZIP has been loaded.";
+    return;
+  }
+  mediaList.className = "media-list";
+  mediaList.innerHTML = `
+    <div class="media-summary">
+      <div class="media-stat"><strong>${mediaState.embeddedCount || 0}</strong><span>embedded in DOCX</span></div>
+      <div class="media-stat"><strong>${mediaState.loadedFiles}</strong><span>files loaded from ZIP</span></div>
+      <div class="media-stat"><strong>${mediaState.references.length}</strong><span>explicit media tags</span></div>
+      <div class="media-stat"><strong>${mediaState.matchedFiles.length}</strong><span>matched</span></div>
+    </div>
+    ${mediaState.references.length ? mediaState.references.map((ref) => `
+      <article class="media-card">
+        <div class="block-top"><div><h3>${escapeHtml(ref.filename)}</h3><p>Block ${ref.blockOrder} • ${escapeHtml(ref.blockFilename)} • <code>&lt;${escapeHtml(ref.tag)}&gt;</code> reference</p></div><span class="mini-tag ${ref.status === "matched" ? "success" : "warn"}">${ref.status === "matched" ? "Matched" : ref.status === "ambiguous" ? "Ambiguous" : "Missing"}</span></div>
+        <p>${escapeHtml(ref.detail)}</p>
+        ${ref.matchedFile ? `<div class="meta-grid"><div class="meta-box"><strong>ZIP entry</strong><div><code>${escapeHtml(ref.matchedFile.path)}</code></div></div><div class="meta-box"><strong>Export path</strong><div><code>media/${escapeHtml(ref.matchedFile.exportName)}</code></div></div></div><div class="media-link-row"><a class="download-link" href="${escapeHtml(ref.matchedFile.url)}" download="${escapeHtml(ref.matchedFile.exportName)}">Download media</a></div>` : ""}
+      </article>
+    `).join("") : `<article class="media-card"><div class="block-top"><h3>No explicit media refs in source</h3><span class="mini-tag">${mediaState.loadedFiles} loaded</span></div><p>The media ZIP is loaded, but the current source document contains no explicit media tags such as <code>&lt;image&gt;file.jpg&lt;/image&gt;</code>.</p></article>`}
+    ${mediaState.unusedFiles.length ? `<article class="media-card"><div class="block-top"><h3>Unused media in ZIP</h3><span class="mini-tag">${mediaState.unusedFiles.length} unused</span></div><p>These files are loaded but not referenced by any explicit media tag in the source.</p><div class="excerpt">${escapeHtml(mediaState.unusedFiles.map((file) => file.exportName).join(", "))}</div></article>` : ""}
+  `;
+}
+
+function renderWarnings(primaryWarnings, extraWarnings) {
+  const allWarnings = dedupeWarnings([...primaryWarnings, ...extraWarnings]);
+  warningsCount.textContent = `${allWarnings.length} warning${allWarnings.length === 1 ? "" : "s"}`;
+  if (!allWarnings.length) {
+    warningsList.className = "empty-state";
+    warningsList.innerHTML = "No obvious problems were detected.";
+    return;
+  }
+  warningsList.className = "warning-list";
+  warningsList.innerHTML = allWarnings.map((warning) => `<article class="warning-card ${warning.level}"><div class="block-top"><h3>${escapeHtml(warning.title)}</h3><span class="mini-tag ${warning.level === "danger" ? "danger" : "warn"}">${warning.level === "danger" ? "Error" : "Warning"}</span></div><p>${escapeHtml(warning.detail)}</p></article>`).join("");
+}
+
+function renderGeneratedOutputs(files) {
+  generatedPanel.hidden = false;
+  generatedCount.textContent = `${files.length} file${files.length === 1 ? "" : "s"}`;
+  if (!files.length) {
+    generatedList.className = "empty-state";
+    generatedList.textContent = "No output files were generated from this source.";
+    return;
+  }
+  generatedList.className = "generated-list";
+  generatedList.innerHTML = files.map((file) => `<article class="generated-card"><div class="generated-card-top"><div><h3>${escapeHtml(file.filename)}</h3><p>${escapeHtml(file.outputLabel)}</p></div><a class="download-link" href="${escapeHtml(file.url)}" download="${escapeHtml(file.filename)}">Download</a></div><div class="meta-grid"><div class="meta-box"><strong>Source block</strong><div>${escapeHtml(file.tagType)}</div></div><div class="meta-box"><strong>Status</strong><div>${escapeHtml(file.status)}</div></div></div></article>`).join("");
+}
+
+function renderError(message) {
+  previewStatus.textContent = "Upload failed";
+  previewBox.className = "empty-state";
+  previewBox.textContent = message;
+  blocksList.className = "empty-state";
+  blocksList.textContent = "No blocks available.";
+  outputsList.className = "empty-state";
+  outputsList.textContent = "No outputs available.";
+  scormPanel.className = "empty-state";
+  scormPanel.textContent = "SCORM readiness could not be assessed.";
+  mediaList.className = "empty-state";
+  mediaList.textContent = currentMediaBundle.length ? "Media ZIP is loaded. Upload a valid source document to match explicit media tags." : "Upload a source document and optional media ZIP to inspect explicit media references.";
+  renderWarnings([{ level: "danger", title: "File could not be processed", detail: message }], []);
+}
+
+function renderMediaError(message) {
+  currentMediaZipName = "";
+  currentMediaBundle = [];
+  currentMediaIndex = new Map();
+  currentMediaDuplicateNames = new Set();
+  mediaMeta.innerHTML = `<span>${escapeHtml(message)}</span>`;
+  if (currentAnalysis) {
+    currentAnalysis = applyMediaStateToAnalysis(currentAnalysis);
+    renderAnalysis(currentSourceText, currentAnalysis);
+  } else {
+    renderMediaPanel(null);
+  }
+}
+
+// ─── Summary report ────────────────────────────────────────────────────────
 function buildSummaryReport() {
   if (!currentAnalysis) return "";
   const filenames = currentAnalysis.blocks.filter((block) => block.filename).map((block) => block.filename);
-  const warnings = dedupeWarnings([...currentAnalysis.warnings, ...currentAnalysis.media.warnings]);
+  const warnings  = dedupeWarnings([...currentAnalysis.warnings, ...currentAnalysis.media.warnings]);
   const missingDecisions = currentAnalysis.scorm.checks.filter((item) => !item.ok).map((item) => `- ${item.label}: ${item.missing}`);
   const proposed = currentAnalysis.blocks.length ? currentAnalysis.blocks.map((block) => `- Block ${block.order}: ${block.filename || "(missing filename)"} -> ${block.outputType} -> ${block.destination} (lines ${block.startLine}-${block.endLine})`) : ["- No supported tagged blocks detected."];
   return [
@@ -783,9 +1244,13 @@ function buildSummaryReport() {
     ...(missingDecisions.length ? missingDecisions : ["- None detected by the prototype."]),
     "",
     "Output note:",
-    "- All outputs are generated in the browser from the tagged source document. Matched media files are embedded inline in HTML outputs and included in the bundle ZIP."
+    "- HTML outputs are generated using mammoth.js for faithful formatting preservation.",
+    "- DOCX outputs are real Word files assembled from the source document XML.",
+    "- All matched media files are embedded inline in HTML outputs and included in the bundle ZIP."
   ].join("\n");
 }
+
+// ─── SCORM manifest ────────────────────────────────────────────────────────
 function buildBasicManifest(analysis, artefacts) {
   if (!analysis || !artefacts.length) return "";
   const htmlArtefacts = artefacts.filter((file) => /\.html?$/i.test(file.filename));
@@ -795,7 +1260,7 @@ function buildBasicManifest(analysis, artefacts) {
   const orgId = `${packageId}-org`;
   const title = baseName(currentSourceFile) || "Prototype SCORM Package";
   const artefactEntries = artefacts.map((file, index) => ({ resourceId: `res-${index + 1}`, href: `generated/${file.filename}`, scormType: file.tagType.toLowerCase() === "html" ? "sco" : "asset", title: file.filename }));
-  const mediaEntries = uniqueMatchedMedia(analysis).map((file, index) => ({ resourceId: `media-res-${index + 1}`, href: `media/${file.exportName}`, scormType: "asset", title: file.exportName }));
+  const mediaEntries    = uniqueMatchedMedia(analysis).map((file, index) => ({ resourceId: `media-res-${index + 1}`, href: `media/${file.exportName}`, scormType: "asset", title: file.exportName }));
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <manifest identifier="${escapeXml(packageId)}"
@@ -809,31 +1274,27 @@ function buildBasicManifest(analysis, artefacts) {
   <organizations default="${escapeXml(orgId)}">
     <organization identifier="${escapeXml(orgId)}">
       <title>${escapeXml(title)}</title>
-${artefactEntries.filter((entry) => entry.scormType === "sco").map((entry, index) => `      <item identifier="item-${index + 1}" identifierref="${entry.resourceId}"><title>${escapeXml(entry.title)}</title></item>`).join("\n")}
+${artefactEntries.filter((e) => e.scormType === "sco").map((e, i) => `      <item identifier="item-${i + 1}" identifierref="${e.resourceId}"><title>${escapeXml(e.title)}</title></item>`).join("\n")}
     </organization>
   </organizations>
   <resources>
-${[...artefactEntries, ...mediaEntries].map((entry) => `    <resource identifier="${entry.resourceId}" type="webcontent" adlcp:scormtype="${entry.scormType}" href="${escapeXml(entry.href)}"><file href="${escapeXml(entry.href)}" /></resource>`).join("\n")}
+${[...artefactEntries, ...mediaEntries].map((e) => `    <resource identifier="${e.resourceId}" type="webcontent" adlcp:scormtype="${e.scormType}" href="${escapeXml(e.href)}"><file href="${escapeXml(e.href)}" /></resource>`).join("\n")}
   </resources>
 </manifest>`;
 }
 
+// ─── Bundle download ───────────────────────────────────────────────────────
 async function downloadBundle() {
   const zip = new JSZip();
   const matchedMedia = uniqueMatchedMedia(currentAnalysis);
   zip.file("summary-report.txt", buildSummaryReport());
-  zip.file("blocks-metadata.json", JSON.stringify(currentAnalysis.blocks, null, 2));
-  zip.file("proposed-outputs.json", JSON.stringify(currentAnalysis.blocks.filter((block) => block.filename).map((block) => ({
-    filename: block.filename,
-    tagType: block.tagType,
-    outputType: block.outputType,
-    destination: block.destination,
-    classification: block.classification,
-    mediaRefs: block.mediaRefs.map((ref) => ({ tag: ref.tag, filename: ref.filename, status: ref.status, exportPath: ref.matchedFile ? `media/${ref.matchedFile.exportName}` : null }))
+  zip.file("blocks-metadata.json", JSON.stringify(currentAnalysis.blocks.map((b) => ({
+    order: b.order, tagType: b.tagType, filename: b.filename, outputType: b.outputType,
+    destination: b.destination, classification: b.classification,
+    mediaRefs: b.mediaRefs.map((r) => ({ tag: r.tag, filename: r.filename, status: r.status, exportPath: r.matchedFile ? `media/${r.matchedFile.exportName}` : null }))
   })), null, 2));
   zip.file("scorm-readiness.txt", [
-    currentAnalysis.scorm.summary,
-    "",
+    currentAnalysis.scorm.summary, "",
     ...currentAnalysis.scorm.checks.map((item) => `${item.label}: ${item.ok ? "FOUND" : `MISSING - ${item.missing}`}`),
     "",
     `Media ZIP loaded: ${currentMediaZipName || "No"}`,
@@ -841,19 +1302,21 @@ async function downloadBundle() {
     `Missing media refs: ${currentAnalysis.media.missingCount}`,
     `Ambiguous media refs: ${currentAnalysis.media.ambiguousCount}`
   ].join("\n"));
-  generatedArtefacts.forEach((file) => zip.file(`generated/${file.filename}`, file.content));
+
+  // Generated artefacts: HTML files have .content (string), DOCX files have .blob
+  for (const file of generatedArtefacts) {
+    if (file.blob)    zip.file(`generated/${file.filename}`, file.blob);
+    else if (file.content) zip.file(`generated/${file.filename}`, file.content);
+  }
   matchedMedia.forEach((file) => zip.file(`media/${file.exportName}`, file.data));
+
   const manifest = buildBasicManifest(currentAnalysis, generatedArtefacts);
   if (manifest) zip.file("imsmanifest.xml", manifest);
+
   triggerDownload(createObjectUrl(await zip.generateAsync({ type: "blob" })), `${baseName(currentSourceFile) || "prototype"}-output-bundle.zip`);
-  actionStatus.textContent = manifest ? "Bundle downloaded with media and basic imsmanifest.xml" : "Bundle downloaded";
 }
 
-function setActionButtons(enabled) {
-  generateBtn.disabled = !enabled;
-  summaryBtn.disabled = !enabled;
-  bundleBtn.disabled = !enabled;
-}
+// ─── UI helpers ────────────────────────────────────────────────────────────
 
 function createDownloadUrl(content, mime) {
   return createObjectUrl(new Blob([content], { type: mime }));
@@ -867,7 +1330,6 @@ function createObjectUrl(blob) {
 
 function downloadTextFile(filename, content) {
   triggerDownload(createDownloadUrl(content, "text/plain;charset=utf-8"), filename);
-  actionStatus.textContent = "Summary downloaded";
 }
 
 function triggerDownload(url, filename) {
@@ -885,38 +1347,53 @@ function revokeObjectUrls() {
 }
 
 function resetSourceState() {
-  currentSourceFile = "";
-  currentSourceText = "";
-  currentAnalysis = null;
-  currentEmbeddedMedia = [];
+  currentSourceFile       = "";
+  currentSourceText       = "";
+  currentAnalysis         = null;
+  currentParagraphs       = [];
+  currentDocxZip          = null;
+  currentRels             = new Map();
+  currentStylesXml        = null;
+  currentNumberingXml     = null;
+  currentThemeXml         = null;
+  currentDocXml           = null;
+  currentEmbeddedMedia    = [];
   currentEmbeddedMediaIndex = new Map();
-  generatedArtefacts = [];
-  blocksCount.textContent = "0 blocks";
+  generatedArtefacts      = [];
+  hasBuilt                = false;
+
+  buildCta.hidden         = true;
+  buildAllBtn.disabled    = false;
+  buildAllBtn.innerHTML   = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Build Outputs`;
+  ctaInfo.textContent     = "";
+  ctaSummaryBtn.disabled  = true;
+  ctaBundleBtn.disabled   = true;
+  resultsArea.hidden      = true;
+
+  blocksCount.textContent  = "0 blocks";
   outputsCount.textContent = "0 outputs";
   warningsCount.textContent = "0 warnings";
-  scormStatus.textContent = "Not assessed";
-  mediaCount.textContent = currentMediaBundle.length ? `${currentMediaBundle.length} files loaded` : "0 references";
-  previewBox.className = "empty-state";
-  previewBox.textContent = "Upload a tagged .docx to see the extracted document text here.";
+  scormStatus.textContent  = "Not assessed";
+  mediaCount.textContent   = currentMediaBundle.length ? `${currentMediaBundle.length} files loaded` : "0 references";
+  previewBox.className     = "empty-state";
+  previewBox.textContent   = "Upload a tagged .docx to see the extracted document text here.";
   previewStatus.textContent = "Waiting for upload";
-  blocksList.className = "empty-state";
-  blocksList.textContent = "No blocks yet. Upload a document to detect <HTML>, <worksheet>, and <document> sections.";
-  outputsList.className = "empty-state";
-  outputsList.textContent = "Proposed outputs will appear here after tags and filenames are detected.";
-  scormPanel.className = "empty-state";
-  scormPanel.textContent = "Upload a source document to inspect SCORM-related notes and missing decisions.";
-  warningsList.className = "empty-state";
+  blocksList.className     = "empty-state";
+  blocksList.textContent   = "No blocks yet. Upload a document to detect <HTML>, <worksheet>, and <document> sections.";
+  outputsList.className    = "empty-state";
+  outputsList.textContent  = "Proposed outputs will appear here after tags and filenames are detected.";
+  scormPanel.className     = "empty-state";
+  scormPanel.textContent   = "Upload a source document to inspect SCORM-related notes and missing decisions.";
+  warningsList.className   = "empty-state";
   warningsList.textContent = "No warnings yet.";
-  actionsPanel.hidden = true;
-  generatedPanel.hidden = true;
-  generatedList.className = "empty-state";
+  generatedList.className  = "empty-state";
   generatedList.textContent = "No output files generated yet.";
   generatedCount.textContent = "0 files";
-  fileMeta.innerHTML = "<span>No source file loaded yet.</span>";
+  fileMeta.innerHTML       = "<span>No source file loaded yet.</span>";
   renderMediaPanel(null);
-  setActionButtons(false);
 }
 
+// ─── Analysis utilities ────────────────────────────────────────────────────
 function emptyMediaState() {
   return { zipName: currentMediaZipName, loadedFiles: currentMediaBundle.length, embeddedCount: currentEmbeddedMedia.length, references: [], matchedFiles: [], missingCount: 0, ambiguousCount: 0, unusedFiles: currentMediaBundle, warnings: [] };
 }
@@ -940,6 +1417,7 @@ function stripStructuralTags(body) {
     .replace(/\n{3,}/g, "\n\n");
 }
 
+// ─── Prototype HTML helpers (used by fallback builder) ─────────────────────
 function deriveDisplayContent(block, filename) {
   const lines = splitBodyLines(block.body);
   const matchedMedia = block.mediaRefs.filter((ref) => ref.status === "matched");
@@ -950,28 +1428,23 @@ function deriveDisplayContent(block, filename) {
 
   if (lines.length) {
     if (/^worksheet\b/i.test(lines[0]) || /^document\b/i.test(lines[0]) || /^introduction\b/i.test(lines[0])) {
-      title = lines[0];
-      contentLines = lines.slice(1);
+      title = lines[0]; contentLines = lines.slice(1);
     } else if (lines[0].length <= 70) {
-      title = lines[0];
-      contentLines = lines.slice(1);
+      title = lines[0]; contentLines = lines.slice(1);
     }
   }
-
   if (contentLines.length && contentLines[0].length <= 110 && !looksLikeSectionLabel(contentLines[0])) {
-    subtitle = contentLines[0];
-    contentLines = contentLines.slice(1);
+    subtitle = contentLines[0]; contentLines = contentLines.slice(1);
   }
-
   return { title, subtitle, contentLines, leadMedia: matchedMedia[0] || null, remainingMedia: matchedMedia.slice(1), missingMedia };
 }
 
 function renderSingleMediaHtml(ref) {
   if (ref.status !== "matched" || !ref.matchedFile) return `<p style="margin:0;color:#64748b;line-height:1.7;">${escapeHtml(ref.tag)}: ${escapeHtml(ref.filename)} (${escapeHtml(ref.detail)})</p>`;
   const embeddedHref = ref.matchedFile.dataUrl || buildEmbeddedMediaUrl(ref.matchedFile);
-  if (ref.tag === "image" && isImageFile(ref.matchedFile.exportName)) return `<strong>Image:</strong> ${escapeHtml(ref.matchedFile.exportName)}<img src="${embeddedHref}" alt="${escapeHtml(ref.matchedFile.exportName)}" />`;
-  if (ref.tag === "video" && isVideoFile(ref.matchedFile.exportName)) return `<strong>Video:</strong> ${escapeHtml(ref.matchedFile.exportName)}<video controls src="${embeddedHref}"></video>`;
-  if (ref.tag === "audio" && isAudioFile(ref.matchedFile.exportName)) return `<strong>Audio:</strong> ${escapeHtml(ref.matchedFile.exportName)}<audio controls src="${embeddedHref}"></audio>`;
+  if (ref.tag === "image"     && isImageFile(ref.matchedFile.exportName))  return `<strong>Image:</strong> ${escapeHtml(ref.matchedFile.exportName)}<img src="${embeddedHref}" alt="${escapeHtml(ref.matchedFile.exportName)}" />`;
+  if (ref.tag === "video"     && isVideoFile(ref.matchedFile.exportName))  return `<strong>Video:</strong> ${escapeHtml(ref.matchedFile.exportName)}<video controls src="${embeddedHref}"></video>`;
+  if (ref.tag === "audio"     && isAudioFile(ref.matchedFile.exportName))  return `<strong>Audio:</strong> ${escapeHtml(ref.matchedFile.exportName)}<audio controls src="${embeddedHref}"></audio>`;
   return `<strong>${escapeHtml(capitalize(ref.tag))}:</strong> <a href="${embeddedHref}" download="${escapeHtml(ref.matchedFile.exportName)}">${escapeHtml(ref.matchedFile.exportName)}</a>`;
 }
 
@@ -979,43 +1452,32 @@ function renderBodyContentHtml(lines) {
   if (!lines.length) return `<p>(No visible text inside block)</p>`;
   const html = [];
   let listBuffer = [];
-
   const flushList = () => {
     if (!listBuffer.length) return;
     html.push(`<ul>${listBuffer.map((line) => `<li>${linkifyText(escapeHtml(line))}</li>`).join("")}</ul>`);
     listBuffer = [];
   };
-
   lines.forEach((line) => {
-    if (looksLikeSectionLabel(line)) {
-      flushList();
-      html.push(`<h2>${escapeHtml(trimTrailingColon(line))}</h2>`);
-      return;
-    }
-
-    if (looksLikeBullet(line)) {
-      listBuffer.push(line.replace(/^[-*•]\s+/, "").trim());
-      return;
-    }
-
+    if (looksLikeSectionLabel(line)) { flushList(); html.push(`<h2>${escapeHtml(trimTrailingColon(line))}</h2>`); return; }
+    if (looksLikeBullet(line))       { listBuffer.push(line.replace(/^[-*•]\s+/, "").trim()); return; }
     flushList();
     html.push(`<p>${linkifyText(escapeHtml(line))}</p>`);
   });
-
   flushList();
   return html.join("");
 }
 
+// ─── Pure utilities ────────────────────────────────────────────────────────
 function splitBodyLines(value) {
   return sanitizeBodyText(value).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
 }
 
 function sanitizeBodyText(value) {
-  return String(value || "").replace(/\u00a0/g, " ").replace(/[“”]/g, "\"").replace(/[‘’]/g, "'").replace(/\s+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  return String(value || "").replace(/ /g, " ").replace(/[""]/g, "\"").replace(/['']/g, "'").replace(/\s+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 function sanitizeFilenameValue(value) {
-  const cleaned = String(value || "").replace(/[“”]/g, "").replace(/[‘’]/g, "").replace(/[\u200b-\u200d\uFEFF]/g, "").trim();
+  const cleaned = String(value || "").replace(/[""]/g, "").replace(/['']/g, "").replace(/[​-‍﻿]/g, "").trim();
   return cleaned.replace(/[<>:"|?*]/g, "").replace(/\s+/g, " ");
 }
 
@@ -1026,18 +1488,9 @@ function sanitizeMediaReferenceName(value) {
 function looksLikeSectionLabel(line) {
   return /^[A-Z][A-Za-z0-9 /&()-]{1,40}:$/.test(line) || /^(over to you|challenges|hints|resources|extensions):?$/i.test(line);
 }
-
-function trimTrailingColon(line) {
-  return String(line).replace(/:\s*$/, "");
-}
-
-function looksLikeBullet(line) {
-  return /^[-*•]\s+/.test(line);
-}
-
-function linkifyText(html) {
-  return html.replace(/(https?:\/\/[^\s<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-}
+function trimTrailingColon(line) { return String(line).replace(/:\s*$/, ""); }
+function looksLikeBullet(line)   { return /^[-*•]\s+/.test(line); }
+function linkifyText(html)       { return html.replace(/(https?:\/\/[^\s<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'); }
 
 function buildMediaIndex(files) {
   const counts = new Map();
@@ -1050,8 +1503,8 @@ function buildMediaIndex(files) {
 
 function dedupeWarnings(warnings) {
   const seen = new Set();
-  return warnings.filter((warning) => {
-    const key = `${warning.level}|${warning.title}|${warning.detail}`;
+  return warnings.filter((w) => {
+    const key = `${w.level}|${w.title}|${w.detail}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -1060,21 +1513,21 @@ function dedupeWarnings(warnings) {
 
 function uniqueMatchedMedia(analysis) {
   const seen = new Set();
-  return analysis.media.references.filter((ref) => ref.status === "matched" && ref.matchedFile).map((ref) => ref.matchedFile).filter((file) => {
-    if (seen.has(file.key)) return false;
-    seen.add(file.key);
-    return true;
-  });
+  return analysis.media.references
+    .filter((ref) => ref.status === "matched" && ref.matchedFile)
+    .map((ref) => ref.matchedFile)
+    .filter((file) => { if (seen.has(file.key)) return false; seen.add(file.key); return true; });
 }
 
-function baseName(filename) { return filename ? filename.replace(/\.[^.]+$/, "") : ""; }
-function lineNumberAt(text, index) { return String(text || "").slice(0, index).split("\n").length; }
-function basenameOnly(value) { return String(value).split("/").pop().split("\\").pop(); }
-function normalizeMediaName(value) { return basenameOnly(value).trim().toLowerCase(); }
+function baseName(filename)         { return filename ? filename.replace(/\.[^.]+$/, "") : ""; }
+function lineNumberAt(text, index)  { return String(text || "").slice(0, index).split("\n").length; }
+function basenameOnly(value)        { return String(value).split("/").pop().split("\\").pop(); }
+function normalizeMediaName(value)  { return basenameOnly(value).trim().toLowerCase(); }
+
 function blobToDataUrl(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload  = () => resolve(reader.result);
     reader.onerror = () => reject(reader.error || new Error("Could not convert blob to data URL."));
     reader.readAsDataURL(blob);
   });
@@ -1087,9 +1540,8 @@ function buildEmbeddedMediaUrl(file) {
 function uint8ToBase64(uint8) {
   let binary = "";
   const chunkSize = 32768;
-  for (let index = 0; index < uint8.length; index += chunkSize) {
-    const chunk = uint8.subarray(index, index + chunkSize);
-    binary += String.fromCharCode(...chunk);
+  for (let i = 0; i < uint8.length; i += chunkSize) {
+    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
   }
   return btoa(binary);
 }
@@ -1097,28 +1549,29 @@ function uint8ToBase64(uint8) {
 function getMimeType(filename) {
   const lower = filename.toLowerCase();
   if (/\.(jpg|jpeg)$/.test(lower)) return "image/jpeg";
-  if (/\.png$/.test(lower)) return "image/png";
-  if (/\.gif$/.test(lower)) return "image/gif";
-  if (/\.svg$/.test(lower)) return "image/svg+xml";
-  if (/\.webp$/.test(lower)) return "image/webp";
-  if (/\.mp4$/.test(lower)) return "video/mp4";
-  if (/\.webm$/.test(lower)) return "video/webm";
-  if (/\.mp3$/.test(lower)) return "audio/mpeg";
-  if (/\.wav$/.test(lower)) return "audio/wav";
-  if (/\.pdf$/.test(lower)) return "application/pdf";
+  if (/\.png$/.test(lower))        return "image/png";
+  if (/\.gif$/.test(lower))        return "image/gif";
+  if (/\.svg$/.test(lower))        return "image/svg+xml";
+  if (/\.webp$/.test(lower))       return "image/webp";
+  if (/\.mp4$/.test(lower))        return "video/mp4";
+  if (/\.webm$/.test(lower))       return "video/webm";
+  if (/\.mp3$/.test(lower))        return "audio/mpeg";
+  if (/\.wav$/.test(lower))        return "audio/wav";
+  if (/\.pdf$/.test(lower))        return "application/pdf";
+  if (/\.docx$/.test(lower))       return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   return "application/octet-stream";
 }
+
 function isImageFile(filename) { return /\.(png|jpe?g|gif|svg|webp)$/i.test(filename); }
 function isVideoFile(filename) { return /\.(mp4|webm|ogg)$/i.test(filename); }
 function isAudioFile(filename) { return /\.(mp3|wav|ogg|m4a)$/i.test(filename); }
-function encodePathSegment(value) { return encodeURIComponent(value); }
-function capitalize(value) { return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : ""; }
+function capitalize(value)     { return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : ""; }
+
 function makeExcerpt(value, maxLength) {
   const cleaned = value.replace(/\s+/g, " ").trim();
   if (!cleaned) return "";
-  if (cleaned.length <= maxLength) return cleaned;
-  return `${cleaned.slice(0, maxLength).trim()}...`;
+  return cleaned.length <= maxLength ? cleaned : `${cleaned.slice(0, maxLength).trim()}...`;
 }
-function escapeXml(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&apos;"); }
-function escapeHtml(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;"); }
 
+function escapeXml(value)  { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&apos;"); }
+function escapeHtml(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;"); }
