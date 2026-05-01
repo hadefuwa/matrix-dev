@@ -697,11 +697,19 @@ async function buildMiniDocx(block) {
   try {
     const zip = new JSZip();
     const { nodes, extraMediaFiles, extraRelEntries } = resolveImageNodes(block.contentParaNodes, block);
-    zip.file("word/document.xml",        buildBlockDocumentXml(nodes));
+    // Resolve relationships first so we know which r:link IDs were embedded from the ZIP.
+    const { relsXml, mediaFiles, linkedToEmbeddedIds } = await buildBlockRels(nodes, extraRelEntries);
+    // Build document XML, then promote r:link → r:embed for any IDs we just embedded.
+    // Word treats r:link as an external reference regardless of the relationship Target,
+    // so images only appear when the attribute is r:embed.
+    let docXml = buildBlockDocumentXml(nodes);
+    for (const rId of linkedToEmbeddedIds) {
+      docXml = docXml.split(`r:link="${rId}"`).join(`r:embed="${rId}"`);
+    }
+    zip.file("word/document.xml",        docXml);
     if (currentStylesXml)    zip.file("word/styles.xml",         currentStylesXml);
     if (currentNumberingXml) zip.file("word/numbering.xml",      currentNumberingXml);
     if (currentThemeXml)     zip.file("word/theme/theme1.xml",   currentThemeXml);
-    const { relsXml, mediaFiles } = await buildBlockRels(nodes, extraRelEntries);
     zip.file("word/_rels/document.xml.rels", relsXml);
     const seen = new Set();
     for (const f of [...mediaFiles, ...extraMediaFiles]) {
@@ -756,6 +764,9 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
 
   const relEntries = [];
   const mediaFiles = [];
+  // Track IDs that were r:link (externally-linked) but resolved to embedded files.
+  // The document XML still has r:link for these — callers must swap them to r:embed.
+  const linkedToEmbeddedIds = new Set();
 
   for (const [rId, rel] of currentRels) {
     if (!usedRids.has(rId)) continue;
@@ -773,10 +784,12 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
         if (zipEntry) {
           mediaFiles.push({ name: zipEntry.exportName, data: zipEntry.data });
           relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(zipEntry.exportName)}"/>`);
+          linkedToEmbeddedIds.add(rId);
           continue;
         } else if (embEntry) {
           mediaFiles.push({ name: embEntry.exportName, data: embEntry.data });
           relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(embEntry.exportName)}"/>`);
+          linkedToEmbeddedIds.add(rId);
           continue;
         }
       }
@@ -810,7 +823,8 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
 
   return {
     relsXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n${[...relEntries, ...extraRelEntries].join("\n")}\n</Relationships>`,
-    mediaFiles
+    mediaFiles,
+    linkedToEmbeddedIds
   };
 }
 
