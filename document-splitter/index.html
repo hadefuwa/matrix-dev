@@ -253,27 +253,27 @@
     .btn-ghost:hover { background: var(--surface); color: var(--ink); }
     .btn svg { flex-shrink: 0; }
 
-    .hero-side {
-      background: var(--panel);
+    .hero-pipeline-card {
+      background: #ffffff;
       border: 1px solid rgba(255,255,255,0.5);
-      border-radius: var(--radius);
+      border-radius: 14px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.12);
-      padding: 1.5rem;
+      padding: 1.25rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       position: relative;
       overflow: hidden;
     }
-    .hero-side::before {
+    .hero-pipeline-card::before {
       content: "";
       position: absolute;
       inset: 0 0 auto 0;
       height: 3px;
       background: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #059669 100%);
-      border-radius: var(--radius) var(--radius) 0 0;
     }
-    .pipeline-label {
+    .pipeline-card-label {
+      display: block;
       font-size: 0.73rem;
       font-weight: 800;
       letter-spacing: 0.1em;
@@ -762,46 +762,53 @@
           </div>
         </div>
 
-        <aside class="hero-side">
-          <p class="pipeline-label">Pipeline</p>
-          <svg viewBox="0 0 300 155" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-pipeline-svg" aria-label="Diagram: source DOCX feeds tagged blocks through analysis into built outputs">
-            <rect x="8" y="14" width="68" height="86" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
-            <path d="M58 14 L76 30 H58 Z" fill="#bfdbfe"/>
-            <line x1="58" y1="14" x2="76" y2="30" stroke="#93c5fd" stroke-width="1.2"/>
-            <rect x="16" y="38" width="42" height="7" rx="3" fill="#3b82f6"/>
-            <rect x="16" y="50" width="32" height="5" rx="2.5" fill="#bfdbfe"/>
-            <rect x="16" y="60" width="42" height="7" rx="3" fill="#7c3aed" opacity="0.75"/>
-            <rect x="16" y="72" width="24" height="5" rx="2.5" fill="#ddd6fe"/>
-            <rect x="16" y="82" width="42" height="7" rx="3" fill="#059669" opacity="0.75"/>
-            <rect x="16" y="94" width="18" height="4" rx="2" fill="#d1fae5"/>
+        <aside class="hero-pipeline-card">
+          <span class="pipeline-card-label">Pipeline — live prototype</span>
+          <svg viewBox="0 0 300 155" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-pipeline-svg" aria-label="Diagram: source DOCX feeds 32 tagged blocks through analysis into 2 built outputs">
+            <!-- Source document -->
+            <rect x="8" y="14" width="68" height="86" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"></rect>
+            <path d="M58 14 L76 30 H58 Z" fill="#bfdbfe"></path>
+            <line x1="58" y1="14" x2="76" y2="30" stroke="#93c5fd" stroke-width="1.2"></line>
+            <!-- Tagged block lines in document -->
+            <rect x="16" y="38" width="42" height="7" rx="3" fill="#3b82f6"></rect>
+            <rect x="16" y="50" width="32" height="5" rx="2.5" fill="#bfdbfe"></rect>
+            <rect x="16" y="60" width="42" height="7" rx="3" fill="#7c3aed" opacity="0.75"></rect>
+            <rect x="16" y="72" width="24" height="5" rx="2.5" fill="#ddd6fe"></rect>
+            <rect x="16" y="82" width="42" height="7" rx="3" fill="#059669" opacity="0.75"></rect>
+            <rect x="16" y="94" width="18" height="4" rx="2" fill="#d1fae5"></rect>
             <text x="42" y="112" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">· · ·</text>
-            <text x="42" y="127" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui">Source DOCX</text>
-            <text x="42" y="140" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">1 file</text>
+            <text x="42" y="127" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui, sans-serif">Source DOCX</text>
+            <text x="42" y="140" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui, sans-serif">1 file</text>
+            <!-- Animated connector 1 -->
             <line x1="80" y1="57" x2="112" y2="57" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
-              <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite"/>
+              <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite"></animate>
             </line>
-            <path d="M110 53 L118 57 L110 61" fill="#3b82f6"/>
-            <rect x="118" y="22" width="72" height="72" rx="8" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.5"/>
-            <rect x="126" y="31" width="56" height="10" rx="3" fill="#dbeafe"/>
-            <rect x="126" y="31" width="22" height="10" rx="3" fill="#3b82f6"/>
-            <rect x="126" y="45" width="56" height="10" rx="3" fill="#ede9fe"/>
-            <rect x="126" y="45" width="38" height="10" rx="3" fill="#7c3aed" opacity="0.8"/>
-            <rect x="126" y="59" width="56" height="10" rx="3" fill="#d1fae5"/>
-            <rect x="126" y="59" width="30" height="10" rx="3" fill="#059669" opacity="0.8"/>
-            <rect x="128" y="77" width="52" height="13" rx="6.5" fill="#2563eb"/>
+            <path d="M110 53 L118 57 L110 61" fill="#3b82f6"></path>
+            <!-- Analysis box -->
+            <rect x="118" y="22" width="72" height="72" rx="8" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.5"></rect>
+            <rect x="126" y="31" width="56" height="10" rx="3" fill="#dbeafe"></rect>
+            <rect x="126" y="31" width="22" height="10" rx="3" fill="#3b82f6"></rect>
+            <rect x="126" y="45" width="56" height="10" rx="3" fill="#ede9fe"></rect>
+            <rect x="126" y="45" width="38" height="10" rx="3" fill="#7c3aed" opacity="0.8"></rect>
+            <rect x="126" y="59" width="56" height="10" rx="3" fill="#d1fae5"></rect>
+            <rect x="126" y="59" width="30" height="10" rx="3" fill="#059669" opacity="0.8"></rect>
+            <rect x="128" y="77" width="52" height="13" rx="6.5" fill="#2563eb"></rect>
             <text x="154" y="87" text-anchor="middle" fill="white" font-size="8.5" font-weight="700" font-family="system-ui">32 blocks</text>
             <text x="154" y="113" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui">Analysis</text>
             <text x="154" y="126" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">tags classified</text>
+            <!-- Animated connector 2 -->
             <line x1="194" y1="57" x2="224" y2="57" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3">
-              <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite" begin="0.6s"/>
+              <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.2s" repeatCount="indefinite" begin="0.6s"></animate>
             </line>
-            <path d="M222 53 L230 57 L222 61" fill="#3b82f6"/>
-            <rect x="232" y="12" width="60" height="48" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
-            <path d="M272 12 L292 30 H272 Z" fill="#a7f3d0"/>
+            <path d="M222 53 L230 57 L222 61" fill="#3b82f6"></path>
+            <!-- HTML output -->
+            <rect x="232" y="12" width="60" height="48" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"></rect>
+            <path d="M272 12 L292 30 H272 Z" fill="#a7f3d0"></path>
             <text x="252" y="36" fill="#065f46" font-size="11" font-weight="700" font-family="monospace">&lt;/&gt;</text>
             <text x="262" y="50" text-anchor="middle" fill="#6b7280" font-size="8.5" font-family="system-ui">H1.html</text>
-            <rect x="232" y="70" width="60" height="48" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
-            <path d="M272 70 L292 88 H272 Z" fill="#ddd6fe"/>
+            <!-- DOC output -->
+            <rect x="232" y="70" width="60" height="48" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"></rect>
+            <path d="M272 70 L292 88 H272 Z" fill="#ddd6fe"></path>
             <text x="253" y="94" fill="#5b21b6" font-size="11" font-weight="700" font-family="monospace">DOC</text>
             <text x="262" y="108" text-anchor="middle" fill="#6b7280" font-size="8.5" font-family="system-ui">1.html</text>
             <text x="262" y="127" text-anchor="middle" fill="#6b7280" font-size="9.5" font-weight="600" font-family="system-ui">Outputs</text>
