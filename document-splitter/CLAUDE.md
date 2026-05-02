@@ -28,6 +28,7 @@ specs/
   output-rules.md       — output naming and routing
   scorm-rules.md        — SCORM packaging requirements and stop conditions
   source-authoring-guide.md — how to write a source DOCX correctly
+  media-rules.md        — media handling invariants, URI-safety rule, cover-table pattern, regression test
 
 agents.md               — AI agent roles, stage definitions, stop conditions
 prompt-01-analyse.md    — Stage 1 prompt
@@ -169,3 +170,25 @@ This is a real tagged DOCX with 32 blocks. It uses **external media references**
 - Do not add `<script>` tags after `upload-media.js` to override its functions — they are module-scoped and cannot be overridden externally
 - Do not add IDs to HTML elements that `upload-media.js` does not reference — they will silently do nothing
 - Do not break the panel ID list — the JS selects all panels by ID at startup
+- **Do not write media filenames directly into ZIP entries or `Target` attributes without calling `sanitizeMediaFilename()` first** — spaces and other URI-illegal characters cause Word to silently drop the image with no error (see `specs/media-rules.md` §3)
+- **Do not exclude the opening paragraph of a block from content when it is a table** — the cover-table pattern means the opening table holds real deliverable content, including the cover image (see `specs/media-rules.md` §4)
+- **Do not modify media-handling code without running `node document-splitter/build-all.js` afterwards** — it must report 32 blocks, 66 checks, 0 failures
+
+---
+
+## Regression testing
+
+After any change to media handling, block extraction, or DOCX building:
+
+```
+node document-splitter/build-all.js
+```
+
+This replicates the full browser pipeline in Node.js and verifies every block's embedded images. It is the authoritative regression guard for the two historical bugs:
+
+| Bug | Guard |
+|-----|-------|
+| Spaces in filenames → blank images in Word | CP4807-6 must embed `electronics_board.jpg` and `youtube_logo.png` |
+| Cover-table image dropped | Every worksheet block must contain at least one embedded image |
+
+Both bugs were confirmed and fixed May 2026. Details in `specs/media-rules.md`.
