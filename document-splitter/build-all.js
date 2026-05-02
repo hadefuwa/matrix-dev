@@ -39,7 +39,7 @@ const hr    = (t)  => console.log(`\n${"═".repeat(64)}\n  ${t}\n${"═".repeat
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function normalizeKey(name) {
-  return path.basename(String(name)).trim().toLowerCase();
+  return path.basename(String(name)).trim().toLowerCase().replace(/[\s]+/g, "_");
 }
 function decodeFileName(raw) {
   try { return decodeURIComponent(raw); } catch (_) { return raw; }

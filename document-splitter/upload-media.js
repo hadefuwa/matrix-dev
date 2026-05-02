@@ -1790,7 +1790,7 @@ function uniqueMatchedMedia(analysis) {
 function baseName(filename)         { return filename ? filename.replace(/\.[^.]+$/, "") : ""; }
 function lineNumberAt(text, index)  { return String(text || "").slice(0, index).split("\n").length; }
 function basenameOnly(value)        { return String(value).split("/").pop().split("\\").pop(); }
-function normalizeMediaName(value)  { return basenameOnly(value).trim().toLowerCase(); }
+function normalizeMediaName(value)  { return basenameOnly(value).trim().toLowerCase().replace(/[\s]+/g, "_"); }
 // Sanitize a media filename for use inside a DOCX ZIP and as an OOXML relationship Target.
 // OOXML relationship Targets are anyURIs — spaces are not valid in a URI path segment and
 // cause Word to silently fail to load the image.  Replace spaces (and other unsafe chars)
