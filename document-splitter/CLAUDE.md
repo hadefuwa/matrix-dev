@@ -17,6 +17,10 @@ index.html              — single-page UI (hero + upload panels)
 upload-media.js         — all logic: DOCX parsing, block detection, output generation
 styles.css              — legacy styles (not used by index.html, which is self-contained)
 .gitignore              — excludes ~$* Word temp files
+inspect-filename.js     — Node.js debug tool: prints raw chars & surrounding XML for <filename> tags
+                          Usage: node document-splitter/inspect-filename.js <path-to.docx>
+build-all.js            — Node.js regression test (replicates browser pipeline)
+                          Usage: node document-splitter/build-all.js
 
 source/
   CP4807 - Introduction to microcontrollers 05 04 26.docx  — example source document
@@ -184,7 +188,7 @@ After any change to media handling, block extraction, or DOCX building:
 node document-splitter/build-all.js
 ```
 
-This replicates the full browser pipeline in Node.js and verifies every block's embedded images. It is the authoritative regression guard for the two historical bugs:
+Must report: **32 blocks, 66 checks, 0 failures**. This is the authoritative regression guard.
 
 | Bug | Guard |
 |-----|-------|
@@ -192,3 +196,13 @@ This replicates the full browser pipeline in Node.js and verifies every block's 
 | Cover-table image dropped | Every worksheet block must contain at least one embedded image |
 
 Both bugs were confirmed and fixed May 2026. Details in `specs/media-rules.md`.
+
+## Debug tools
+
+**Diagnosing `<filename>` tag parsing issues** (e.g. curly quotes, invisible Unicode):
+
+```
+node document-splitter/inspect-filename.js <path-to.docx>
+```
+
+Prints raw character codes and surrounding XML for the first six `<filename>` tags in the document. Use this when `analyzeText` fails to detect blocks that visually look correct in Word.

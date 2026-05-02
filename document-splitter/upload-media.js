@@ -1709,13 +1709,30 @@ function stripStructuralTags(body) {
 // Regex matching tag markup that should never appear as visible text in output files.
 const NODE_TAG_STRIP_RE = /<\/?(HTML|worksheet|document)\s*>|<filename>[^<>]*<\/filename>|<(?:image|video|audio|datasheet)[^<>]*>[^<>]*<\/(?:image|video|audio|datasheet)>/gi;
 
-// Strip tag markup text from all w:t children of a DOM node (mutates — call on imported copies only).
+// Strip tag markup text from a DOM node (mutates — call on imported copies only).
+// Works at the w:p level so split-across-runs tags are caught by joining all runs first.
+// Handles both standalone paragraphs and paragraphs inside cover tables.
 function stripTagMarkupFromNode(node) {
-  const tNodes = node.getElementsByTagNameNS ? node.getElementsByTagNameNS("*", "t") : [];
-  for (const t of tNodes) {
-    const orig = t.textContent || "";
-    const stripped = orig.replace(NODE_TAG_STRIP_RE, "");
-    if (stripped !== orig) t.textContent = stripped;
+  const paras = node.localName === "p" ? [node] : [];
+  if (!paras.length && node.getElementsByTagNameNS) {
+    const nl = node.getElementsByTagNameNS("*", "p");
+    for (let i = 0; i < nl.length; i++) paras.push(nl[i]);
+  }
+  for (const para of paras) {
+    const tNodes = para.getElementsByTagNameNS ? para.getElementsByTagNameNS("*", "t") : [];
+    if (!tNodes.length) continue;
+    const fullText = Array.from(tNodes).map(t => t.textContent || "").join("");
+    if (!fullText.replace(NODE_TAG_STRIP_RE, "").trim()) {
+      // Whole paragraph is just structural tag text — wipe all runs
+      for (const t of tNodes) t.textContent = "";
+    } else {
+      // Real content — only strip individual runs that exactly match a tag pattern
+      for (const t of tNodes) {
+        const orig = t.textContent || "";
+        const stripped = orig.replace(NODE_TAG_STRIP_RE, "");
+        if (stripped !== orig) t.textContent = stripped;
+      }
+    }
   }
 }
 

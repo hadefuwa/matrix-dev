@@ -70,11 +70,24 @@ function getText(node) {
 const NODE_TAG_STRIP_RE = /<\/?(HTML|worksheet|document)\s*>|<filename>[^<>]*<\/filename>|<(?:image|video|audio|datasheet)[^<>]*>[^<>]*<\/(?:image|video|audio|datasheet)>/gi;
 
 function stripTagMarkupFromNode(node) {
-  const tNodes = node.getElementsByTagNameNS ? node.getElementsByTagNameNS("*", "t") : [];
-  for (const t of tNodes) {
-    const orig = t.textContent || "";
-    const stripped = orig.replace(NODE_TAG_STRIP_RE, "");
-    if (stripped !== orig) t.textContent = stripped;
+  // Work at the w:p level so split-across-runs tags are caught by joining all runs first.
+  // This handles both standalone paragraphs and paragraphs inside cover tables.
+  const paras = node.localName === "p" ? [node] : getByLocal(node, "p");
+  for (const para of paras) {
+    const tNodes = getByLocal(para, "t");
+    if (!tNodes.length) continue;
+    const fullText = tNodes.map(t => t.textContent || "").join("");
+    if (!fullText.replace(NODE_TAG_STRIP_RE, "").trim()) {
+      // Whole paragraph is just structural tag text — wipe all runs
+      for (const t of tNodes) t.textContent = "";
+    } else {
+      // Real content — only strip individual runs that exactly match a tag pattern
+      for (const t of tNodes) {
+        const orig = t.textContent || "";
+        const stripped = orig.replace(NODE_TAG_STRIP_RE, "");
+        if (stripped !== orig) t.textContent = stripped;
+      }
+    }
   }
 }
 
