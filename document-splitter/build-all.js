@@ -239,7 +239,17 @@ function extractContentNodes(block, paragraphs) {
   const openEntry = paragraphs[open];
   if (openEntry && openEntry.isTable) nodes.push(openEntry.xmlNode);
   for (let i = open + 1; i < close; i++) {
-    if (paragraphs[i]) nodes.push(paragraphs[i].xmlNode);
+    const p = paragraphs[i];
+    if (!p) continue;
+    // Skip paragraphs that are purely structural tag markers — their combined text
+    // reduces to empty after removing all tag patterns.  Guard image paragraphs:
+    // an image-only paragraph also has empty text, so check for drawing elements
+    // before discarding.
+    if (!p.isTable) {
+      const hasImage = getByLocal(p.xmlNode, "drawing").length > 0 || getByLocal(p.xmlNode, "blip").length > 0;
+      if (!hasImage && !p.text.replace(NODE_TAG_STRIP_RE, "").trim()) continue;
+    }
+    nodes.push(p.xmlNode);
   }
   return nodes;
 }
