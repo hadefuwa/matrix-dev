@@ -47,6 +47,7 @@ function decodeFileName(raw) {
 function escXml(v) {
   return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
+function sanitizeMediaFilename(name) { return String(name).replace(/[\s#%&?]/g, "_"); }
 
 const xParser = new DOMParser({ onError: () => {} });
 const xSer    = new XMLSerializer();
@@ -243,8 +244,9 @@ function buildBlockRels(contentNodes, rels) {
 
     if (rel.mode === "Internal" && isImg && rel._resolvedFile) {
       const f = rel._resolvedFile;
-      mediaFiles.push({ name: f.exportName, data: f.data });
-      relEntries.push(`  <Relationship Id="${escXml(rId)}" Type="${escXml(rel.type)}" Target="media/${escXml(f.exportName)}"/>`);
+      const safeName = sanitizeMediaFilename(f.exportName);
+      mediaFiles.push({ name: safeName, data: f.data });
+      relEntries.push(`  <Relationship Id="${escXml(rId)}" Type="${escXml(rel.type)}" Target="media/${escXml(safeName)}"/>`);
     } else if (rel.mode === "External" && isImg) {
       // fallback: should have been patched already, but handle it anyway
       relEntries.push(`  <Relationship Id="${escXml(rId)}" Type="${escXml(rel.type)}" Target="${escXml(rel.target)}" TargetMode="External"/>`);

@@ -762,12 +762,13 @@ function resolveImageNodes(paraNodes, block) {
       );
       if (ref) {
         const file = ref.matchedFile;
+        const safeName = sanitizeMediaFilename(file.exportName);
         const rId = `rImgInj${++seq}`;
         try {
-          const drawingNode = new DOMParser().parseFromString(buildDrawingXml(rId, file.exportName), "application/xml").documentElement;
+          const drawingNode = new DOMParser().parseFromString(buildDrawingXml(rId, safeName), "application/xml").documentElement;
           result.push(drawingNode);
-          extraMediaFiles.push({ name: file.exportName, data: file.data });
-          extraRelEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${escapeXml(file.exportName)}"/>`);
+          extraMediaFiles.push({ name: safeName, data: file.data });
+          extraRelEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${escapeXml(safeName)}"/>`);
           continue;
         } catch (_) { /* fall through */ }
       }
@@ -907,16 +908,18 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
         const zipEntry = currentMediaIndex.get(key);
         const embEntry = currentEmbeddedMediaIndex.get(key);
         if (zipEntry) {
-          mediaFiles.push({ name: zipEntry.exportName, data: zipEntry.data });
-          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(zipEntry.exportName)}"/>`);
+          const safeName = sanitizeMediaFilename(zipEntry.exportName);
+          mediaFiles.push({ name: safeName, data: zipEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(safeName)}"/>`);
           linkedToEmbeddedIds.add(rId);
-          console.log(`[DOCX-IMG]   → resolved from ZIP: ${zipEntry.exportName}`);
+          console.log(`[DOCX-IMG]   → resolved from ZIP: ${safeName}`);
           continue;
         } else if (embEntry) {
-          mediaFiles.push({ name: embEntry.exportName, data: embEntry.data });
-          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(embEntry.exportName)}"/>`);
+          const safeName = sanitizeMediaFilename(embEntry.exportName);
+          mediaFiles.push({ name: safeName, data: embEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(safeName)}"/>`);
           linkedToEmbeddedIds.add(rId);
-          console.log(`[DOCX-IMG]   → resolved from embedded: ${embEntry.exportName}`);
+          console.log(`[DOCX-IMG]   → resolved from embedded: ${safeName}`);
           continue;
         } else {
           console.warn(`[DOCX-IMG]   ✗ no match for "${fileName}" — image will be missing`);
@@ -927,15 +930,17 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
       // Internal resource — check for pre-resolved file first (set by patchSourceXmlForEmbeddedImages)
       if (isImageRel && rel._resolvedFile) {
         const f = rel._resolvedFile;
-        mediaFiles.push({ name: f.exportName, data: f.data });
-        relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(f.exportName)}"/>`);
-        console.log(`[DOCX-IMG]   → pre-resolved: ${f.exportName}`);
+        const safeName = sanitizeMediaFilename(f.exportName);
+        mediaFiles.push({ name: safeName, data: f.data });
+        relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(safeName)}"/>`);
+        console.log(`[DOCX-IMG]   → pre-resolved: ${safeName}`);
         continue;
       }
       // Copy the file from the source DOCX
       const rawTarget = rel.target.replace(/^\//, "");
       const sourcePath = rawTarget.startsWith("word/") ? rawTarget : `word/${rawTarget}`;
-      const fileName = rawTarget.split("/").pop();
+      const rawFileName = rawTarget.split("/").pop();
+      const fileName = sanitizeMediaFilename(rawFileName);
       const sourceEntry = currentDocxZip.file(sourcePath) || currentDocxZip.file(rawTarget);
       if (sourceEntry) {
         const data = await sourceEntry.async("uint8array");
@@ -943,15 +948,17 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
         relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(fileName)}"/>`);
       } else if (isImageRel) {
         // File missing from DOCX — try ZIP and embedded media as fallback
-        const key = normalizeMediaName(fileName);
+        const key = normalizeMediaName(rawFileName);
         const zipEntry = currentMediaIndex.get(key);
         const embEntry = currentEmbeddedMediaIndex.get(key);
         if (zipEntry) {
-          mediaFiles.push({ name: zipEntry.exportName, data: zipEntry.data });
-          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(zipEntry.exportName)}"/>`);
+          const safeName = sanitizeMediaFilename(zipEntry.exportName);
+          mediaFiles.push({ name: safeName, data: zipEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(safeName)}"/>`);
         } else if (embEntry) {
-          mediaFiles.push({ name: embEntry.exportName, data: embEntry.data });
-          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(embEntry.exportName)}"/>`);
+          const safeName = sanitizeMediaFilename(embEntry.exportName);
+          mediaFiles.push({ name: safeName, data: embEntry.data });
+          relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="media/${escapeXml(safeName)}"/>`);
         }
       }
     }
@@ -1784,6 +1791,11 @@ function baseName(filename)         { return filename ? filename.replace(/\.[^.]
 function lineNumberAt(text, index)  { return String(text || "").slice(0, index).split("\n").length; }
 function basenameOnly(value)        { return String(value).split("/").pop().split("\\").pop(); }
 function normalizeMediaName(value)  { return basenameOnly(value).trim().toLowerCase(); }
+// Sanitize a media filename for use inside a DOCX ZIP and as an OOXML relationship Target.
+// OOXML relationship Targets are anyURIs — spaces are not valid in a URI path segment and
+// cause Word to silently fail to load the image.  Replace spaces (and other unsafe chars)
+// with underscores so the Target is always a valid URI without needing percent-encoding.
+function sanitizeMediaFilename(name) { return String(name).replace(/[\s#%&?]/g, "_"); }
 
 function blobToDataUrl(blob) {
   return new Promise((resolve, reject) => {
