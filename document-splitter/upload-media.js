@@ -29,6 +29,7 @@ const generatedList = document.getElementById("generatedList");
 
 // ─── Source file state ─────────────────────────────────────────────────────
 let currentSourceFile = "";
+let currentSourceBuffer = null;   // raw bytes of the uploaded DOCX
 let currentSourceText = "";
 let currentAnalysis = null;
 let currentParagraphs = [];       // [{index, textContent, xmlNode, isTable}]
@@ -41,6 +42,7 @@ let currentDocXml = null;         // raw string of word/document.xml
 
 // ─── Media state ───────────────────────────────────────────────────────────
 let currentMediaZipName = "";
+let currentMediaZipBuffer = null; // raw bytes of the uploaded media ZIP
 let currentMediaBundle = [];
 let currentMediaIndex = new Map();
 let currentMediaDuplicateNames = new Set();
@@ -167,6 +169,7 @@ async function handleSourceFile(file) {
 
   try {
     const buffer = await file.arrayBuffer();
+    currentSourceBuffer = new Uint8Array(buffer);
     const zip = await JSZip.loadAsync(buffer);
     if (!zip.file("word/document.xml")) {
       renderError("The uploaded .docx could not be read as a standard Word document.");
@@ -212,6 +215,7 @@ async function handleMediaFile(file) {
 
   try {
     const buffer = await file.arrayBuffer();
+    currentMediaZipBuffer = new Uint8Array(buffer);
     const zip = await JSZip.loadAsync(buffer);
     const mediaFiles = [];
 
@@ -1480,6 +1484,7 @@ function renderError(message) {
 
 function renderMediaError(message) {
   currentMediaZipName = "";
+  currentMediaZipBuffer = null;
   currentMediaBundle = [];
   currentMediaIndex = new Map();
   currentMediaDuplicateNames = new Set();
@@ -1589,6 +1594,9 @@ async function downloadBundle() {
     `Ambiguous media refs: ${currentAnalysis.media.ambiguousCount}`
   ].join("\n"));
 
+  if (currentSourceBuffer)   zip.file(`source/${currentSourceFile}`, currentSourceBuffer);
+  if (currentMediaZipBuffer) zip.file(`source/${currentMediaZipName}`, currentMediaZipBuffer);
+
   // Generated artefacts: HTML files have .content (string), DOCX files have .blob
   for (const file of generatedArtefacts) {
     if (file.blob)    zip.file(`generated/${file.filename}`, file.blob);
@@ -1634,6 +1642,7 @@ function revokeObjectUrls() {
 
 function resetSourceState() {
   currentSourceFile       = "";
+  currentSourceBuffer     = null;
   currentSourceText       = "";
   currentAnalysis         = null;
   currentParagraphs       = [];
