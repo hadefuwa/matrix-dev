@@ -1788,7 +1788,11 @@ function sanitizeBodyText(value) {
 }
 
 function sanitizeFilenameValue(value) {
-  const cleaned = String(value || "").replace(/[""]/g, "").replace(/['']/g, "").replace(/[​-‍﻿]/g, "").trim();
+  const cleaned = String(value || "")
+    .replace(/[“”]/g, "")   // left/right double quotation marks (curly)
+    .replace(/[‘’]/g, "")   // left/right single quotation marks (curly)
+    .replace(/[​-‏﻿]/g, "")  // zero-width / BOM chars
+    .trim();
   return cleaned.replace(/[<>:"|?*]/g, "").replace(/\s+/g, " ");
 }
 

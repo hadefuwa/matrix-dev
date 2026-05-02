@@ -216,14 +216,14 @@ function findBlocks(paragraphs) {
   };
 
   const blocks  = [];
-  const TOKEN   = /<filename>\s*["“”]?([^"“”<>\n]+)["“”]?\s*<\/filename>|<(HTML|worksheet|document)>|<\/(HTML|worksheet|document)>/gi;
+  const TOKEN   = /<filename>\s*[\u201c\u201d"]?([^\u201c\u201d"<>\n]+)[\u201c\u201d"]?\s*<\/filename>|<(HTML|worksheet|document)>|<\/(HTML|worksheet|document)>/gi;
   let current   = null;
   let tok;
   while ((tok = TOKEN.exec(joined)) !== null) {
     const idx = toParaIdx(tok.index);
     if (tok[2])                             { current = { tagType: tok[2], openIdx: idx, filename: null }; }
     else if (tok[3] && current)             { blocks.push({ ...current, closeIdx: idx }); current = null; }
-    else if (tok[1] && current && !current.filename) { current.filename = tok[1].trim().replace(/["“”]/g, ""); }
+    else if (tok[1] && current && !current.filename) { current.filename = tok[1].trim().replace(/[\u201c\u201d"]/g, ""); }
   }
   return blocks;
 }
