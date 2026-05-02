@@ -650,7 +650,13 @@ function extractContentParaNodes(rawBlock, paragraphs) {
   const open  = rawBlock.openParaIndex  !== undefined ? rawBlock.openParaIndex  : 0;
   const close = rawBlock.closeParaIndex !== undefined ? rawBlock.closeParaIndex : paragraphs.length - 1;
   const nodes = [];
-  // Exclude the tag paragraphs at open and close; include everything in between
+  // The opening tag paragraph (e.g. <HTML>) is normally a plain text paragraph that only
+  // contains the tag marker — exclude it.  However, when the author puts the block tag
+  // inside a table (a common pattern for cover/header tables that also embed images), the
+  // whole table is indexed as the opening paragraph.  In that case include it so that
+  // images embedded in the cover table are not silently dropped from the output.
+  const openEntry = paragraphs[open];
+  if (openEntry && openEntry.isTable) nodes.push(openEntry.xmlNode);
   for (let i = open + 1; i < close; i++) {
     if (paragraphs[i]) nodes.push(paragraphs[i].xmlNode);
   }

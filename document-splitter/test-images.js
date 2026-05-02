@@ -223,6 +223,300 @@ async function main() {
     pass(`Patched XML has ${imageEmbeds.length} r:embed reference(s) for images`);
   }
 
+  // ── Test 5: End-to-end block build pipeline ──────────────────────────────
+  section("TEST 5 — End-to-end block build: find all HTML blocks & build the one with images");
+
+  let mediaFileIndex = new Map(); // normalizedKey → { exportName, data }
+  if (fs.existsSync(SOURCE_MEDIA)) {
+    const mzRaw = await JSZip.loadAsync(fs.readFileSync(SOURCE_MEDIA));
+    for (const [name, entry] of Object.entries(mzRaw.files)) {
+      if (!entry.dir && !name.startsWith("__MACOSX/")) {
+        const exportName = path.basename(name);
+        const key = normalizeKey(exportName);
+        const data = await entry.async("uint8array");
+        mediaFileIndex.set(key, { exportName, data });
+      }
+    }
+    pass(`Media file data loaded — ${mediaFileIndex.size} entries with bytes`);
+  } else {
+    skip("Media ZIP not found — Test 5 cannot run without file data");
+  }
+
+  // Build patchedRels: simulate what patchSourceXmlForEmbeddedImages does to currentRels
+  // For each external image rel that was successfully patched in Test 3, mark it Internal + _resolvedFile
+  const patchedRels = new Map();
+  let t5ResolvedCount = 0;
+  let t5SkippedCount  = 0;
+  for (const [rId, rel] of rels) {
+    patchedRels.set(rId, { ...rel });
+  }
+  for (const [rId, rel] of patchedRels) {
+    if (rel.mode !== "External" || !rel.type.includes("/image")) continue;
+    const fileName = decodeFileName(rel.target.split(/[\\/]/).pop());
+    const key      = normalizeKey(fileName);
+    const resolved = mediaFileIndex.get(key);
+    if (!resolved) { t5SkippedCount++; continue; }
+
+    // Verify the swap was actually applied in patchedXml (same check as Test 3)
+    const safeId  = rId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const wasSwapped = patchedXml !== patchedXml.replace(
+      new RegExp(`([\\w][\\w-]*):embed="${safeId}"`, "g"), `CHECK`
+    );
+    // Simpler check: does patchedXml contain :embed="rId"?
+    const embedPresentInXml = new RegExp(`[\\w][\\w-]*:embed="${safeId}"`).test(patchedXml);
+    if (embedPresentInXml) {
+      patchedRels.set(rId, { ...rel, mode: "Internal", target: `media/${resolved.exportName}`, _resolvedFile: resolved });
+      t5ResolvedCount++;
+    } else {
+      t5SkippedCount++;
+    }
+  }
+  pass(`patchedRels built: ${t5ResolvedCount} image rels marked Internal+_resolvedFile, ${t5SkippedCount} not resolved`);
+
+  // Parse patchedXml with @xmldom/xmldom to extract paragraph nodes
+  const { DOMParser: XDomParser, XMLSerializer: XDomSerializer } = require("@xmldom/xmldom");
+  const xParser = new XDomParser({
+    onError: (level, msg) => { if (level === "fatalError") throw new Error(msg); }
+  });
+  const xSerializer = new XDomSerializer();
+
+  function xGetByLocalName(node, localName) {
+    const result = [];
+    function walk(n) {
+      if (n.nodeType === 1 && n.localName === localName) result.push(n);
+      for (let c = n.firstChild; c; c = c.nextSibling) walk(c);
+    }
+    walk(node);
+    return result;
+  }
+
+  function xGetText(node) {
+    let text = "";
+    for (const t of xGetByLocalName(node, "t")) {
+      text += (t.textContent || "").replace(/ /g, " ");
+    }
+    return text.trim();
+  }
+
+  const patchedDoc = xParser.parseFromString(patchedXml, "application/xml");
+  const xBodyEl    = xGetByLocalName(patchedDoc, "body")[0];
+
+  if (!xBodyEl) {
+    fail("@xmldom/xmldom could not find <w:body> in patchedXml");
+  } else {
+    // Extract all paragraph/table nodes sequentially (same logic as parseDocxStructure)
+    const xParagraphs = []; // { index, text, xmlNode }
+    for (let c = xBodyEl.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType !== 1) continue;
+      const ln = c.localName;
+      if (ln === "p" || ln === "tbl") {
+        xParagraphs.push({ index: xParagraphs.length, text: xGetText(c), xmlNode: c, isTable: ln === "tbl" });
+      } else if (ln === "sdt") {
+        const sdtContent = xGetByLocalName(c, "sdtContent")[0];
+        if (sdtContent) {
+          for (let sc = sdtContent.firstChild; sc; sc = sc.nextSibling) {
+            if (sc.nodeType === 1 && (sc.localName === "p" || sc.localName === "tbl")) {
+              xParagraphs.push({ index: xParagraphs.length, text: xGetText(sc), xmlNode: sc, isTable: sc.localName === "tbl" });
+            }
+          }
+        }
+      }
+    }
+    pass(`Parsed patchedXml via @xmldom/xmldom: ${xParagraphs.length} paragraph/table nodes`);
+
+    // Find all <HTML> blocks using the same joined-text token scanning as analyzeText
+    const joinedText  = xParagraphs.map(p => p.text).join("\n");
+    const paraOffsets = [];
+    let off = 0;
+    for (const p of xParagraphs) { paraOffsets.push(off); off += p.text.length + 1; }
+    const charToParaIdx = (pos) => {
+      let lo = 0, hi = paraOffsets.length - 1;
+      while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (paraOffsets[mid] <= pos) lo = mid; else hi = mid - 1; }
+      return lo;
+    };
+
+    const xBlocks = [];
+    const TOKEN_RE = /<filename>\s*"?([^"<>\n]+)"?\s*<\/filename>|<(HTML|worksheet|document)>|<\/(HTML|worksheet|document)>/gi;
+    let xCurrent = null;
+    let tok;
+    while ((tok = TOKEN_RE.exec(joinedText)) !== null) {
+      const paraIdx = charToParaIdx(tok.index);
+      if (tok[2]) { // opening tag
+        xCurrent = { openIdx: paraIdx, filename: null };
+      } else if (tok[3] && xCurrent) { // closing tag
+        xBlocks.push({ openIdx: xCurrent.openIdx, closeIdx: paraIdx, filename: xCurrent.filename });
+        xCurrent = null;
+      } else if (tok[1] && xCurrent && !xCurrent.filename) { // filename inside block
+        xCurrent.filename = tok[1].trim().replace(/^"|"$/g, "");
+      }
+    }
+    pass(`Found ${xBlocks.length} <HTML>/<worksheet>/<document> block(s) in patchedXml`);
+
+    // For each block, scan content paragraphs for image rId references
+    // Report blocks that have r:link remaining (bad) or r:embed (good)
+    let t5BlocksWithImages = 0;
+    let t5BlocksWithLinks  = 0;
+    let targetBlock = null;
+
+    for (const block of xBlocks) {
+      // Mirror the fixed extractContentParaNodes: include opening para if it's a table
+      const openEntry = xParagraphs[block.openIdx];
+      const contentParas = [];
+      if (openEntry && openEntry.isTable) contentParas.push(openEntry);
+      for (const p of xParagraphs.slice(block.openIdx + 1, block.closeIdx)) contentParas.push(p);
+
+      const embedRids = new Set();
+      const linkRids  = new Set();
+      for (const para of contentParas) {
+        const raw = xSerializer.serializeToString(para.xmlNode);
+        for (const m of raw.matchAll(/[\w][\w-]*:embed="([^"]+)"/g)) {
+          const rel = patchedRels.get(m[1]);
+          if (rel && rel.type.includes("/image")) embedRids.add(m[1]);
+        }
+        for (const m of raw.matchAll(/[\w][\w-]*:link="([^"]+)"/g)) {
+          const rel = patchedRels.get(m[1]);
+          if (rel && rel.type.includes("/image")) linkRids.add(m[1]);
+        }
+      }
+      if (embedRids.size + linkRids.size > 0) {
+        t5BlocksWithImages++;
+        if (linkRids.size > 0) {
+          t5BlocksWithLinks++;
+          fail(`Block "${block.filename}" (${block.openIdx}–${block.closeIdx}): ${linkRids.size} image(s) still r:link — ${[...linkRids].join(", ")}`);
+        } else {
+          info(`  Block "${block.filename}" (${block.openIdx}–${block.closeIdx}): ${embedRids.size} embedded image(s) — ${[...embedRids].join(", ")}`);
+        }
+        // Look for a block that has at least 2 external image rIds resolved (prefer the one named CP4807-6)
+        const resolvedCount = [...embedRids].filter(rId => {
+          const rel = patchedRels.get(rId);
+          return rel && rel._resolvedFile;
+        }).length;
+        const isCp4807_6 = (block.filename || "").includes("CP4807-6");
+        if (resolvedCount >= 2 && (!targetBlock || isCp4807_6)) {
+          targetBlock = { ...block, contentParas, embedRids };
+        }
+      }
+    }
+
+    if (t5BlocksWithLinks === 0) {
+      pass(`No blocks have residual r:link image refs — pre-patch applied correctly to all ${t5BlocksWithImages} image-bearing block(s)`);
+    }
+
+    // Build the first multi-image block as a mini-DOCX and verify it
+    if (!targetBlock) {
+      skip("No block with ≥2 resolved images found — skipping mini-DOCX build");
+    } else {
+      info(`\n  Building mini-DOCX for block "${targetBlock.filename}" (paras ${targetBlock.openIdx}–${targetBlock.closeIdx}, ${targetBlock.contentParas.length} content paras)`);
+      const contentNodes = targetBlock.contentParas.map(p => p.xmlNode);
+
+      // Collect all rIds used in content (regex on serialized XML — same as browser fallback)
+      const usedRids = new Set();
+      for (const node of contentNodes) {
+        const raw = xSerializer.serializeToString(node);
+        for (const m of raw.matchAll(/[\w][\w-]*:(?:embed|link|id|href)="([^"]+)"/g)) {
+          usedRids.add(m[1]);
+        }
+      }
+      info(`  rIds referenced in content: ${[...usedRids].join(", ")}`);
+
+      // Build rel entries + media file list (mirror of buildBlockRels)
+      const t5RelEntries = [];
+      const t5MediaFiles = [];
+      const linkedToEmbedIds = new Set();
+      for (const [rId, rel] of patchedRels) {
+        if (!usedRids.has(rId)) continue;
+        const isImg = rel.type.includes("/image");
+        if (rel.mode === "Internal" && isImg && rel._resolvedFile) {
+          const f = rel._resolvedFile;
+          t5MediaFiles.push({ name: f.exportName, data: f.data });
+          t5RelEntries.push(`  <Relationship Id="${rId}" Type="${rel.type}" Target="media/${f.exportName}"/>`);
+          pass(`  ${rId}: → media/${f.exportName} (${f.data.byteLength.toLocaleString()} bytes) — Internal/_resolvedFile ✓`);
+        } else if (rel.mode === "External" && isImg) {
+          // Pre-patch missed this one — try ZIP fallback (same as buildBlockRels External branch)
+          const fileName = decodeFileName(rel.target.split(/[\\/]/).pop());
+          const key = normalizeKey(fileName);
+          const resolved = mediaFileIndex.get(key);
+          if (resolved) {
+            t5MediaFiles.push({ name: resolved.exportName, data: resolved.data });
+            t5RelEntries.push(`  <Relationship Id="${rId}" Type="${rel.type}" Target="media/${resolved.exportName}"/>`);
+            linkedToEmbedIds.add(rId);
+            fail(`  ${rId}: pre-patch did NOT apply — fell back to ZIP lookup at build time ("${resolved.exportName}")`);
+          } else {
+            fail(`  ${rId}: External image rel, no match in ZIP — IMAGE WILL BE MISSING from output`);
+            t5RelEntries.push(`  <Relationship Id="${rId}" Type="${rel.type}" Target="${rel.target}" TargetMode="External"/>`);
+          }
+        } else if (rel.mode === "External") {
+          t5RelEntries.push(`  <Relationship Id="${rId}" Type="${rel.type}" Target="${rel.target}" TargetMode="External"/>`);
+        } else if (rel.mode === "Internal" && !isImg) {
+          // Non-image internal rels (styles, fonts etc.) — emit without a media file (no source DOCX here)
+          t5RelEntries.push(`  <Relationship Id="${rId}" Type="${rel.type}" Target="${rel.target}"/>`);
+        }
+      }
+      info(`  Total media files for block: ${t5MediaFiles.length}`);
+
+      // Build document XML: use patchedXml as envelope, replace body contents
+      let t5DocumentXml;
+      try {
+        const envDoc  = xParser.parseFromString(patchedXml, "application/xml");
+        const envBody = xGetByLocalName(envDoc, "body")[0];
+        // Remove all existing body children
+        while (envBody.firstChild) envBody.removeChild(envBody.firstChild);
+        // Append cloned content nodes
+        for (const node of contentNodes) {
+          const imported = envDoc.importNode(node, true);
+          envBody.appendChild(imported);
+        }
+        // Add empty sectPr
+        const W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        envBody.appendChild(envDoc.createElementNS(W_NS, "w:sectPr"));
+        t5DocumentXml = xSerializer.serializeToString(envDoc);
+
+        // Post-serialization: promote any residual r:link → r:embed for linked images
+        // (safety net, same as buildBlockDocumentXml does)
+        for (const rId of linkedToEmbedIds) {
+          const safeId = rId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          t5DocumentXml = t5DocumentXml.replace(
+            new RegExp(`([\\w][\\w-]*):link="${safeId}"`, "g"), `$1:embed="${rId}"`
+          );
+        }
+        pass("  Built document XML from patched envelope + content nodes");
+      } catch (e) {
+        fail(`  Failed to build document XML: ${e.message}`);
+        t5DocumentXml = `<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:sectPr/></w:body></w:document>`;
+      }
+
+      // Build the mini ZIP
+      const t5Zip = new JSZip();
+      t5Zip.file("word/document.xml", t5DocumentXml);
+      t5Zip.file("word/_rels/document.xml.rels",
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n${t5RelEntries.join("\n")}\n</Relationships>`
+      );
+      const t5Seen = new Set();
+      for (const f of t5MediaFiles) {
+        if (!t5Seen.has(f.name)) { t5Seen.add(f.name); t5Zip.file(`word/media/${f.name}`, f.data); }
+      }
+      t5Zip.file("_rels/.rels",
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>\n</Relationships>`
+      );
+      const t5Exts = new Set(t5MediaFiles.map(f => f.name.split(".").pop().toLowerCase()).filter(Boolean));
+      const T5_MIME = { png:"image/png", jpg:"image/jpeg", jpeg:"image/jpeg", gif:"image/gif", bmp:"image/bmp", svg:"image/svg+xml", webp:"image/webp" };
+      const t5ExtLines = [...t5Exts].map(e => `  <Default Extension="${e}" ContentType="${T5_MIME[e] || "application/octet-stream"}"/>`);
+      t5Zip.file("[Content_Types].xml",
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n  <Default Extension="xml" ContentType="application/xml"/>\n${t5ExtLines.join("\n")}\n  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>\n</Types>`
+      );
+
+      const t5OutDir  = path.join(__dirname, "outputs", "docx");
+      fs.mkdirSync(t5OutDir, { recursive: true });
+      const t5OutPath = path.join(t5OutDir, `test5-${path.basename(targetBlock.filename || "block").replace(/[^a-z0-9._-]/gi, "_")}.docx`);
+      const t5Buf     = await t5Zip.generateAsync({ type: "nodebuffer" });
+      fs.writeFileSync(t5OutPath, t5Buf);
+      pass(`  Mini-DOCX written: ${t5OutPath}`);
+
+      info("\n  Verifying built mini-DOCX structure:");
+      await verifyOutputDocx(t5OutPath);
+    }
+  }
+
   // ── Test 4: Verify existing output files ─────────────────────────────────
   section("TEST 4 — Existing output files: structure verification");
 
