@@ -1703,7 +1703,7 @@ function stripTagMarkupFromNode(node) {
   const tNodes = node.getElementsByTagNameNS ? node.getElementsByTagNameNS("*", "t") : [];
   for (const t of tNodes) {
     const orig = t.textContent || "";
-    const stripped = orig.replace(NODE_TAG_STRIP_RE, "").replace(/^\s+|\s+$/g, "");
+    const stripped = orig.replace(NODE_TAG_STRIP_RE, "");
     if (stripped !== orig) t.textContent = stripped;
   }
 }

@@ -67,6 +67,25 @@ function getText(node) {
   return t.trim();
 }
 
+const NODE_TAG_STRIP_RE = /<\/?(HTML|worksheet|document)\s*>|<filename>[^<>]*<\/filename>|<(?:image|video|audio|datasheet)[^<>]*>[^<>]*<\/(?:image|video|audio|datasheet)>/gi;
+
+function stripTagMarkupFromNode(node) {
+  const tNodes = node.getElementsByTagNameNS ? node.getElementsByTagNameNS("*", "t") : [];
+  for (const t of tNodes) {
+    const orig = t.textContent || "";
+    const stripped = orig.replace(NODE_TAG_STRIP_RE, "");
+    if (stripped !== orig) t.textContent = stripped;
+  }
+}
+
+function isNodeEffectivelyEmpty(node) {
+  if (node.getElementsByTagNameNS("*", "drawing").length > 0) return false;
+  if (node.getElementsByTagNameNS("*", "blip").length    > 0) return false;
+  const tNodes = node.getElementsByTagNameNS ? node.getElementsByTagNameNS("*", "t") : [];
+  for (const t of tNodes) { if ((t.textContent || "").trim()) return false; }
+  return true;
+}
+
 // ─── Parse DOCX structure ────────────────────────────────────────────────────
 
 async function parseDocx(docxPath) {
@@ -197,14 +216,14 @@ function findBlocks(paragraphs) {
   };
 
   const blocks  = [];
-  const TOKEN   = /<filename>\s*"?([^"<>\n]+)"?\s*<\/filename>|<(HTML|worksheet|document)>|<\/(HTML|worksheet|document)>/gi;
+  const TOKEN   = /<filename>\s*["“”]?([^"“”<>\n]+)["“”]?\s*<\/filename>|<(HTML|worksheet|document)>|<\/(HTML|worksheet|document)>/gi;
   let current   = null;
   let tok;
   while ((tok = TOKEN.exec(joined)) !== null) {
     const idx = toParaIdx(tok.index);
     if (tok[2])                             { current = { tagType: tok[2], openIdx: idx, filename: null }; }
     else if (tok[3] && current)             { blocks.push({ ...current, closeIdx: idx }); current = null; }
-    else if (tok[1] && current && !current.filename) { current.filename = tok[1].trim().replace(/^"|"$/g, ""); }
+    else if (tok[1] && current && !current.filename) { current.filename = tok[1].trim().replace(/["“”]/g, ""); }
   }
   return blocks;
 }
@@ -273,7 +292,11 @@ function buildDocumentXml(contentNodes, patchedXml) {
   const envDoc  = xParser.parseFromString(patchedXml, "application/xml");
   const envBody = getByLocal(envDoc, "body")[0];
   while (envBody.firstChild) envBody.removeChild(envBody.firstChild);
-  for (const node of contentNodes) envBody.appendChild(envDoc.importNode(node, true));
+  for (const node of contentNodes) {
+    const imported = envDoc.importNode(node, true);
+    stripTagMarkupFromNode(imported);
+    if (!isNodeEffectivelyEmpty(imported)) envBody.appendChild(imported);
+  }
   const W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
   envBody.appendChild(envDoc.createElementNS(W_NS, "w:sectPr"));
   return xSer.serializeToString(envDoc);
