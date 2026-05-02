@@ -626,6 +626,14 @@ function finalizeBlock(rawBlock, blocks, warnings, duplicateMap, paragraphs) {
   const contentParaNodes = extractContentParaNodes(rawBlock, paragraphs);
   const embeddedImageCount = countEmbeddedImages(contentParaNodes);
 
+  // Warn when content paragraphs contain stray tag markup (authoring error — will be stripped from output)
+  const strayTagRE = /<\/?(HTML|worksheet|document)\s*>|<filename>[^<>]*<\/filename>/i;
+  const strayParas = contentParaNodes.filter(n => strayTagRE.test(extractNodeText(n)));
+  if (strayParas.length) {
+    const label = filename || `${rawBlock.tagType} block at line ${rawBlock.startLine}`;
+    warnings.push({ level: "warn", title: `Stray tag markup in ${label}`, detail: `${strayParas.length} paragraph(s) inside this block contain raw tag text (e.g. <worksheet>, <filename>). These will be stripped from the exported file automatically.` });
+  }
+
   blocks.push({
     order: blocks.length + 1,
     tagType: rawBlock.tagType,
@@ -820,7 +828,9 @@ function buildBlockDocumentXml(paraNodes, linkedToEmbeddedIds = new Set()) {
     while (bodyEl.firstChild) bodyEl.removeChild(bodyEl.firstChild);
 
     for (const node of paraNodes) {
-      bodyEl.appendChild(doc.importNode(node, true));
+      const imported = doc.importNode(node, true);
+      stripTagMarkupFromNode(imported);
+      if (!isNodeEffectivelyEmpty(imported)) bodyEl.appendChild(imported);
     }
 
     const wNs = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
@@ -1683,6 +1693,28 @@ function stripStructuralTags(body) {
     .replace(/<filename>\s*\"?([^\"<>\n]+)\"?\s*<\/filename>/gi, "")
     .replace(/<\/?(HTML|worksheet|document)>/gi, "")
     .replace(/\n{3,}/g, "\n\n");
+}
+
+// Regex matching tag markup that should never appear as visible text in output files.
+const NODE_TAG_STRIP_RE = /<\/?(HTML|worksheet|document)\s*>|<filename>[^<>]*<\/filename>|<(?:image|video|audio|datasheet)[^<>]*>[^<>]*<\/(?:image|video|audio|datasheet)>/gi;
+
+// Strip tag markup text from all w:t children of a DOM node (mutates — call on imported copies only).
+function stripTagMarkupFromNode(node) {
+  const tNodes = node.getElementsByTagNameNS ? node.getElementsByTagNameNS("*", "t") : [];
+  for (const t of tNodes) {
+    const orig = t.textContent || "";
+    const stripped = orig.replace(NODE_TAG_STRIP_RE, "").replace(/^\s+|\s+$/g, "");
+    if (stripped !== orig) t.textContent = stripped;
+  }
+}
+
+// Returns true if a node has no inline drawings and no non-whitespace text — safe to drop from output.
+function isNodeEffectivelyEmpty(node) {
+  if ((node.getElementsByTagNameNS("*", "drawing") || []).length > 0) return false;
+  if ((node.getElementsByTagNameNS("*", "blip")    || []).length > 0) return false;
+  const tNodes = node.getElementsByTagNameNS ? node.getElementsByTagNameNS("*", "t") : [];
+  for (const t of tNodes) { if ((t.textContent || "").trim()) return false; }
+  return true;
 }
 
 // ─── Prototype HTML helpers (used by fallback builder) ─────────────────────
