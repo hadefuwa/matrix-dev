@@ -818,6 +818,12 @@ Look at the circuit diagram below and answer the questions.</span>
 
         <div class="callout tip">
           <div class="callout-icon">i</div>
+          <p><strong>Your source files are preserved</strong>
+          The bundle includes a <code>source/</code> folder containing the original <code>.docx</code> you uploaded and, if you provided one, the companion media <code>.zip</code>. This means the bundle is self-contained — you always have the inputs alongside the outputs.</p>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
           <p><strong>The bundle is the deliverable</strong>
           You do not need to do anything to the individual files before uploading. Extract the ZIP, and the folder structure is already correct for deployment. HTML files link to their media, the SCORM manifest points to the right launch file, and Word documents are standalone.</p>
         </div>
@@ -825,19 +831,20 @@ Look at the circuit diagram below and answer the questions.</span>
         <h3 style="font-size:1rem;font-weight:800;margin:1.5rem 0 0.5rem;">Folder structure inside the bundle</h3>
 
         <div class="code-block"><pre><span class="hl-dim">your-document-bundle.zip</span>
-<span class="hl-dim">├──</span> <span class="hl-tag">outputs/</span>
-<span class="hl-dim">│   ├──</span> <span class="hl-attr">html/</span>
-<span class="hl-dim">│   │   ├──</span> <span class="hl-val">CP4807-H1.html</span>       <span class="hl-dim">← from &lt;HTML&gt; blocks</span>
-<span class="hl-dim">│   │   └──</span> <span class="hl-val">CP4807-H2.html</span>
-<span class="hl-dim">│   └──</span> <span class="hl-attr">docx/</span>
-<span class="hl-dim">│       ├──</span> <span class="hl-val">CP4807-1.docx</span>        <span class="hl-dim">← from &lt;worksheet&gt; blocks</span>
-<span class="hl-dim">│       └──</span> <span class="hl-val">CP4807-CPDcert.docx</span>  <span class="hl-dim">← from &lt;document&gt; blocks</span>
+<span class="hl-dim">├──</span> <span class="hl-tag">source/</span>
+<span class="hl-dim">│   ├──</span> <span class="hl-val">CP4807-Introduction.docx</span>  <span class="hl-dim">← your original source document</span>
+<span class="hl-dim">│   └──</span> <span class="hl-val">Media.zip</span>                 <span class="hl-dim">← your media ZIP (if uploaded)</span>
+<span class="hl-dim">├──</span> <span class="hl-tag">generated/</span>
+<span class="hl-dim">│   ├──</span> <span class="hl-val">CP4807-H1.html</span>            <span class="hl-dim">← from &lt;HTML&gt; blocks</span>
+<span class="hl-dim">│   ├──</span> <span class="hl-val">CP4807-H2.html</span>
+<span class="hl-dim">│   ├──</span> <span class="hl-val">CP4807-1.docx</span>             <span class="hl-dim">← from &lt;worksheet&gt; blocks</span>
+<span class="hl-dim">│   └──</span> <span class="hl-val">CP4807-CPDcert.docx</span>       <span class="hl-dim">← from &lt;document&gt; blocks</span>
 <span class="hl-dim">├──</span> <span class="hl-tag">media/</span>
-<span class="hl-dim">│   ├──</span> <span class="hl-val">traffic-lights.jpg</span>      <span class="hl-dim">← matched media files</span>
+<span class="hl-dim">│   ├──</span> <span class="hl-val">traffic-lights.jpg</span>        <span class="hl-dim">← matched media files</span>
 <span class="hl-dim">│   └──</span> <span class="hl-val">intro.mp4</span>
-<span class="hl-dim">└──</span> <span class="hl-tag">scorm/</span>                       <span class="hl-dim">← only present if SCORM detected</span>
-<span class="hl-dim">    ├──</span> <span class="hl-val">imsmanifest.xml</span>
-<span class="hl-dim">    └──</span> <span class="hl-val">…</span></pre></div>
+<span class="hl-dim">├──</span> <span class="hl-val">imsmanifest.xml</span>               <span class="hl-dim">← only present if SCORM detected</span>
+<span class="hl-dim">├──</span> <span class="hl-val">summary-report.txt</span>
+<span class="hl-dim">└──</span> <span class="hl-val">blocks-metadata.json</span></pre></div>
       </div>
 
       <!-- ── Section 8: Quick reference ── -->
