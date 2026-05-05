@@ -14,6 +14,7 @@ There is also an AI pipeline alongside it (prompts, specs, agents) for running t
 
 ```
 index.html              — single-page UI (hero + upload panels)
+how-to-guide.html       — standalone how-to guide: tagging rules, bundle structure diagram, step-by-step walkthrough
 upload-media.js         — all logic: DOCX parsing, block detection, output generation
 styles.css              — legacy styles (not used by index.html, which is self-contained)
 .gitignore              — excludes ~$* Word temp files
