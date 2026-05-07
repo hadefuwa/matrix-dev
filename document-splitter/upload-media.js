@@ -1762,11 +1762,15 @@ function stripTagMarkupFromNode(node) {
       // Whole paragraph is just structural tag text — wipe all runs
       for (const t of tNodes) t.textContent = "";
     } else {
-      // Real content — only strip individual runs that exactly match a tag pattern
-      for (const t of tNodes) {
-        const orig = t.textContent || "";
-        const stripped = orig.replace(NODE_TAG_STRIP_RE, "");
-        if (stripped !== orig) t.textContent = stripped;
+      // Real content mixed with tag markup.
+      // Tag text is routinely split across multiple w:t runs by Word, so per-run
+      // replacement won't match the full pattern. Strip from the joined text and
+      // put the result in the first run, clearing the rest.
+      const stripped = fullText.replace(NODE_TAG_STRIP_RE, "");
+      if (stripped !== fullText) {
+        const tArr = Array.from(tNodes);
+        tArr[0].textContent = stripped;
+        for (let i = 1; i < tArr.length; i++) tArr[i].textContent = "";
       }
     }
   }
