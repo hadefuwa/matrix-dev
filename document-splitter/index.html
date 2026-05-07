@@ -748,9 +748,15 @@
     .warn-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
     .warn-row:last-child { border-bottom: none; padding-bottom: 0; }
     .warn-row:first-child { padding-top: 0; }
+    .warn-row-text { flex: 1; }
     .warn-row-text strong { display: block; color: var(--ink); margin-bottom: 0.1rem; }
     .warn-row-text span { color: var(--ink-2); line-height: 1.5; }
     .warn-row .mini-tag { flex-shrink: 0; margin-top: 0.1rem; }
+    .warn-snippet { margin-top: 0.45rem; font-family: monospace; font-size: 0.8rem; color: var(--ink-2); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.6rem; white-space: pre-wrap; word-break: break-all; }
+    .warn-collapsible { margin-top: 0.25rem; }
+    .warn-collapsible-summary { cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--muted); padding: 0.4rem 0; letter-spacing: 0.02em; list-style: none; user-select: none; }
+    .warn-collapsible-summary::-webkit-details-marker { display: none; }
+    .warn-collapsible[open] .warn-collapsible-summary { margin-bottom: 0.25rem; }
 
     /* ── Technical detail accordion ── */
     .tech-detail { margin-top: 0.5rem; }

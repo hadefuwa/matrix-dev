@@ -468,6 +468,13 @@ function extractReadableText(xmlString) {
   return paragraphs.join("\n");
 }
 
+function snippetFromPara(paragraphs, paraIndex) {
+  const para = paragraphs[paraIndex];
+  if (!para) return "";
+  const text = para.textContent.trim();
+  return text.length > 120 ? text.slice(0, 117) + "…" : text;
+}
+
 // ─── Block analysis (operates on paragraph objects) ────────────────────────
 function analyzeText(paragraphs) {
   // Build joined text from paragraphs for SCORM/classification analysis and token scanning
@@ -512,23 +519,23 @@ function analyzeText(paragraphs) {
     if (filenameValue) {
       sawTagToken = true;
       if (!currentBlock) {
-        warnings.push({ level: "warn", title: "Filename found outside a block", detail: `${sanitizeFilenameValue(filenameValue)} appears at line ${lineNumber} but is not inside <HTML>, <worksheet>, or <document>.` });
+        warnings.push({ level: "warn", title: "Filename found outside a block", detail: `${sanitizeFilenameValue(filenameValue)} appears at line ${lineNumber} but is not inside <HTML>, <worksheet>, or <document>.`, snippet: snippetFromPara(paragraphs, paraIndex) });
       } else if (!currentBlock.filename) {
         currentBlock.filename = sanitizeFilenameValue(filenameValue);
       }
     } else if (openTag) {
       sawTagToken = true;
       if (currentBlock) {
-        warnings.push({ level: "danger", title: `Nested or interrupted ${currentBlock.tagType} block`, detail: `A new <${openTag}> tag was found at line ${lineNumber} before <${currentBlock.tagType}> was closed${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.` });
+        warnings.push({ level: "danger", title: `Nested or interrupted ${currentBlock.tagType} block`, detail: `A new <${openTag}> tag was found at line ${lineNumber} before <${currentBlock.tagType}> was closed${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.`, snippet: snippetFromPara(paragraphs, paraIndex) });
         finalizeBlock(currentBlock, blocks, warnings, duplicateMap, paragraphs);
       }
       currentBlock = { tagType: openTag, filename: "", bodyParts: [], rawOpenIndex: tokenIndex, startLine: lineNumber, openParaIndex: paraIndex, closeParaIndex: paragraphs.length - 1 };
     } else if (closeTag) {
       sawTagToken = true;
       if (!currentBlock) {
-        warnings.push({ level: "warn", title: `Extra closing ${closeTag} tag`, detail: `A closing </${closeTag}> tag was found at line ${lineNumber} with no matching opening tag.` });
+        warnings.push({ level: "warn", title: `Extra closing ${closeTag} tag`, detail: `A closing </${closeTag}> tag was found at line ${lineNumber} with no matching opening tag.`, snippet: snippetFromPara(paragraphs, paraIndex) });
       } else if (currentBlock.tagType.toLowerCase() !== closeTag.toLowerCase()) {
-        warnings.push({ level: "danger", title: "Mismatched closing tag", detail: `Line ${lineNumber} closes </${closeTag}> while the open block is <${currentBlock.tagType}>${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.` });
+        warnings.push({ level: "danger", title: "Mismatched closing tag", detail: `Line ${lineNumber} closes </${closeTag}> while the open block is <${currentBlock.tagType}>${currentBlock.filename ? ` for ${currentBlock.filename}` : ""}.`, snippet: snippetFromPara(paragraphs, paraIndex) });
         finalizeBlock(currentBlock, blocks, warnings, duplicateMap, paragraphs);
         currentBlock = null;
       } else {
@@ -543,7 +550,7 @@ function analyzeText(paragraphs) {
 
   if (currentBlock) {
     currentBlock.bodyParts.push(text.slice(lastIndex));
-    warnings.push({ level: "danger", title: `Unclosed ${currentBlock.tagType} block`, detail: `The <${currentBlock.tagType}> block${currentBlock.filename ? ` for ${currentBlock.filename}` : ""} starts at line ${currentBlock.startLine} but has no matching closing tag.` });
+    warnings.push({ level: "danger", title: `Unclosed ${currentBlock.tagType} block`, detail: `The <${currentBlock.tagType}> block${currentBlock.filename ? ` for ${currentBlock.filename}` : ""} starts at line ${currentBlock.startLine} but has no matching closing tag.`, snippet: snippetFromPara(paragraphs, currentBlock.openParaIndex) });
     finalizeBlock(currentBlock, blocks, warnings, duplicateMap, paragraphs);
   }
 
@@ -623,7 +630,7 @@ function finalizeBlock(rawBlock, blocks, warnings, duplicateMap, paragraphs) {
   const classification = inferClassification(body, filename);
   const output = inferOutput(rawBlock.tagType, filename);
 
-  if (!filename) warnings.push({ level: "warn", title: `Missing filename in ${rawBlock.tagType} block`, detail: `The <${rawBlock.tagType}> block starting at line ${rawBlock.startLine} has no <filename> value.` });
+  if (!filename) warnings.push({ level: "warn", title: `Missing filename in ${rawBlock.tagType} block`, detail: `The <${rawBlock.tagType}> block starting at line ${rawBlock.startLine} has no <filename> value.`, snippet: snippetFromPara(paragraphs, rawBlock.openParaIndex) });
   else duplicateMap.set(filename, (duplicateMap.get(filename) || 0) + 1);
 
   // Collect the XML nodes for this block's content (used by mini-DOCX builder)
@@ -1433,24 +1440,44 @@ function renderMediaPanel(analysis) {
   `;
 }
 
-function renderWarnings(primaryWarnings, extraWarnings) {
-  const allWarnings = dedupeWarnings([...primaryWarnings, ...extraWarnings]);
-  const warningsPanel = document.getElementById("warningsPanel");
-  warningsCount.textContent = `${allWarnings.length} warning${allWarnings.length === 1 ? "" : "s"}`;
-  if (!allWarnings.length) {
-    if (warningsPanel) warningsPanel.hidden = true;
-    warningsList.innerHTML = "";
-    return;
-  }
-  if (warningsPanel) warningsPanel.hidden = false;
-  warningsList.innerHTML = allWarnings.map((w) => `
+function renderWarnRow(w) {
+  return `
     <div class="warn-row">
       <span class="mini-tag ${w.level === "danger" ? "danger" : "warn"}">${w.level === "danger" ? "Error" : "Warning"}</span>
       <div class="warn-row-text">
         <strong>${escapeHtml(w.title)}</strong>
         <span>${escapeHtml(w.detail)}</span>
+        ${w.snippet ? `<div class="warn-snippet">${escapeHtml(w.snippet)}</div>` : ""}
       </div>
-    </div>`).join("");
+    </div>`;
+}
+
+function renderWarnings(primaryWarnings, extraWarnings) {
+  const allWarnings = dedupeWarnings([...primaryWarnings, ...extraWarnings]);
+  const warningsPanel = document.getElementById("warningsPanel");
+  const errors   = allWarnings.filter((w) => w.level === "danger");
+  const warnings = allWarnings.filter((w) => w.level !== "danger");
+  const total    = allWarnings.length;
+
+  warningsCount.textContent = `${total} issue${total === 1 ? "" : "s"}`;
+
+  if (!total) {
+    if (warningsPanel) warningsPanel.hidden = true;
+    warningsList.innerHTML = "";
+    return;
+  }
+  if (warningsPanel) warningsPanel.hidden = false;
+
+  const errorHtml = errors.map(renderWarnRow).join("");
+  const warningHtml = warnings.length ? `
+    <details class="warn-collapsible">
+      <summary class="warn-collapsible-summary">
+        ${warnings.length} warning${warnings.length === 1 ? "" : "s"} — click to expand
+      </summary>
+      ${warnings.map(renderWarnRow).join("")}
+    </details>` : "";
+
+  warningsList.innerHTML = errorHtml + warningHtml;
 }
 
 function renderGeneratedOutputs(files) {
