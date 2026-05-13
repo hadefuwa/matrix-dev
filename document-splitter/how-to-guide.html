@@ -461,6 +461,7 @@
           <span class="hero-chip"><span class="hero-chip-dot" style="background:#7dd3fc;"></span>3 block types</span>
           <span class="hero-chip"><span class="hero-chip-dot" style="background:#86efac;"></span>1 required tag per block</span>
           <span class="hero-chip"><span class="hero-chip-dot" style="background:#fde68a;"></span>4 media reference tags</span>
+          <span class="hero-chip"><span class="hero-chip-dot" style="background:#a78bfa;"></span>5 SCORM decisions</span>
         </div>
       </div>
     </section>
@@ -683,6 +684,168 @@ Look at the circuit diagram below and answer the questions.</span>
 <span class="hl-tag">&lt;/HTML&gt;</span></pre></div>
       </div>
 
+      <!-- ── Section 5b: SCORM packaging ── -->
+      <div class="section-label">SCORM packaging</div>
+
+      <div class="guide-section">
+        <h2>Making your document SCORM compliant</h2>
+        <p>
+          If your bundle needs to be uploaded to an LMS (Moodle, Canvas, Blackboard, etc.) as a SCORM
+          package, the tool will generate an <code>imsmanifest.xml</code> and the supporting structure
+          for you — but only if your source document tells it five things. These are the SCORM
+          decisions, and they are the only SCORM-related things you need to write yourself.
+        </p>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>You do not write SCORM XML by hand</strong>
+          The boss-facing job is just to add a short SCORM notes block somewhere in your Word document.
+          The tool reads those five values and builds the manifest, organisation structure, and
+          resource list automatically. If the SCORM block is missing, no manifest is generated and
+          your bundle still contains all the HTML pages and worksheets — it just is not LMS-ready.</p>
+        </div>
+
+        <h3 style="font-size:1rem;font-weight:800;margin:1.5rem 0 0.5rem;">The five SCORM decisions</h3>
+
+        <div class="tag-grid">
+          <div class="tag-card">
+            <div class="tag-card-icon teal">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <h3>SCORM version</h3>
+            <p>Which SCORM standard the LMS expects. Use <code>"1.2"</code> by default — it is the most widely supported. Only use <code>"2004"</code> if the LMS team has told you to.</p>
+            <span class="output-pill teal">scorm-version: "1.2"</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon blue">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <h3>Launch file</h3>
+            <p>The first page the learner sees when they open the course in the LMS. Must be the filename of an existing <code>&lt;HTML&gt;</code> block in the same document.</p>
+            <span class="output-pill blue">launch: "CO0003-welcome.htm"</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon purple">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <h3>Tracking</h3>
+            <p>What the LMS reports back. Choose <code>"completion-only"</code>, <code>"score-only"</code>, or <code>"completion-and-score"</code> depending on whether the course has graded work.</p>
+            <span class="output-pill purple">tracking: "completion-only"</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon teal">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3>Completion</h3>
+            <p>How a learner is marked complete. <code>"page-view"</code> = viewing every page; <code>"quiz-pass"</code> = passing an embedded quiz; <code>"manual"</code> = learner clicks done.</p>
+            <span class="output-pill teal">completion: "page-view"</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon blue">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <h3>Navigation</h3>
+            <p>Whether the learner can jump around. <code>"free"</code> = any page in any order; <code>"linear"</code> = pages must be visited in order, with no skipping ahead.</p>
+            <span class="output-pill blue">navigation: "free"</span>
+          </div>
+          <div class="tag-card">
+            <div class="tag-card-icon purple">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <h3>For CPD courses</h3>
+            <p>For a "view all pages then download a certificate" CPD flow, the safe defaults are <code>"completion-only"</code> tracking, <code>"page-view"</code> completion, and <code>"free"</code> navigation.</p>
+            <span class="output-pill purple">CPD-friendly defaults</span>
+          </div>
+        </div>
+
+        <h3 style="font-size:1rem;font-weight:800;margin:1.5rem 0 0.5rem;">Where to put the SCORM block</h3>
+        <p>
+          The SCORM block sits <strong>outside</strong> any <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>,
+          or <code>&lt;document&gt;</code> block — in the same place where you keep your planning notes.
+          Put it once per course, anywhere in the document. The tool scans the whole document for these
+          five values regardless of position.
+        </p>
+
+        <div class="code-block"><pre><span class="hl-tag">&lt;HTML&gt;</span>
+<span class="hl-attr">&lt;filename&gt;</span><span class="hl-val">"CO0003-welcome.htm"</span><span class="hl-attr">&lt;/filename&gt;</span>
+<span class="hl-text">Welcome to Digital Techniques for Aviation Technicians…</span>
+<span class="hl-tag">&lt;/HTML&gt;</span>
+
+<span class="hl-dim">─── SCORM packaging notes for this course ─────────────────</span>
+
+<span class="hl-attr">scorm-version:</span> <span class="hl-val">"1.2"</span>
+<span class="hl-attr">launch:</span>        <span class="hl-val">"CO0003-welcome.htm"</span>
+<span class="hl-attr">tracking:</span>      <span class="hl-val">"completion-only"</span>
+<span class="hl-attr">completion:</span>    <span class="hl-val">"page-view"</span>
+<span class="hl-attr">navigation:</span>    <span class="hl-val">"free"</span></pre></div>
+
+        <ul class="rule-list">
+          <li>
+            <span class="rule-icon ok">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg>
+            </span>
+            <span>Use <strong>straight double quotes</strong> around every value, exactly like a <code>&lt;filename&gt;</code> tag.</span>
+          </li>
+          <li>
+            <span class="rule-icon ok">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg>
+            </span>
+            <span>The <code>launch:</code> filename must match the <code>&lt;filename&gt;</code> of a real <code>&lt;HTML&gt;</code> block in the same document — including the extension and case.</span>
+          </li>
+          <li>
+            <span class="rule-icon ok">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 8 6 12 14 4"/></svg>
+            </span>
+            <span>Use <strong>SCORM 1.2</strong> as the default. Only use 2004 if the LMS team has confirmed they need it.</span>
+          </li>
+          <li>
+            <span class="rule-icon bad">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+            </span>
+            <span>Do <strong>not</strong> wrap the SCORM block in <code>&lt;HTML&gt;</code>, <code>&lt;worksheet&gt;</code>, or <code>&lt;document&gt;</code> tags — those tags would turn it into an output file. The SCORM block is metadata, not deliverable content.</span>
+          </li>
+          <li>
+            <span class="rule-icon bad">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+            </span>
+            <span>Do <strong>not</strong> point <code>launch:</code> at a worksheet or document filename — only HTML pages can launch in a SCORM package.</span>
+          </li>
+        </ul>
+
+        <div class="callout warn">
+          <div class="callout-icon">!</div>
+          <p><strong>Worksheets and documents are not trackable</strong>
+          The LMS can only track learner progress through <code>&lt;HTML&gt;</code> blocks. Word documents
+          and PDFs included in the bundle are downloadable assets — they will not register completion
+          or score. If a piece of content needs to be tracked, write it as an HTML block.</p>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-icon">i</div>
+          <p><strong>What if the SCORM block is missing?</strong>
+          The tool still produces a complete bundle of HTML pages, worksheets, and documents — but no
+          <code>imsmanifest.xml</code> is generated. That means the bundle works as a static download
+          but cannot be uploaded to an LMS as SCORM. Add the SCORM block whenever the bundle is
+          intended for LMS deployment.</p>
+        </div>
+
+        <h3 style="font-size:1rem;font-weight:800;margin:1.5rem 0 0.5rem;">Quick reference for common course patterns</h3>
+
+        <div class="code-block"><pre><span class="hl-dim">─── CPD course (view all pages, get a certificate) ────────</span>
+<span class="hl-attr">scorm-version:</span> <span class="hl-val">"1.2"</span>
+<span class="hl-attr">launch:</span>        <span class="hl-val">"CO0002-welcome.htm"</span>
+<span class="hl-attr">tracking:</span>      <span class="hl-val">"completion-only"</span>
+<span class="hl-attr">completion:</span>    <span class="hl-val">"page-view"</span>
+<span class="hl-attr">navigation:</span>    <span class="hl-val">"free"</span>
+
+<span class="hl-dim">─── Assessed course (graded quiz, must pass to complete) ──</span>
+<span class="hl-attr">scorm-version:</span> <span class="hl-val">"1.2"</span>
+<span class="hl-attr">launch:</span>        <span class="hl-val">"CP4807-A1.html"</span>
+<span class="hl-attr">tracking:</span>      <span class="hl-val">"completion-and-score"</span>
+<span class="hl-attr">completion:</span>    <span class="hl-val">"quiz-pass"</span>
+<span class="hl-attr">navigation:</span>    <span class="hl-val">"linear"</span></pre></div>
+      </div>
+
       <!-- ── Section 6: Common mistakes ── -->
       <div class="section-label">Common mistakes</div>
 
@@ -766,6 +929,33 @@ Look at the circuit diagram below and answer the questions.</span>
               DOCX and is not in the uploaded media ZIP, the tool will warn you that the file is missing and the
               output will have a broken reference. <strong>Fix:</strong> make sure every referenced media file is
               either embedded in the Word document or included in your media ZIP.
+            </p>
+          </div>
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge danger">SCORM not generated</span>
+              <h4><code>launch:</code> points at a file that does not exist</h4>
+            </div>
+            <p>
+              If the launch filename in your SCORM block does not match the <code>&lt;filename&gt;</code> of any
+              <code>&lt;HTML&gt;</code> block — for example a typo, a missing extension, or pointing at a
+              <code>.docx</code> worksheet — the manifest will reference a file that the LMS cannot open.
+              <strong>Fix:</strong> copy the launch filename directly from one of your <code>&lt;HTML&gt;</code> block
+              <code>&lt;filename&gt;</code> tags so the two match exactly.
+            </p>
+          </div>
+
+          <div class="issue-card">
+            <div class="issue-card-top">
+              <span class="issue-badge warn">Defaults applied silently</span>
+              <h4>SCORM mentioned but the five values are missing</h4>
+            </div>
+            <p>
+              If your document mentions SCORM but does not include all five decisions, the tool falls back to
+              defaults (SCORM 1.2, first HTML block as launch, basic tracking, completion on view, linear
+              navigation). That may not be what your LMS expects. <strong>Fix:</strong> always write all five
+              values explicitly, even if they happen to match the defaults.
             </p>
           </div>
 
@@ -871,7 +1061,15 @@ Look at the circuit diagram below and answer the questions.</span>
 <span class="hl-attr">&lt;image&gt;</span><span class="hl-val">photo.jpg</span><span class="hl-attr">&lt;/image&gt;</span>
 <span class="hl-attr">&lt;video&gt;</span><span class="hl-val">clip.mp4</span><span class="hl-attr">&lt;/video&gt;</span>
 <span class="hl-attr">&lt;audio&gt;</span><span class="hl-val">track.mp3</span><span class="hl-attr">&lt;/audio&gt;</span>
-<span class="hl-attr">&lt;datasheet&gt;</span><span class="hl-val">spec.pdf</span><span class="hl-attr">&lt;/datasheet&gt;</span></pre></div>
+<span class="hl-attr">&lt;datasheet&gt;</span><span class="hl-val">spec.pdf</span><span class="hl-attr">&lt;/datasheet&gt;</span>
+
+<span class="hl-dim">─── SCORM packaging notes (outside any block, once per course) ───</span>
+
+<span class="hl-attr">scorm-version:</span> <span class="hl-val">"1.2"</span>
+<span class="hl-attr">launch:</span>        <span class="hl-val">"CO0003-welcome.htm"</span>
+<span class="hl-attr">tracking:</span>      <span class="hl-val">"completion-only"</span>
+<span class="hl-attr">completion:</span>    <span class="hl-val">"page-view"</span>
+<span class="hl-attr">navigation:</span>    <span class="hl-val">"free"</span></pre></div>
 
         <div class="callout tip">
           <div class="callout-icon">i</div>
