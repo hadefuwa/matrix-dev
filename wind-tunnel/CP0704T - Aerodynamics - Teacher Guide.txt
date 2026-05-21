@@ -1,0 +1,206 @@
+Aerodynamics
+
+Teacher Guide
+
+CP0704
+www.matrixtsl.co
+m
+
+Copyright 2023-2024 Matrix Technology Solutions Limited
+
+About this course
+Aims and introduction
+The ‘Wind Tunnel 125’ module aims to introduce students to concepts involved in aerodynamics
+and fluid flow.
+A series of practical investigations illustrates a range of topics relating to fluid dynamics, using
+equipment which can be used with minimal supervision. This equipment opens up a wide range of
+student-designed investigations exploring factors involved in the design of wind-generator blades,
+aeroplane wings or vehicles.
+Prior Knowledge
+It is expected that students have a sufficient science / engineering background to enable them to
+design investigations, take, record and analyse measurements and manage observational errors .
+Some mathematical capability is desirable, including the ability to use spreadsheets to analyse observations.
+Using this course:
+An Equipment Guide is available which describes features of the equipment and how they can be
+used.
+
+The Wind Tunnel 125 kit includes automated data capture software. The advantage to students of
+using this is that it will speed progress through the module. However, the instructor may feel that
+they lose close connection to the details of the investigations. However, it is a powerful tool for the
+instructor to demonstrate aspects of the work in plenary sessions.
+It is expected that the Worksheets and Student Handout are printed / photocopied, preferably in
+colour, for the students’ use.
+The worksheets have:
+• an introduction to the topic under investigation;
+• step-by-step instructions for the investigation that follows
+• a guide to analysing the results.
+
+This format encourages self-study, with students working at a rate that suits their ability.
+The Student Handout is a record of the measurements taken in each worksheet and questions
+relating to them. Students do not need a permanent copy of the worksheets but could require their
+own copy of the Student Handout
+It is for the instructor to monitor that their understanding is keeping pace with progress through the
+worksheets. One way to do this is to ‘sign off’ each worksheet, as the student completes it, and in
+the process have a brief chat to assess the student’s grasp of the ideas involved in the exercises
+it contains.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 2
+
+Notes
+
+Introduction
+
+The wind tunnel is designed to facilitate a wide range of experimentation around
+aerodynamics and fluid flow. The following worksheets provide an introduction to
+these studies and illustrate what is possible.
+An overview of the structure and function of the wind tunnel and its components
+is a necessary starting point. Students need a guided tour of the equipment, to
+appreciate its capabilities. In particular, the configuration of the menus offered
+by the control unit needs outlining.
+
+Worksheet
+1
+Pitot-static
+tube
+
+Concepts involved:
+incompressible fluid
+Bernouilli’s theorem
+static pressure
+
+streamline flow
+U-tube manometer
+stagnation pressure
+
+turbulent flow
+pitot-static tube
+dynamic pressure
+
+Students need to appreciate the importance of correct alignment for the pitotstatic tube in the air stream.
+The aim of the investigation is to relate the air speed in the wind tunnel with the
+resulting air pressure. In later investigations, this allows us to use measured air
+pressure to deduce the prevailing air speed.
+It also compares the performance of the U-tube manometer with that of a digital
+pressure sensor, validating the use of the latter in later worksheets.
+
+Worksheet
+2
+Flow
+patterns
+around a
+cylinder
+
+Concepts involved:
+Reynolds number
+
+pressure coefficient
+
+pressure distribution diagram
+
+This investigation focuses on the pressure distribution around an object
+immersed in a fluid, in this case a cylinder placed in a stream of air.
+Students use their measurements to calculate the resulting pressure coefficient
+and generate a pressure distribution diagram from their results.
+Each stage in this investigation involves taking measurements at thirty seven
+different angles of attack. This is then repeated for three more air speeds.
+It may be desirable to spread these tasks around a number of student groups,
+with a final plenary session to pool the results.
+Please note and advise students using spreadsheets to obtain the graphs, thatthat many require angles measured in radians. This conversion could be part of
+the spreadsheet.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 3
+
+Notes
+
+Worksheet
+3
+Flow
+patterns
+around an
+aerofoil
+
+Worksheet
+4
+Lift and drag
+on an
+aerofoil
+
+Worksheet
+5
+Drag
+coefficient
+
+Concepts involved:
+aerofoil
+
+angle of attack
+
+The challenge in this investigation is manipulating the equipment - twenty-three
+tappings, twenty-three readings at each air speed, four air speeds.
+Once again, for efficient classroom management, it may be preferable to spread
+thee tasks around the student groups, using a final plenary session to pool
+results.
+
+Concepts involved:
+lift
+
+drag
+
+The instructor may wish to outline the controversy over the cause of lift in an
+aerofoil.
+The conventional explanation called on Bernouilli’s equation. The implication
+was that the air speed over the upper surface of the aerofoil is greater than that
+over the lower surface resulting in a pressure difference and lift.
+The alternative explanation invokes Newton’s laws of motion to explain that this
+pressure difference is due to the bending of the streamlines over the surfaces.
+The instructor may wish to use the software controlled angle adjustment and automated data collection. This would speed up the investigation. It would also allow students to widen the investigation to other angles and wind speeds.
+
+Concepts involved:
+drag coefficient
+The drag coefficient formula introduces a quantity known as the ‘characteristic
+area’ of the body, important in vehicle design. This is not necessarily the full
+cross-sectional area of the body, but depends on the area of the body facing the
+air flow. This could lead to a discussion and research project on implications for
+vehicle design.
+The instructor could allocate two different shapes to three groups of students
+and hold a class presentation to compare and combine results.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 4
+
+Notes
+Worksheet
+6
+Streamlined?
+
+This is an open-ended investigation where students observe air flow around
+objects by viewing the smoke trails around them.
+Ideally they use the slow-motion facility, now available on most mobile ‘phones.
+It requires a little practice in positioning the smoke generator nozzle, but the
+results are worth the effort!
+Student groups can be given different shapes to investigate, looking at the effect
+of changing the air speed or changing the angle of attack. The results could be
+delivered in a class presentation.
+
+Worksheet
+7
+Where next?
+
+This is a very open-ended investigation! It encourages students to focus on their
+particular field of interest.
+Students can design their own shapes, following the size guidelines given in the
+worksheet, and plan a range of investigations using them.
+A variety of manufacturing methods can be used but it is important to recognise
+that considerable forces are exerted on the object by the air stream and so the
+materials used must be strong enough to withstand them.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 5
+
+

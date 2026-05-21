@@ -1,0 +1,3394 @@
+Page 2
+
+Contents
+
+Wind tunnel 125
+
+Introduction
+
+3
+
+Worksheet 1 - Pitot-static tube
+
+5
+
+Worksheet 2 - Flow patterns around a cylinder
+
+7
+
+Worksheet 3 - Flow patterns around an aerofoil
+
+10
+
+Worksheet 4 - Lift and drag on an aerofoil
+
+13
+
+Worksheet 5 - Drag coefficient
+
+15
+
+Worksheet 6 - Streamlined?
+
+17
+
+Worksheet 7 - Where next?
+
+18
+
+Student Handout
+
+19
+
+Notes for the Instructor
+
+47
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 3
+
+Introduction
+
+Wind tunnel 125
+
+Wind tunnel 125
+This bench-top wind tunnel is designed for teaching aerodynamics and the principles of
+fluid flow. In addition to the investigations outlined in the following sections, it offers scope
+for extensive open-ended experimentation.
+
+Transparent test section
+
+Moving LED lights mimic air flow
+Touch-screen panel
+controls air flow and
+built-in data
+acquisition system
+
+A smoke generator shows flow patterns around test objects
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 4
+
+Introduction
+
+Wind tunnel 125
+
+Tapped cylinder attached
+to circular protractor
+(Worksheet 2)
+
+Aerofoil holder
+(Worksheet 3)
+
+Pitot-static tube
+experiment holder
+(Worksheet 1)
+
+•
+
+Two-force module
+connected to aerofoil section
+(Worksheet 4)
+• connected to test shapes
+(Worksheet 5)
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 5
+
+Worksheet 1
+
+Wind tunnel 125
+
+Pitot-static tube
+Pitot-static tubes are used in vehicles such as
+aircraft and racing cars to monitor air speed
+and hence the speed of the vehicle.
+They compare the pressure created in a tube,
+(the pitot tube,) facing directly into the fluid
+flow, with the static pressure around it.
+The faster the fluid flow, the greater this
+pressure difference.
+
+Over to you:
+1. Using the U-tube manometer:
+•
+
+Place the pitot-static tube experiment holder into the wind tunnel test area and secure it
+with the two thumb-nuts, as shown in the diagram.
+Make sure that the tube points directly into the air flow.
+
+•
+
+Add water to the manometer via one of the ports identified in the diagram below so that
+the water level sits at near 50.
+
+Connect the experiment holder to the ‘U’ tube manometer.
+(It doesn’t matter which tube goes to which port. The important thing is the difference in
+the heights of the water columns.)
+• Measure the initial heights of the water columns in the manometer (i.e. at 0% fan speed).
+•
+
+•
+
+Record the measurement in the table in the Student Handout.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 6
+
+Worksheet 1
+
+Wind tunnel 125
+
+Pitot static tube
+Over to you .....
+•
+
+Switch on the air flow in the wind tunnel by pressing the ‘speed-up’ button and set the
+fan speed to 10%. (On switch-on, it starts at 10% automatically.)
+
+•
+
+Again, measure the heights of the water columns.
+
+•
+
+Increase the fan speed in steps of 10% up to a speed of 100%. Each time, measure the
+water column heights.
+
+•
+
+Record all measurements in the Student Handout.
+
+So what:
+Using Bernoulli’s equation, we predict that:
+V2 = 2 (w x g x h)
+a
+where V = air speed,
+w= density of water (taken to be 1000kg.m-3)
+g = gravitational field strength = 9.81N.kg-1
+h = manometer height difference in metres,
+a= density of air (taken to be 1.20 kg.m-3).
+•
+
+•
+
+For each value of fan speed, calculate:
+•
+
+the manometer height difference, h, in metres;
+
+•
+
+the air speed, V, using the above formula.
+
+Use these results to plot a graph of air speed against height difference. Draw a smooth
+curve, using your points as a guide.
+
+2. Using the digital pressure meter:
+•
+
+Now detach the tubes from the manometer and instead connect them to the ports on
+the control unit. Once again, it doesn’t matter which way round you connect them.
+(It’s the magnitude that matters, so ignore minus signs! Ideally though its negative, as
+the pressure decreases with velocity)
+
+Zero the sensors on the control panel.
+• Take a series of readings of air speed and (modulus of) pressure difference shown on
+the digital pressure meter, as before, but for fan speeds from 10% to 100%, .
+•
+
+•
+
+Record all measurements in the Student Handout.
+
+So what:
+•
+
+Plot another graph of air speed against height difference, this time using the digital
+pressure meter readings. Again, draw a smooth curve through the points.
+
+•
+
+Calculate the Reynolds number for each fan speed percentage
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 7
+
+Worksheet 2
+
+Wind tunnel 125
+
+Flow patterns around a cylinder
+When designing ships, aircraft, cars etc. the aim is usually
+to reduce drag and other frictional forces in order to increase
+the vehicle’s speed, or reduce its energy consumption.
+Important factors in this include the profile that the vehicle
+presents to the fluid flow and the speed of the flow.
+
+This experiment explores the pressure distribution around an
+object placed in a stream of air.
+
+Over to you:
+The object is a cylinder, with a hole on its surface, connected to a shaft running down its
+centre. The cylinder is attached to a circular protractor.
+
+Place the cylinder holder into the wind tunnel test area and secure it with the thumb-nuts.
+0
+• The holder has a twisting mechanism that allows the cylinder to be rotated in 5 steps.
+•
+•
+•
+•
+•
+•
+
+Rotate it to an angle of attack, , of 00 relative to the air flow. (In this position, the 900
+scale marker lines up with the vertical marker on the test window.)
+Connect the pressure port on the holder to one of the ports on the control unit. Leave
+the other port open to ambient pressure.
+Zero the pressure sensor on the control panel, when the fan speed is zero.
+Turn on the fan and set it to 20%.
+Read the air speed and pressure, shown on the digital pressure meter.
+
+Rotate the cylinder in its holder to an angle, , of 50 and repeat the procedure.
+0
+0
+• Increase the angle of attack in steps of 5 up to an angle of 180 .
+Each time, observe the resulting pressure reading.
+•
+
+•
+
+Record all measurements in the Student Handout.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 8
+
+Worksheet 2
+
+Wind tunnel 125
+
+Flow patterns around a cylinder
+So what:
+Significant factors in determining the flow pattern that we see around objects placed in a
+fluid stream include:
+•
+
+the Reynolds number, Re, for the flow, which depends on dimensions,
+such as the diameter of the cylinder, and on the velocity and properties
+of the fluid;
+
+•
+
+the pressure coefficient, Cp, used to obtain the pressure distribution
+around an object immersed in a fluid.
+
+It can be shown that:
+
+Cp = (P - P∞)
+½ρV²
+
+where P =
+
+pressure in Pa at a particular point on the surface of the body
+
+P∞ =
+
+free-stream pressure of the fluid (i.e. undisturbed by the presence
+of the object). This is found from the results of the first worksheet,
+which used the pitot-static tube to measure the free-stream
+(undisturbed) air pressure for a range of air speeds
+
+ρ
+
+density of the fluid, air in this case, taken to be 1.20 kg.m-3
+
+=
+
+V =
+
+velocity of the fluid.
+
+•
+
+Use this equation to calculate pressure coefficient values for each angle of attack.
+
+•
+
+Plot a graph of pressure coefficient versus angle of attack, , for this value of air speed.
+(If you use a spreadsheet such as Excel to obtain the graph, you may have to
+convert the angles from degrees into radians. (1 degree = 0.017 radians.))
+
+•
+
+Compare the results to the theoretical curve, explain the difference between
+them.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 9
+
+Worksheet 2
+
+Wind tunnel 125
+
+Flow patterns around a cylinder
+So what .....
+The pressure distribution around an object is often presented in the form shown below:
+
+•
+
+•
+
+Positive pressure is indicated by the arrows flowing away from the object.
+
+•
+
+For a negative pressure, the arrows flow towards the object.
+
+Use your results to create a pressure distribution diagram of this type.
+A template is provided in the Student Handout. Your measurements cover only the
+range from 00 to 1800. The pattern is symmetrical so you can complete it if you wish.
+
+•
+
+Compare this diagram with the graph you plotted earlier.
+In the Student Handout, comment on this comparison.
+
+Challenge!
+Obtain pressure distribution graphs for fan speeds of 50%, 80% and 100%.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 10
+
+Worksheet 3
+
+Wind tunnel 125
+
+Flow patterns around an aerofoil
+When a fluid flows around an object, it can generate
+nett forces that cause the object to rise or fall.
+The shape (profile) that the object presents determines
+the size of these forces.
+An aerofoil exploits this effect, giving aircraft lift, wind
+turbines rotation and ship propellers thrust.
+
+This investigation explores the pressure distribution around a model aerofoil, with a shape
+known as NACA0015.
+
+Tappings
+
+Pressure ports
+
+Twenty-three tappings (holes) along the surface of the aerofoil lead through internal tubes
+to ports which can be connected to a pressure meter.
+
+In this way, we can take static pressure readings over the surface of the aerofoil.
+Over to you:
+•
+•
+•
+•
+•
+•
+•
+•
+
+Place the aerofoil holder into the wind tunnel test area and secure it with thumb-nuts.
+Turn the aerofoil to an angle of attack of 00 (relative to the air flow).
+Zero the sensors on the control panel.
+Turn on the fan and set the speed to 25%.
+Connect tapping ‘1’ to port 1 on the control box.
+Leave the other port open to ambient pressure.
+Read the air speed and pressure, shown on the
+digital pressure meter for that point on the aerofoil.
+Record it in the table in the Student Handout.
+Remove the tapping tube form the port, and repeat
+this process for the other aerofoil tappings.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 11
+
+Worksheet 3
+
+Wind tunnel 125
+
+Flow patterns around an aerofoil
+So what:
+To make it easier to scale the results to other aerofoils, the distance from the front of the
+aerofoil to the tapping is recorded as a fraction of the length of the aerofoil chord, in this
+case 60mm.
+
+The table shows this fractional distance, x, for each of the tappings:
+Pressure tapping
+
+1
+
+2
+13
+
+3
+14
+
+4
+15
+
+5
+16
+
+6
+17
+
+7
+18
+
+8
+19
+
+9
+20
+
+10
+21
+
+11
+22
+
+12
+23
+
+Distance along
+chord in mm
+
+0
+
+0.6
+
+1.6
+
+3.8
+
+7.4
+
+10.8
+
+18.3
+
+24.2
+
+30.7
+
+35.9
+
+41.8
+
+47.7
+
+Fractional distance
+x along chord
+
+0
+
+0.01
+
+0.03
+
+0.06
+
+0.12
+
+0.18
+
+0.30
+
+0.40
+
+0.51
+
+0.60
+
+0.70
+
+0.80
+
+Notice that tappings 2 and 13, 3 and 14 etc., lie at the same distance along the chord, one
+on the top surface and one on the lower surface.
+The parameter pressure coefficient, Cp, used to describe the pressure variation across an
+aerofoil is calculated from the formula given earlier:
+Cp = P - P∞
+½  V2
+where P = pressure at wing tapping in Pa
+P∞ = free-stream pressure of the fluid, found, again, from the first worksheet results
+ = density of air, taken as 1.20 kg.m-3
+V = air speed
+•
+
+Use this formula to calculate the pressure coefficient at each tapping and add the result
+to the table in the Student Handout.
+
+•
+
+Use the results to plot a pressure distribution graph, CP versus x, for the top surface of
+the aerofoil.
+
+•
+
+On the same axes, plot a pressure distribution graph for the lower surface.
+
+•
+
+Comment on what these graphs show.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 12
+
+Worksheet 3
+
+Wind tunnel 125
+
+Flow patterns around an aerofoil
+So what .....
+Once again, it is customary to show these results in a pressure distribution diagram, like the
+one shown below.
+
+•
+
+Use your results to plot a pressure distribution graph, CP versus x, using the 00
+template provided in the Student Handout. (The positions of the tappings are shown
+on the template.)
+
+•
+
+Change the angle of attack of the aerofoil to 50 and repeat the procedure. Use the
+results to plot a pressure distribution graph on the 50 template provided in the Student
+Handout.
+
+•
+
+Now set the angle of attack to 150 and repeat the process.
+
+Challenge!
+In the same way, obtain a set of pressure distribution graphs for fan speeds of 50%, 80%
+and 100%.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 13
+
+Worksheet 4
+
+Wind tunnel 125
+
+Lift and drag on an aerofoil
+The shape of the aerofoil causes the streamlines of
+air flowing around it to curve.
+This requires a pressure gradient across the air
+flow, leading to lower air pressure on top of the aerofoil than underneath.
+The result - an upward force on the aerofoil - we
+call it lift.
+
+This experiment requires the ’two-force’ module holder,
+shown opposite.
+It contains:
+• two built-in load cells, one to measure lift forces and
+the other drag forces;
+• a stepper motor to adjust the angle of attack of the
+aerofoil.
+The aerofoils provided with the kit are also shown, with the
+names of their profiles.
+Each has a threaded insert. Twist this
+onto the shaft on the end of the holder
+and then attach it to the test section of
+the wind tunnel using the thumb-nuts.
+Use the cables provided to attach the
+sockets on the holder to the corresponding sockets on the control unit.
+Over to you:
+•
+•
+•
+•
+•
+•
+•
+•
+•
+
+Attach the NACA0015 aerofoil to the holder and place it in the wind tunnel.
+Turn the aerofoil to an angle of attack of 00 (relative to the air flow).
+With the fan turned off, zero the sensors on the control panel.
+Switch on the fan and set it to a power level of 20%.
+Increase the angle of attack in steps of 50 from an angle of -250 to +450.
+Each time, read the values of lift and drag shown on the control panel and record them
+in the table in the Student Handout.
+Increase the fan speed to 50% and repeat the procedure.
+Then do the same at a fan speed of 80%.
+Complete the appropriate tables in the Student Handout with your results.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 14
+
+Worksheet 4
+
+Wind tunnel 125
+
+Lift and drag on an aerofoil
+So what:
+•
+
+On the same axes, plot graphs of lift force versus angle of attack for the three air
+speeds and label each. Draw smooth curves using the experimental points a guide.
+
+•
+
+Then draw graphs of drag force versus angle of attack for the three air speeds.
+
+•
+
+Comment on what these graphs show.
+
+Over to you:
+•
+
+Remove the NACA0015 aerofoil and replace it with the S1223 aerofoil.
+
+•
+
+Repeat the procedure to obtain lift and drag graphs for fan speeds of 20%, 50% and
+80%.
+
+•
+
+Then do the same for the NACA4415 aerofoil.
+
+So what:
+•
+
+On the same axes, now plot a graph of lift force versus angle of attack for the three
+aerofoils at a wind speed of 20% to compare their aerodynamic performance.
+
+•
+
+Then draw a second graph to compare the drag forces on each aerofoil at a fan speed
+of 20%.
+
+•
+
+Comment on these comparisons.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 15
+
+Worksheet 5
+
+Wind tunnel 125
+
+Drag coefficient
+Everyday speech uses the term ‘streamlined’
+for a shape that glides easily through a fluid,
+such as air, experiencing minimum resistance (drag).
+This investigation explores the relationship
+between the shape of an object and the drag
+forces it produces.
+The drag coefficient is derived for a number
+of shapes. It depends on factors like the surface area and roughness of the object’s surface as well as the speed of the air across it..
+
+This experiment also uses the ’two-force’ module holder, with each of the drag shapes
+shown below, attached in turn.
+
+Over to you:
+•
+
+Attach the first shape, the cone, firmly to the ’two-force’ holder using the threaded shaft.
+
+•
+
+Place it in the test section of the wind tunnel and secure it with the thumb nuts.
+
+•
+
+Connect the module holder to the control unit as before.
+
+•
+
+Set the angle of attack to 00 (relative to the air flow).
+
+•
+
+With the fan turned off, zero the sensors on the control panel.
+
+•
+
+Switch on the fan and set it to a power level of 10%.
+
+•
+
+Read values of air speed and drag force, shown on the control panel.
+
+•
+
+Increase the air speed in steps of 10% up to 100%.
+
+•
+
+Each time, read the values of air speed and drag and record them in the first table in
+the Student Handout.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 16
+
+Worksheet 5
+
+Wind tunnel 125
+
+Drag coefficient
+So what:
+•
+
+For each value of air speed, calculate the drag coefficient, using the formula:
+drag coefficient Cd =
+
+D
+1/2  V2 x d
+
+where D = drag force in N
+
+ = density of air, taken as 1.20 kg.m-3
+V = air speed in m.s-1
+d = diameter of shape = 44 mm = 0.044 m
+•
+
+What do you notice about the effect of air speed on the drag coefficient?
+
+Over to you:
+•
+
+Repeat the same procedure for the other shapes, completing the appropriate tables in
+the Student Handout with your results.
+
+So what:
+The following table gives theoretical values for the drag coefficients of these shapes.
+
+Shape
+
+Drag coefficient
+
+Cone
+
+0.5
+
+Smooth sphere
+
+0.47
+
+Half sphere
+
+0.42
+
+Rough sphere
+
+0.2
+
+Flat surface
+
+1.1
+
+Tear drop
+
+0.04
+
+Some of these values vary with the precise shape of the object and with the conditions
+under which measurements are taken.
+•
+
+Compare your results with the values given in the table and comment on this in the
+Student Handout.
+
+•
+
+In the Student Handout, answer these questions, using your results as appropriate:
+•
+
+A modern car has a drag coefficient around 0.2 to 0.3. Which of these shapes
+is most likely to be chosen for a streamlined car?
+
+•
+
+Why are golf balls dimpled?
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 17
+
+Worksheet 6
+
+Wind tunnel 125
+
+Streamlined?
+Wind tunnels are often used to obtain
+images of the air flow around objects
+such as cars, aircraft and buildings in
+order to improve their design.
+In this investigation, you use streams
+of smoke blowing around objects
+placed in the air stream to create
+these images.
+
+The precise procedure in this investigation depends on exactly what you want to investigate
+and the equipment you have at your disposal and so instructions given below amount to
+general guidelines only.
+
+It is possible to take photographs that show the patterns produced by the smoke streams,
+but it is ‘hit-and-miss’ because they change rapidly.
+An alternative is to create a video clip using the slow-motion facility available on many cell
+phones.
+Over to you:
+•
+
+Attach the object you are interested in firmly to the ‘two force’ module.
+
+•
+
+Place it in the test section of the wind tunnel at the desired angle.
+
+•
+
+Switch on the fan at a low fan speed to begin with.
+
+•
+
+Hold the smoke generator outlet near the centre of the wind tunnel’s inlet grill.
+
+•
+
+Adjust its position to improve the pattern of smoke flowing around the object.
+
+•
+
+Once you are happy with the pattern, use the camera on a cell phone to take either still
+pictures or, preferably, slow-motion video of the smoke pattern.
+
+•
+
+Experiment with other fan speeds and other angles of attack.
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Page 18
+
+Worksheet 7
+
+Wind tunnel 125
+
+Where next?
+And now... over to you absolutely!
+What is your area of interest:
+• car body shape;
+• aeronautics;
+• ship hull design;
+• wind turbine efficiency?
+At this point, investigate a shape of your own
+making.
+
+Guidelines
+The size of the shape you produce is important. Keep the area exposed to the air stream to
+less than 10% of the cross-section of the test area of the wind tunnel, which has dimensions
+125mm x 125mm.
+
+Over to you:
+If you have ‘3-D’ printed it, you may have included a tapping to sense the pressure. In
+that case, connect it up and proceed as in worksheet 2.
+• If you are interested in the forces exerted on the shape by the air flow, proceed as in
+worksheets 4 and 5.
+• You might be interested in the air flow around the shape, in which case proceed as in
+worksheet 6.
+•
+
+Copyright 2021 Matrix Technology Solutions Limited
+
+Wind tunnel 125
+
+Student
+Handout
+
+Wind tunnel 125
+Worksheet 1 - Pitot-static tube
+1.
+
+Using the U-tube manometer:
+Fan
+
+speed
+%
+
+Left-hand
+column height
+in mm
+
+Right-hand
+column height
+in mm
+
+Height
+difference h
+in m
+
+Air speed
+V
+in m.s-1
+
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+
+2.
+Uspressure sensor:
+
+ing the digital
+
+Fan
+speed
+%
+
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+
+Pressure
+reading
+in Pa
+
+Air speed
+V
+in m.s-1
+
+Wind tunnel 125
+Worksheet 2 - Flow patterns around a cylinder
+Fan speed = 20%
+Angle of
+attack
+
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+Angle of
+attack
+
+00
+
+950
+
+50
+
+1000
+
+100
+
+1050
+
+150
+
+1100
+
+200
+
+1150
+
+250
+
+1200
+
+300
+
+1250
+
+350
+
+1300
+
+400
+
+1350
+
+450
+
+1400
+
+500
+
+1450
+
+550
+
+1500
+
+600
+
+1550
+
+650
+
+1600
+
+700
+
+1650
+
+750
+
+1700
+
+800
+
+1750
+
+850
+
+1800
+
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+900
+
+Pressure distribution diagram
+
+Wind tunnel 125
+Worksheet 2 - Flow patterns around a cylinder
+Comparing the two ways to present the pressure distribution:
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+Wind tunnel 125
+Worksheet 2 - Flow patterns around a cylinder
+Challenge!
+Angle of
+attack
+
+Fan speed = ....................
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+Angle of
+attack
+
+00
+
+950
+
+50
+
+1000
+
+100
+
+1050
+
+150
+
+1100
+
+200
+
+1150
+
+250
+
+1200
+
+300
+
+1250
+
+350
+
+1300
+
+400
+
+1350
+
+450
+
+1400
+
+500
+
+1450
+
+550
+
+1500
+
+600
+
+1550
+
+650
+
+1600
+
+700
+
+1650
+
+750
+
+1700
+
+800
+
+1750
+
+850
+
+1800
+
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+900
+
+Pressure distribution diagram
+
+Wind tunnel 125
+Worksheet 2 - Flow patterns around a cylinder
+Challenge!
+Angle of
+attack
+
+Fan speed = ....................
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+Angle of
+attack
+
+00
+
+950
+
+50
+
+1000
+
+100
+
+1050
+
+150
+
+1100
+
+200
+
+1150
+
+250
+
+1200
+
+300
+
+1250
+
+350
+
+1300
+
+400
+
+1350
+
+450
+
+1400
+
+500
+
+1450
+
+550
+
+1500
+
+600
+
+1550
+
+650
+
+1600
+
+700
+
+1650
+
+750
+
+1700
+
+800
+
+1750
+
+850
+
+1800
+
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+900
+
+Pressure distribution diagram
+
+Wind tunnel 125
+Worksheet 2 - Flow patterns around a cylinder
+Challenge!
+Angle of
+attack
+
+Fan speed = ....................
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+Angle of
+attack
+
+00
+
+950
+
+50
+
+1000
+
+100
+
+1050
+
+150
+
+1100
+
+200
+
+1150
+
+250
+
+1200
+
+300
+
+1250
+
+350
+
+1300
+
+400
+
+1350
+
+450
+
+1400
+
+500
+
+1450
+
+550
+
+1500
+
+600
+
+1550
+
+650
+
+1600
+
+700
+
+1650
+
+750
+
+1700
+
+800
+
+1750
+
+850
+
+1800
+
+Pressure Pressure
+difference coefficient
+in Pa
+Cp
+
+900
+
+Pressure distribution diagram
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 00
+
+Fan speed = 25%
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+00
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 50
+
+Fan speed = 25%
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+50
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 150
+
+Fan speed = 25%
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+150
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 00
+
+Challenge
+
+Fan speed = 50%
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+
+0
+
+2
+
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+00
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 50
+
+Challenge
+
+Fan speed = 50%
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+50
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 150 Fan speed = 50%
+
+Challenge
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+150
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 00
+
+Challenge
+
+Fan speed = 80%
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+
+0
+
+2
+
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+00
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Challenge
+
+Angle of attack = 50
+Upper surface:
+
+Fan speed = 80%
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+Lower surface:
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+50
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 150 Fan speed = 80%
+
+Challenge
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+150
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 00
+
+Challenge
+
+Fan speed = 100%
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+
+0
+
+2
+
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+00
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Challenge
+
+Angle of attack = 50
+Upper surface:
+
+Fan speed = 100%
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+50
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+Angle of attack = 150 Fan speed = 100%
+
+Challenge
+
+Upper surface:
+
+Lower surface:
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+Pressure Fractional
+Pressure
+Pressure
+tapping distance x
+coefficient
+p in Pa
+number along chord
+Cp
+
+1
+2
+
+0
+0.01
+
+3
+
+0.03
+
+4
+
+0.06
+
+5
+
+0.12
+
+6
+
+0.18
+
+7
+
+0.30
+
+8
+
+0.40
+
+9
+
+0.51
+
+10
+
+0.60
+
+11
+
+0.70
+
+12
+
+0.80
+
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+Pressure distribution diagram:
+
+150
+
+0.01
+0.03
+0.06
+0.12
+0.18
+0.30
+0.40
+0.51
+0.60
+0.70
+0.80
+
+Wind tunnel 125
+Worksheet 3 - Flow patterns around an aerofoil
+What do you deduce from the graphs of pressure distributions across the upper and lower
+surfaces of the aerofoil?
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+Wind tunnel 125
+Worksheet 4 - Lift and drag on an aerofoil NACA0015
+Fan speed = 20%
+
+Fan speed = 50%
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+
+-250
+
+-250
+
+-200
+
+-200
+
+-150
+
+-150
+
+-100
+
+-100
+
+-50
+
+-50
+
+00
+
+00
+
+50
+
+50
+
+100
+
+100
+
+150
+
+150
+
+200
+
+200
+
+250
+
+300
+
+250
+300
+
+350
+
+350
+
+400
+
+400
+
+450
+
+450
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+-250
+
+-200
+-150
+-100
+-50
+00
+50
+100
+150
+200
+250
+300
+350
+400
+450
+
+Fan speed = 80%
+
+Wind tunnel 125
+Worksheet 4 - Lift and drag on an aerofoil S1223
+Fan speed = 20%
+
+Fan speed = 50%
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+
+-250
+
+-250
+
+-200
+
+-200
+
+-150
+
+-150
+
+-100
+
+-100
+
+-50
+
+-50
+
+00
+
+00
+
+50
+
+50
+
+100
+
+100
+
+150
+
+150
+
+200
+
+200
+
+250
+
+300
+
+250
+300
+
+350
+
+350
+
+400
+
+400
+
+450
+
+450
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+-250
+
+-200
+-150
+-100
+-50
+00
+50
+100
+150
+200
+250
+300
+350
+400
+450
+
+Fan speed = 80%
+
+Wind tunnel 125
+Worksheet 4 - Lift and drag on an aerofoil NACA4415
+Fan speed = 20%
+
+Fan speed = 50%
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+
+-250
+
+-250
+
+-200
+
+-200
+
+-150
+
+-150
+
+-100
+
+-100
+
+-50
+
+-50
+
+00
+
+00
+
+50
+
+50
+
+100
+
+100
+
+150
+
+150
+
+200
+
+200
+
+250
+
+300
+
+250
+300
+
+350
+
+350
+
+400
+
+400
+
+450
+
+450
+
+Angle of Lift force Drag force
+attack
+in N
+in N
+-250
+
+-200
+-150
+-100
+-50
+00
+50
+100
+150
+200
+250
+300
+350
+400
+450
+
+Fan speed = 80%
+
+Wind tunnel 125
+Worksheet 4 - Lift and drag on an aerofoil
+What do you deduce from the graphs of lift and drag versus angle of attack at the different air
+speeds?
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+How do the different aerofoils compare for lift and drag at a fan speed of 20%?
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+Wind tunnel 125
+Worksheet 5 - Drag coefficient
+
+
+The cone
+Fan
+speed
+%
+
+Air speed Drag force
+Drag
+in m.s-1
+in N
+coefficient
+
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+
+2
+
+The smooth sphere
+
+Fan
+speed
+%
+10
+20
+
+30
+40
+50
+60
+70
+80
+90
+100
+
+Air speed Drag force
+Drag
+in m.s-1
+in N
+coefficient
+
+Wind tunnel 125
+Worksheet 5 - Drag coefficient
+3.
+
+The half sphere
+Fan
+speed
+%
+
+Air speed Drag force
+Drag
+in m.s-1
+in N
+coefficient
+
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+
+4
+
+The rough sphere
+
+Fan
+speed
+%
+10
+20
+
+30
+40
+50
+60
+70
+80
+90
+100
+
+Air speed Drag force
+Drag
+in m.s-1
+in N
+coefficient
+
+Wind tunnel 125
+Worksheet 5 - Drag coefficient
+5. The flat surface
+Fan
+speed
+%
+
+Air speed Drag force
+Drag
+in m.s-1
+in N
+coefficient
+
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+
+6
+
+The tear drop
+
+Fan
+speed
+%
+10
+20
+
+30
+40
+50
+60
+70
+80
+90
+100
+
+Air speed Drag force
+Drag
+in m.s-1
+in N
+coefficient
+
+Wind tunnel 125
+Worksheet 5 - Drag coefficient
+What do you deduce from these results?
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+Which of these shapes is chosen by many car designers for the overall shape of a car?
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+Why are golf balls dimpled?
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+..............................................................................................................................................
+
+..............................................................................................................................................
+..............................................................................................................................................
+
+Wind tunnel 125
+
+Notes
+for the
+Instructor
+
+Wind tunnel 125
+About this course
+Aims and introduction
+The ‘Wind Tunnel 125’ module aims to introduce students to concepts involved in aerodynamics
+and fluid flow.
+A series of practical investigations illustrates a range of topics relating to fluid dynamics, using
+equipment which can be used with minimal supervision. This equipment opens up a wide range of
+student-designed investigations exploring factors involved in the design of wind-generator blades,
+aeroplane wings or vehicles.
+Prior Knowledge
+It is expected that students have a sufficient science / engineering background to enable them to
+design investigations, take, record and analyse measurements and manage observational errors .
+Some mathematical capability is desirable, including the ability to use spreadsheets to analyse
+observations.
+Using this course:
+An Equipment Guide is available which describes features of the equipment and how they can be
+used.
+The Wind Tunnel 125 kit includes automated data capture software. The advantage to students of
+using this is that it will speed progress through the module. However, the instructor may feel that
+they lose close connection to the details of the investigations. However, it is a powerful tool for the
+instructor to demonstrate aspects of the work in plenary sessions.
+It is expected that the Worksheets and Student Handout are printed / photocopied, preferably in
+colour, for the students’ use.
+
+The worksheets have:
+• an introduction to the topic under investigation;
+• step-by-step instructions for the investigation that follows
+• a guide to analysing the results.
+
+This format encourages self-study, with students working at a rate that suits their ability.
+The Student Handout is a record of the measurements taken in each worksheet and questions
+relating to them. Students do not need a permanent copy of the worksheets but could require their
+own copy of the Student Handout
+It is for the instructor to monitor that their understanding is keeping pace with progress through
+the worksheets. One way to do this is to ‘sign off’ each worksheet, as the student completes it,
+and in the process have a brief chat to assess the student’s grasp of the ideas involved in the
+exercises it contains.
+
+Wind tunnel 125
+Notes
+Introduction
+
+The wind tunnel is designed to facilitate a wide range of experimentation around
+aerodynamics and fluid flow. The following worksheets provide an introduction to
+these studies and illustrate what is possible.
+An overview of the structure and function of the wind tunnel and its components
+is a necessary starting point. Students need a guided tour of the equipment, to
+appreciate its capabilities. In particular, the configuration of the menus offered
+by the control unit needs outlining.
+
+Worksheet
+1
+Pitot-static
+tube
+
+Concepts involved:
+incompressible fluid
+Bernouilli’s theorem
+static pressure
+
+streamline flow
+U-tube manometer
+stagnation pressure
+
+turbulent flow
+pitot-static tube
+dynamic pressure
+
+Students need to appreciate the importance of correct alignment for the pitotstatic tube in the air stream.
+The aim of the investigation is to relate the air speed in the wind tunnel with the
+resulting air pressure. In later investigations, this allows us to use measured air
+pressure to deduce the prevailing air speed.
+It also compares the performance of the U-tube manometer with that of a digital
+pressure sensor, validating the use of the latter in later worksheets.
+
+Worksheet
+2
+Flow
+patterns
+around a
+cylinder
+
+Concepts involved:
+Reynolds number
+
+pressure coefficient
+
+pressure distribution diagram
+
+This investigation focuses on the pressure distribution around an object
+immersed in a fluid, in this case a cylinder placed in a stream of air.
+Students use their measurements to calculate the resulting pressure coefficient
+and generate a pressure distribution diagram from their results.
+Each stage in this investigation involves taking measurements at thirty seven
+different angles of attack. This is then repeated for three more air speeds.
+It may be desirable to spread these tasks around a number of student groups,
+with a final plenary session to pool the results.
+Please note and advise students using spreadsheets to obtain the graphs, thatthat many require angles measured in radians. This conversion could be part of
+the spreadsheet.
+
+Wind tunnel 125
+Notes
+
+Worksheet
+3
+Flow
+patterns
+around an
+aerofoil
+
+Worksheet
+4
+Lift and
+drag on an
+aerofoil
+
+Worksheet
+5
+Drag
+coefficient
+
+Concepts involved:
+aerofoil
+
+angle of attack
+
+The challenge in this investigation is manipulating the equipment - twenty-three
+tappings, twenty-three readings at each air speed, four air speeds.
+Once again, for efficient classroom management, it may be preferable to spread
+thee tasks around the student groups, using a final plenary session to pool
+results.
+
+Concepts involved:
+lift
+
+drag
+
+The instructor may wish to outline the controversy over the cause of lift in an
+aerofoil.
+The conventional explanation called on Bernouilli’s equation. The implication
+was that the air speed over the upper surface of the aerofoil is greater than that
+over the lower surface resulting in a pressure difference and lift.
+The alternative explanation invokes Newton’s laws of motion to explain that this
+pressure difference is due to the bending of the streamlines over the surfaces.
+The instructor may wish to use the software controlled angle adjustment and automated data collection. This would speed up the investigation. It would also allow students to widen the investigation to other angles and wind speeds.
+
+Concepts involved:
+drag coefficient
+The drag coefficient formula introduces a quantity known as the ‘characteristic
+area’ of the body, important in vehicle design. This is not necessarily the full
+cross-sectional area of the body, but depends on the area of the body facing the
+air flow. This could lead to a discussion and research project on implications for
+vehicle design.
+The instructor could allocate two different shapes to three groups of students
+and hold a class presentation to compare and combine results.
+
+Wind tunnel 125
+Notes
+Worksheet
+6
+Streamlined?
+
+This is an open-ended investigation where students observe air flow around
+objects by viewing the smoke trails around them.
+Ideally they use the slow-motion facility, now available on most mobile ‘phones.
+It requires a little practice in positioning the smoke generator nozzle, but the
+results are worth the effort!
+
+Student groups can be given different shapes to investigate, looking at the effect
+of changing the air speed or changing the angle of attack. The results could be
+delivered in a class presentation.
+
+Worksheet
+7
+Where
+next?
+
+This is a very open-ended investigation! It encourages students to focus on their
+particular field of interest.
+Students can design their own shapes, following the size guidelines given in the
+worksheet, and plan a range of investigations using them.
+
+A variety of manufacturing methods can be used but it is important to recognise
+that considerable forces are exerted on the object by the air stream and so the
+materials used must be strong enough to withstand them.
+
+

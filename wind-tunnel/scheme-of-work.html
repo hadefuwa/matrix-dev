@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CP0704 Aerodynamics — Scheme of Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: #04101c;
+    --bg-1: #07182b;
+    --bg-2: #0b2440;
+    --panel: rgba(10, 28, 48, 0.72);
+    --panel-edge: rgba(120, 200, 230, 0.18);
+    --ink: #e8f3fb;
+    --ink-soft: #a9c4d8;
+    --muted: #6f8aa3;
+    --cyan: #22d3ee;
+    --cyan-soft: rgba(34, 211, 238, 0.16);
+    --amber: #f8b339;
+    --amber-soft: rgba(248, 179, 57, 0.16);
+    --magenta: #f472b6;
+    --green: #34d399;
+    --rule: rgba(120, 200, 230, 0.12);
+    --shadow: 0 30px 80px rgba(0, 8, 20, 0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    color: var(--ink);
+    font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+    background: var(--bg-0);
+    min-height: 100vh;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(1100px 700px at 85% -10%, rgba(34, 211, 238, 0.18), transparent 60%),
+      radial-gradient(900px 600px at -10% 10%, rgba(248, 179, 57, 0.10), transparent 55%),
+      linear-gradient(180deg, #04101c 0%, #061425 40%, #04101c 100%);
+  }
+
+  /* Blueprint grid overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(120, 200, 230, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120, 200, 230, 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(circle at 50% 30%, #000 0%, #000 60%, transparent 100%);
+  }
+
+  main, header, footer { position: relative; z-index: 1; }
+
+  /* === Header / Hero === */
+  header.hero {
+    padding: 4rem 2rem 3rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .tag-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.6rem;
+  }
+  .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    background: var(--cyan-soft);
+    border: 1px solid rgba(34, 211, 238, 0.35);
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+  }
+  .tag.amber { color: var(--amber); background: var(--amber-soft); border-color: rgba(248, 179, 57, 0.35); }
+
+  h1.title {
+    font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+    font-weight: 700;
+  }
+  h1.title .accent { color: var(--cyan); }
+
+  .subtitle {
+    color: var(--ink-soft);
+    font-size: 1.15rem;
+    max-width: 720px;
+    margin: 0 0 2.2rem;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .meta {
+    border: 1px solid var(--panel-edge);
+    background: var(--panel);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+  }
+  .meta .k {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .meta .v {
+    margin-top: 0.35rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Decorative SVG airflow */
+  .airflow {
+    position: absolute;
+    right: 0;
+    top: 2rem;
+    width: 460px;
+    max-width: 45%;
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  /* === Section base === */
+  main { max-width: 1280px; margin: 0 auto; padding: 0 2rem 4rem; }
+  section { margin-top: 3.2rem; }
+
+  h2.section-title {
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  h2.section-title::before {
+    content: "";
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: var(--cyan);
+    box-shadow: 0 0 18px var(--cyan);
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
+  .section-lead {
+    color: var(--ink-soft);
+    margin: 0 0 1.6rem;
+    max-width: 760px;
+  }
+
+  /* === Overview / aims === */
+  .aims-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .aim {
+    border: 1px solid var(--panel-edge);
+    background: var(--panel);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 1.2rem 1.2rem 1.1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .aim::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), transparent 70%);
+  }
+  .aim .num {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+  }
+  .aim h3 {
+    margin: 0.4rem 0 0.5rem;
+    font-size: 1.05rem;
+  }
+  .aim p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  /* === Lessons === */
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 1.2rem;
+  }
+  .lesson {
+    border: 1px solid var(--panel-edge);
+    background: linear-gradient(180deg, rgba(11, 30, 52, 0.85), rgba(7, 22, 40, 0.85));
+    border-radius: 18px;
+    padding: 1.4rem 1.4rem 1.2rem;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 220ms ease, border-color 220ms ease;
+  }
+  .lesson:hover { transform: translateY(-3px); border-color: rgba(34, 211, 238, 0.45); }
+
+  .lesson .corner {
+    position: absolute;
+    top: 0; right: 0;
+    width: 110px; height: 110px;
+    background: radial-gradient(circle at top right, rgba(34, 211, 238, 0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .lesson.intro .corner { background: radial-gradient(circle at top right, rgba(248, 179, 57, 0.18), transparent 60%); }
+  .lesson.assess .corner { background: radial-gradient(circle at top right, rgba(244, 114, 182, 0.18), transparent 60%); }
+
+  .lesson-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+  }
+  .lesson-id {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .lesson.intro .lesson-id { color: var(--amber); }
+  .lesson.assess .lesson-id { color: var(--magenta); }
+
+  .lesson-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+  }
+  .lesson h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
+  }
+  .lesson .focus {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    margin: 0 0 1rem;
+  }
+
+  .outcomes { margin: 0 0 1rem; padding: 0; list-style: none; }
+  .outcomes li {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    padding-left: 1.3rem;
+    position: relative;
+    margin-bottom: 0.35rem;
+  }
+  .outcomes li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0.55rem;
+    width: 8px; height: 8px;
+    border: 1.5px solid var(--cyan);
+    border-radius: 50%;
+  }
+
+  .resources {
+    border-top: 1px dashed var(--rule);
+    padding-top: 0.9rem;
+    margin-top: 0.4rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .res-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+  }
+  .res-row .label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    min-width: 78px;
+    padding-top: 0.15rem;
+  }
+  .res-row .body { color: var(--ink); flex: 1; }
+  .res-row a {
+    color: var(--cyan);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(34, 211, 238, 0.35);
+    transition: color 160ms;
+  }
+  .res-row a:hover { color: #67e8f9; border-bottom-color: #67e8f9; }
+  .placeholder { color: var(--muted); font-style: italic; }
+
+  /* === Resource library === */
+  .lib {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .lib-card {
+    border: 1px solid var(--panel-edge);
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 1.15rem 1.2rem;
+    display: flex;
+    gap: 0.95rem;
+    align-items: flex-start;
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color 200ms, transform 200ms;
+  }
+  .lib-card:hover { border-color: rgba(34, 211, 238, 0.5); transform: translateY(-2px); }
+  .lib-card .icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--cyan-soft);
+    color: var(--cyan);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(34, 211, 238, 0.35);
+  }
+  .lib-card .name {
+    font-weight: 600;
+    margin: 0 0 0.2rem;
+    font-size: 1rem;
+  }
+  .lib-card .desc { color: var(--ink-soft); margin: 0; font-size: 0.88rem; }
+
+  /* === Assessment table === */
+  .assess-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+  .assess-table th, .assess-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--rule);
+  }
+  .assess-table th {
+    background: rgba(34, 211, 238, 0.08);
+    font-weight: 600;
+    color: var(--cyan);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .assess-table tr:last-child td { border-bottom: none; }
+
+  /* === Footer === */
+  footer {
+    max-width: 1280px;
+    margin: 4rem auto 0;
+    padding: 2rem;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  footer .signature {
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.12em;
+  }
+
+  /* === Print === */
+  @media print {
+    body { background: #fff; color: #111; }
+    body::before { display: none; }
+    .airflow { display: none; }
+    .lesson, .meta, .aim, .lib-card, .assess-table {
+      background: #fff !important; color: #111;
+      border-color: #d4dde4 !important; box-shadow: none !important;
+    }
+    h1.title .accent, .tag, .lesson-id, .res-row a, .lib-card .icon, .assess-table th { color: #0a3a5c !important; }
+    .outcomes li::before { border-color: #0a3a5c; }
+  }
+
+  @media (max-width: 720px) {
+    header.hero { padding: 2.5rem 1.25rem 2rem; }
+    main { padding: 0 1.25rem 3rem; }
+    .airflow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <!-- Decorative airflow lines -->
+  <svg class="airflow" viewBox="0 0 600 400" fill="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="line" x1="0" x2="1">
+        <stop offset="0" stop-color="#22d3ee" stop-opacity="0"/>
+        <stop offset="0.4" stop-color="#22d3ee" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g stroke="url(#line)" stroke-width="1.4" stroke-linecap="round">
+      <path d="M0,60 C180,40 320,90 600,60"/>
+      <path d="M0,120 C180,100 320,170 600,130"/>
+      <path d="M0,180 C200,170 340,230 600,200"/>
+      <path d="M0,240 C220,250 360,290 600,260"/>
+      <path d="M0,300 C200,320 340,340 600,320"/>
+      <path d="M0,360 C180,380 340,380 600,370"/>
+    </g>
+    <!-- Stylised aerofoil -->
+    <g transform="translate(180,180)">
+      <path d="M0,0 C 60,-30 200,-30 280,-8 C 240,4 100,18 0,0 Z"
+            fill="rgba(248,179,57,0.18)" stroke="#f8b339" stroke-width="1.4"/>
+    </g>
+  </svg>
+
+  <div class="tag-row">
+    <span class="tag">CP0704</span>
+    <span class="tag amber">KS5 · A-Level / BTEC</span>
+    <span class="tag">Aerodynamics</span>
+  </div>
+
+  <h1 class="title">Wind Tunnel <span class="accent">Aerodynamics</span><br/>Scheme of Work</h1>
+  <p class="subtitle">A practical, investigation-led programme exploring lift, drag, pressure and flow using the Matrix wind tunnel and the CP0704 worksheet curriculum — designed for A-Level &amp; BTEC engineering and physics learners.</p>
+
+  <div class="meta-grid">
+    <div class="meta">
+      <div class="k">Course Code</div>
+      <div class="v">CP0704</div>
+    </div>
+    <div class="meta">
+      <div class="k">Level</div>
+      <div class="v">KS5 / A-Level / BTEC</div>
+    </div>
+    <div class="meta">
+      <div class="k">Total Lessons</div>
+      <div class="v">9 sessions</div>
+    </div>
+    <div class="meta">
+      <div class="k">Suggested Length</div>
+      <div class="v">60–90 min each</div>
+    </div>
+    <div class="meta">
+      <div class="k">Equipment</div>
+      <div class="v">Matrix Wind Tunnel</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- === Aims & outcomes === -->
+  <section>
+    <h2 class="section-title">Programme Aims</h2>
+    <p class="section-lead">By the end of this scheme of work, learners will be able to confidently operate a wind tunnel, interpret aerodynamic data, and apply core principles of fluid dynamics to real engineering problems.</p>
+    <div class="aims-grid">
+      <article class="aim">
+        <div class="num">AIM · 01</div>
+        <h3>Understand core principles</h3>
+        <p>Bernoulli's principle, continuity, lift, drag and the behaviour of laminar and turbulent flow.</p>
+      </article>
+      <article class="aim">
+        <div class="num">AIM · 02</div>
+        <h3>Operate the equipment safely</h3>
+        <p>Set up, calibrate and run the Matrix wind tunnel; capture meaningful, repeatable measurements.</p>
+      </article>
+      <article class="aim">
+        <div class="num">AIM · 03</div>
+        <h3>Investigate &amp; analyse</h3>
+        <p>Design controlled experiments, analyse data, and evaluate the performance of aerofoils and bluff bodies.</p>
+      </article>
+      <article class="aim">
+        <div class="num">AIM · 04</div>
+        <h3>Communicate findings</h3>
+        <p>Produce technical reports, diagrams and presentations that meet industry standards.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- === Lessons === -->
+  <section>
+    <h2 class="section-title">Lesson Sequence</h2>
+    <p class="section-lead">Each lesson pairs a CP0704 worksheet with theory input, video stimulus, a hands-on activity at the wind tunnel, and homework to consolidate.</p>
+
+    <div class="lesson-grid">
+
+      <!-- Lesson 1 — Introduction -->
+      <article class="lesson intro">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Introduction</span>
+          <span class="lesson-num">L01</span>
+        </div>
+        <h3>Meet the Wind Tunnel</h3>
+        <p class="focus">Orientation, safety, and a tour of the equipment using the manufacturer's user manual.</p>
+        <ul class="outcomes">
+          <li>Identify the parts of the wind tunnel and explain their function</li>
+          <li>Follow safe operating procedure for set-up and shutdown</li>
+          <li>Recognise the variables the tunnel allows you to measure</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Reading</div><div class="body"><a href="Wind%20tunnel%20v4.pdf" target="_blank">Wind Tunnel User Manual (v4)</a></div></div>
+          <div class="res-row"><div class="label">Slides</div><div class="body"><span class="placeholder">Lecture slides — to be added</span></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><span class="placeholder">YouTube intro clip — link pending</span></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Guided walk-around in pairs; identify and label parts on a diagram</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Annotated sketch of the wind tunnel + 5 key safety rules in own words</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 2 — Worksheet 1 -->
+      <article class="lesson">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Worksheet 1</span>
+          <span class="lesson-num">L02</span>
+        </div>
+        <h3>Pitot-Static Tube</h3>
+        <p class="focus">Measure air speed using a pitot-static tube and apply Bernoulli's equation to a U-tube manometer and digital pressure sensor.</p>
+        <ul class="outcomes">
+          <li>Explain how a pitot-static tube measures fluid speed</li>
+          <li>Apply Bernoulli's equation to calculate air speed from pressure difference</li>
+          <li>Compare manometer and digital pressure-sensor readings; calculate Reynolds number</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Worksheet</div><div class="body"><a href="CP0704%20-%20Aerodynamics.pdf" target="_blank">CP0704 — Worksheet 1</a></div></div>
+          <div class="res-row"><div class="label">Teacher</div><div class="body"><a href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">Teacher Guide (CP0704T)</a></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><a href="https://www.youtube.com/watch?v=jb8WIbK2Hts" target="_blank">Watch on YouTube</a></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">U-tube manometer + digital pressure meter readings across fan speeds 0–100%</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Plot air-speed vs pressure-difference graph; calculate Reynolds number for each speed</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 3 — Worksheet 2 -->
+      <article class="lesson">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Worksheet 2</span>
+          <span class="lesson-num">L03</span>
+        </div>
+        <h3>Flow Patterns Around a Cylinder</h3>
+        <p class="focus">Investigate how angle of attack affects pressure distribution around a tapped cylinder; introduce the pressure coefficient Cp.</p>
+        <ul class="outcomes">
+          <li>Define and calculate the pressure coefficient Cp from measured data</li>
+          <li>Record pressure at 5° increments from 0° to 180° and tabulate results</li>
+          <li>Plot a Cp-vs-angle graph and produce a pressure-distribution diagram</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Worksheet</div><div class="body"><a href="CP0704%20-%20Aerodynamics.pdf" target="_blank">CP0704 — Worksheet 2</a></div></div>
+          <div class="res-row"><div class="label">Teacher</div><div class="body"><a href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">Teacher Guide (CP0704T)</a></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><a href="https://www.youtube.com/watch?v=5q7FInrVls4" target="_blank">Watch on YouTube</a></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Tapped cylinder on protractor; pressure readings at 20% fan speed across angles of attack</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Compare experimental Cp curve to the theoretical curve; explain differences in 200 words</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 4 — Worksheet 3 -->
+      <article class="lesson">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Worksheet 3</span>
+          <span class="lesson-num">L04</span>
+        </div>
+        <h3>Flow Patterns Around an Aerofoil</h3>
+        <p class="focus">Map the pressure distribution along a NACA0015 aerofoil using 23 surface tappings, and see how angle of attack changes it.</p>
+        <ul class="outcomes">
+          <li>Use the 23-tapping NACA0015 aerofoil to measure static pressure along the chord</li>
+          <li>Calculate Cp at each tapping and plot Cp-vs-fractional-chord-distance graphs</li>
+          <li>Compare top- and bottom-surface profiles at 0°, 5° and 12° angle of attack</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Worksheet</div><div class="body"><a href="CP0704%20-%20Aerodynamics.pdf" target="_blank">CP0704 — Worksheet 3</a></div></div>
+          <div class="res-row"><div class="label">Teacher</div><div class="body"><a href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">Teacher Guide (CP0704T)</a></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><a href="https://www.youtube.com/watch?v=poDUg5euR9w" target="_blank">Watch on YouTube</a></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Connect each tapping in turn to the pressure port; record at fan 25%, then repeat at 5° and 12°</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Explain in writing how the Cp profile relates to the generation of lift</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 5 — Worksheet 4 -->
+      <article class="lesson">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Worksheet 4</span>
+          <span class="lesson-num">L05</span>
+        </div>
+        <h3>Lift &amp; Drag on an Aerofoil</h3>
+        <p class="focus">Use the two-force module to measure lift and drag across angles of attack, then compare three aerofoil profiles.</p>
+        <ul class="outcomes">
+          <li>Use load cells in the two-force module to record lift and drag</li>
+          <li>Plot lift- and drag-vs-angle curves at fan speeds 20%, 50% and 80%</li>
+          <li>Compare NACA0015, S1223 and NACA4415 aerofoils and evaluate their performance</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Worksheet</div><div class="body"><a href="CP0704%20-%20Aerodynamics.pdf" target="_blank">CP0704 — Worksheet 4</a></div></div>
+          <div class="res-row"><div class="label">Teacher</div><div class="body"><a href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">Teacher Guide (CP0704T)</a></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><a href="https://www.youtube.com/watch?v=0H3arXQvgNs" target="_blank">Watch on YouTube</a></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Sweep angle of attack from −25° to +45° in 5° steps; record lift &amp; drag for each aerofoil</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Recommend a best-suited aerofoil for a glider vs a high-speed UAV — justify with your data</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 6 — Worksheet 5 -->
+      <article class="lesson">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Worksheet 5</span>
+          <span class="lesson-num">L06</span>
+        </div>
+        <h3>Drag Coefficient</h3>
+        <p class="focus">Measure drag on a range of standard shapes and calculate their drag coefficient Cd.</p>
+        <ul class="outcomes">
+          <li>Calculate Cd from measured drag force, air speed and reference area</li>
+          <li>Compare Cd for cone, smooth sphere, half-sphere, rough sphere, flat surface and teardrop</li>
+          <li>Relate experimental Cd values to real-world design (car bodies, dimpled golf balls)</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Worksheet</div><div class="body"><a href="CP0704%20-%20Aerodynamics.pdf" target="_blank">CP0704 — Worksheet 5</a></div></div>
+          <div class="res-row"><div class="label">Teacher</div><div class="body"><a href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">Teacher Guide (CP0704T)</a></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><a href="https://www.youtube.com/watch?v=erQOVRvqKB8" target="_blank">Watch on YouTube</a></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Attach each test shape to the two-force holder; record drag in 10% fan-speed steps</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Compare measured Cd values to published values; explain any deviation</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 7 — Worksheet 6 -->
+      <article class="lesson">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Worksheet 6</span>
+          <span class="lesson-num">L07</span>
+        </div>
+        <h3>Streamlined?</h3>
+        <p class="focus">Use the smoke generator to visualise streamlines and capture flow patterns around test objects on slow-motion video.</p>
+        <ul class="outcomes">
+          <li>Operate the smoke generator safely to produce visible streamlines</li>
+          <li>Capture and annotate slow-motion footage of flow patterns at varied fan speeds and angles</li>
+          <li>Identify laminar vs turbulent regions; recognise separation behind bluff bodies</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Worksheet</div><div class="body"><a href="CP0704%20-%20Aerodynamics.pdf" target="_blank">CP0704 — Worksheet 6</a></div></div>
+          <div class="res-row"><div class="label">Teacher</div><div class="body"><a href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">Teacher Guide (CP0704T)</a></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><a href="https://www.youtube.com/watch?v=XgWtpC4jQy0" target="_blank">Watch on YouTube</a></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Smoke-line flow visualisation; capture stills + slow-motion phone video of two contrasting shapes</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Produce an annotated one-page report comparing two streamline images</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 8 — Worksheet 7 -->
+      <article class="lesson">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Worksheet 7</span>
+          <span class="lesson-num">L08</span>
+        </div>
+        <h3>Where Next? — Independent Design</h3>
+        <p class="focus">Learners choose an area of interest — car bodies, aeronautics, hull design, wind turbines — and investigate a shape of their own.</p>
+        <ul class="outcomes">
+          <li>Design and 3D-print (or build) a test shape sized for the 125×125 mm test section</li>
+          <li>Select an appropriate procedure (pressure, force or smoke flow) for the question being asked</li>
+          <li>Plan a fair test and justify equipment and method choices</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Worksheet</div><div class="body"><a href="CP0704%20-%20Aerodynamics.pdf" target="_blank">CP0704 — Worksheet 7</a></div></div>
+          <div class="res-row"><div class="label">Teacher</div><div class="body"><a href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">Teacher Guide (CP0704T)</a></div></div>
+          <div class="res-row"><div class="label">Video</div><div class="body"><a href="https://www.youtube.com/watch?v=noBo_wY-_zg" target="_blank">Watch on YouTube</a></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Run the procedure most relevant to their chosen question (pressure / force / streamlines)</div></div>
+          <div class="res-row"><div class="label">Homework</div><div class="body">Draft investigation plan + risk assessment ready for the L09 assessment</div></div>
+        </div>
+      </article>
+
+      <!-- Lesson 9 — Assessment -->
+      <article class="lesson assess">
+        <div class="corner"></div>
+        <div class="lesson-head">
+          <span class="lesson-id">Assessment</span>
+          <span class="lesson-num">L09</span>
+        </div>
+        <h3>Investigation &amp; Review</h3>
+        <p class="focus">Learners design and run their own wind tunnel investigation, then present findings.</p>
+        <ul class="outcomes">
+          <li>Plan and justify an investigation using CP0704 techniques</li>
+          <li>Collect, analyse and present aerodynamic data accurately</li>
+          <li>Evaluate sources of error and propose improvements</li>
+        </ul>
+        <div class="resources">
+          <div class="res-row"><div class="label">Brief</div><div class="body"><span class="placeholder">Assessment brief — to be added</span></div></div>
+          <div class="res-row"><div class="label">Practical</div><div class="body">Student-led investigation at the wind tunnel</div></div>
+          <div class="res-row"><div class="label">Deliverable</div><div class="body">Technical report + 5-minute presentation</div></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- === Resource library === -->
+  <section>
+    <h2 class="section-title">Resource Library</h2>
+    <p class="section-lead">All supporting documents live alongside this page in the <code style="color:#22d3ee">wind-tunnel/</code> folder.</p>
+    <div class="lib">
+      <a class="lib-card" href="Wind%20tunnel%20v4.pdf" target="_blank">
+        <span class="icon">PDF</span>
+        <div>
+          <p class="name">Wind Tunnel User Manual (v4)</p>
+          <p class="desc">Manufacturer manual — used in Lesson 1 as the introduction to the equipment.</p>
+        </div>
+      </a>
+      <a class="lib-card" href="CP0704%20-%20Aerodynamics.pdf" target="_blank">
+        <span class="icon">PDF</span>
+        <div>
+          <p class="name">CP0704 — Aerodynamics</p>
+          <p class="desc">Student worksheet pack (7 worksheets). Distributed lesson by lesson.</p>
+        </div>
+      </a>
+      <a class="lib-card" href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">
+        <span class="icon">PDF</span>
+        <div>
+          <p class="name">CP0704T — Teacher Guide</p>
+          <p class="desc">Answers, model investigations and delivery notes for the CP0704 worksheets.</p>
+        </div>
+      </a>
+      <a class="lib-card" href="Wind%20Tunnel.png" target="_blank">
+        <span class="icon">IMG</span>
+        <div>
+          <p class="name">Equipment Photograph</p>
+          <p class="desc">High-resolution image of the wind tunnel for use in slides and worksheets.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- === Assessment overview === -->
+  <section>
+    <h2 class="section-title">Assessment &amp; Tracking</h2>
+    <p class="section-lead">A mix of formative checks across the worksheets plus a summative investigation at L09.</p>
+    <table class="assess-table">
+      <thead>
+        <tr><th>When</th><th>Type</th><th>Evidence</th><th>Weighting</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Every lesson</td><td>Formative</td><td>Completed worksheet pages, exit questions</td><td>—</td></tr>
+        <tr><td>L04 (mid-unit)</td><td>Checkpoint</td><td>Short written test on principles covered so far</td><td>20%</td></tr>
+        <tr><td>Homeworks</td><td>Formative</td><td>Calculations, reading tasks, mini write-ups</td><td>20%</td></tr>
+        <tr><td>L09</td><td>Summative</td><td>Investigation report + presentation</td><td>60%</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <div>CP0704 Aerodynamics · Scheme of Work · Matrix TSL</div>
+  <div class="signature">v0.1 · draft — placeholders to be replaced</div>
+</footer>
+
+</body>
+</html>
