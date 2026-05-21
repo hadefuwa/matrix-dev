@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worksheet 3 — Aerofoil Pressure Mapping · CP0704</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<nav class="crumbs">
+  <a href="../scheme-of-work.html">Scheme of Work</a>
+  <span class="sep">›</span>
+  <a href="../scheme-of-work.html#worksheets">Worksheets</a>
+  <span class="sep">›</span>
+  <span>WS3 · Aerofoil pressure mapping</span>
+</nav>
+
+<header class="hero">
+  <div class="tag-row">
+    <span class="tag">Worksheet 3</span>
+    <span class="tag amber">Week 5 · Lift Generation</span>
+    <span class="tag">Learning Aim B</span>
+  </div>
+  <h1 class="title">Flow Patterns Around an <span class="accent">Aerofoil</span></h1>
+  <p class="subtitle">Map the pressure distribution along a NACA 0015 aerofoil using 23 surface tappings, and visualise exactly how the lift force arises from the pressure difference between top and bottom surfaces.</p>
+</header>
+
+<main>
+  <div class="deck">
+
+    <section class="slide active">
+      <div class="slide-head"><span class="slide-label">Overview</span><span class="slide-num">01</span></div>
+      <h2>What you'll do in this worksheet</h2>
+      <p>When fluid flows around an object, it can generate net forces that cause the object to rise or fall. The <strong>shape (profile)</strong> the body presents to the flow determines the size of these forces.</p>
+      <p>An aerofoil is a shape specifically engineered to exploit this effect — giving aircraft lift, wind turbines rotation and ship propellers thrust. In this worksheet you'll measure the pressure at 23 points along a <strong>NACA 0015</strong> aerofoil and plot how the pressure varies along its surface.</p>
+
+      <h3>Learning objectives</h3>
+      <ul>
+        <li>Measure static pressure at 23 tappings along the chord of an aerofoil</li>
+        <li>Calculate C<sub>p</sub> at each tapping and plot C<sub>p</sub> vs fractional chord</li>
+        <li>Compare upper- and lower-surface pressure distributions</li>
+        <li>See how angle of attack changes the pressure profile and the lift it produces</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Theory</span><span class="slide-num">02</span></div>
+      <h2>Why pressure mapping reveals lift</h2>
+      <p>The flow over the upper surface of an aerofoil is accelerated; Bernoulli tells us that means lower pressure there. Beneath the aerofoil, flow is slower and the pressure is higher. The net upward force from this pressure difference is <strong>lift</strong>.</p>
+      <p>A pressure-distribution diagram makes this visible: at each tapping you measure how far above or below ambient the local pressure is.</p>
+      <div class="formula">
+        C<sub>p</sub> = (P − P<sub>∞</sub>) / (½ ρ V²)
+        <span class="where">P = pressure at the tapping (Pa) · P<sub>∞</sub> = free-stream pressure (Pa, taken from WS1) · ρ = 1.20 kg·m⁻³ · V = free-stream velocity (m·s⁻¹)</span>
+      </div>
+
+      <h3>NACA 0015 — symmetric profile</h3>
+      <p>The first two digits "00" mean no camber (symmetric); "15" means thickness-to-chord = 15%. At α = 0° it should produce essentially no lift. As α increases, the top-surface pressure drops sharply and lift develops.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Equipment</span><span class="slide-num">03</span></div>
+      <h2>What you'll need</h2>
+      <ul>
+        <li>Matrix Wind Tunnel 125</li>
+        <li>Aerofoil holder with NACA 0015 mounted, 23 pressure tappings + ports</li>
+        <li>Tubing to connect each tapping in turn to the controller's pressure port</li>
+        <li>Digital pressure sensor (controller)</li>
+        <li>WS1 free-stream pressure data for P<sub>∞</sub></li>
+        <li>Student Handout templates for the three angles of attack</li>
+      </ul>
+      <p><a href="../Wind%20tunnel%20v4.pdf#page=10" target="_blank">Open the User Manual at pp. 10–12 →</a> for the tapping schematic and port-pairing table.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Tapping geometry</span><span class="slide-num">04</span></div>
+      <h2>Where the 23 tappings sit</h2>
+      <p>Tappings are paired across upper and lower surfaces at the same chord position. (Distance along chord; chord length = 60 mm.)</p>
+      <table class="kv-table">
+        <thead><tr><th>Tapping (top / bottom)</th><th>Dist along chord (mm)</th><th>x / chord</th></tr></thead>
+        <tbody>
+          <tr><td>1 (leading edge)</td><td>0</td><td>0.00</td></tr>
+          <tr><td>2 / 13</td><td>0.6</td><td>0.01</td></tr>
+          <tr><td>3 / 14</td><td>1.6</td><td>0.03</td></tr>
+          <tr><td>4 / 15</td><td>3.8</td><td>0.06</td></tr>
+          <tr><td>5 / 16</td><td>7.4</td><td>0.12</td></tr>
+          <tr><td>6 / 17</td><td>10.8</td><td>0.18</td></tr>
+          <tr><td>7 / 18</td><td>18.3</td><td>0.30</td></tr>
+          <tr><td>8 / 19</td><td>24.2</td><td>0.40</td></tr>
+          <tr><td>9 / 20</td><td>30.7</td><td>0.51</td></tr>
+          <tr><td>10 / 21</td><td>35.9</td><td>0.60</td></tr>
+          <tr><td>11 / 22</td><td>41.8</td><td>0.70</td></tr>
+          <tr><td>12 / 23</td><td>47.7</td><td>0.80</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Procedure</span><span class="slide-num">05</span></div>
+      <h2>Step by step</h2>
+      <ol>
+        <li>Place the aerofoil holder into the test section and secure with thumb-nuts.</li>
+        <li>Set the angle of attack to <strong>α = 0°</strong>.</li>
+        <li>Zero the pressure sensors with the fan <em>off</em>.</li>
+        <li>Switch on the fan and set to <strong>25%</strong>.</li>
+        <li>Connect tapping <strong>1</strong> to port 1 on the controller. Leave port 2 open to ambient.</li>
+        <li>Read and record the air speed and pressure displayed on the digital meter for that point.</li>
+        <li>Disconnect tapping 1 and repeat for tappings 2 through 23 in turn.</li>
+        <li>Now set α = <strong>5°</strong> and repeat all 23 readings.</li>
+        <li>Finally set α = <strong>12°</strong> and repeat once more.</li>
+      </ol>
+      <div class="callout">
+        <span class="l">Why these angles?</span>
+        0° is the baseline (no lift), 5° is a typical cruise angle and 12° is close to (or past) the stall point for NACA 0015 — comparing the three lets you see the pressure peak migrate forward and eventually collapse.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Analysis</span><span class="slide-num">06</span></div>
+      <h2>From pressure to C<sub>p</sub>-vs-x graph</h2>
+      <ul>
+        <li>For each tapping, use the formula on slide 2 to calculate C<sub>p</sub>.</li>
+        <li>Plot C<sub>p</sub> vs fractional chord position x. On the <em>same</em> axes, plot top-surface and lower-surface curves.</li>
+        <li>Repeat for α = 5° and α = 12°.</li>
+        <li>Compare all three diagrams.</li>
+      </ul>
+      <div class="callout amber">
+        <span class="l">What to look for</span>
+        <ul style="margin:0.4rem 0 0; padding-left:1.2rem">
+          <li>The <em>area</em> between the upper and lower C<sub>p</sub> curves is proportional to the lift coefficient C<sub>L</sub>.</li>
+          <li>At α = 0° on a symmetric aerofoil, the two curves should coincide — confirming zero net lift.</li>
+          <li>At α = 12° you should see a sharp suction peak near the leading edge that may have begun to collapse — the onset of stall.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Pressure-distribution diagram</span><span class="slide-num">07</span></div>
+      <h2>Sketching the arrows</h2>
+      <p>Use the chord-position template provided in the Student Handout. For each tapping, draw an arrow:</p>
+      <ul>
+        <li><strong>Outward arrows</strong> (away from the body) for negative C<sub>p</sub> — suction</li>
+        <li><strong>Inward arrows</strong> (towards the body) for positive C<sub>p</sub></li>
+      </ul>
+      <p>Repeat for each angle. Stick all three diagrams alongside the corresponding C<sub>p</sub>-vs-x graphs in your lab notebook.</p>
+
+      <h3>Challenge</h3>
+      <p>Obtain the same set of distributions at fan speeds of <strong>50%, 80% and 100%</strong>. Do the C<sub>p</sub> profiles overlay across all four speeds (as Reynolds-number scaling theory predicts)?</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Data Capture</span><span class="slide-num">08</span></div>
+      <h2>Table per angle of attack</h2>
+      <p>One table per α (0°, 5°, 12°):</p>
+      <table class="kv-table">
+        <thead><tr><th>Tapping</th><th>x / chord</th><th>Surface</th><th>P (Pa)</th><th>C<sub>p</sub></th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>0.00</td><td>LE</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>2</td><td>0.01</td><td>Upper</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>13</td><td>0.01</td><td>Lower</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>…</td><td>…</td><td>…</td><td class="muted">…</td><td class="muted">…</td></tr>
+          <tr><td>12</td><td>0.80</td><td>Upper</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>23</td><td>0.80</td><td>Lower</td><td class="muted">—</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Wrap up</span><span class="slide-num">09</span></div>
+      <h2>What you should be able to do now</h2>
+      <ul>
+        <li>Map the static pressure along an aerofoil chord</li>
+        <li>Calculate C<sub>p</sub> and plot it against fractional position</li>
+        <li>Explain qualitatively how lift arises from the pressure imbalance you measured</li>
+        <li>Identify the suction peak and predict the onset of stall from the C<sub>p</sub> trace</li>
+      </ul>
+
+      <h3>Homework — Airfoil Analysis Peer Review (Wk 5 milestone)</h3>
+      <p>Hand a partner your C<sub>p</sub>-vs-x plots and ask them to predict whether the aerofoil is lifting and roughly how much. Peer-mark using the rubric in the Teacher Guide.</p>
+
+      <h3>Next up</h3>
+      <p>Worksheet 4 — Lift &amp; drag measured directly using the two-force module across three different aerofoil profiles.</p>
+    </section>
+
+    <div class="deck-controls">
+      <button type="button" data-prev>← Prev</button>
+      <span class="counter" data-counter>1 / 9</span>
+      <button type="button" data-next>Next →</button>
+    </div>
+    <div class="deck-dots"></div>
+
+  </div>
+</main>
+
+<footer class="page-foot">
+  <div>CP0704 · Worksheet 3 · Flow patterns around an aerofoil</div>
+  <div class="signature">Use ← → keys to navigate</div>
+</footer>
+
+<script src="../slideshow.js"></script>
+</body>
+</html>

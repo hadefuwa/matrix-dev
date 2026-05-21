@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worksheet 2 — Flow Around a Cylinder · CP0704</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<nav class="crumbs">
+  <a href="../scheme-of-work.html">Scheme of Work</a>
+  <span class="sep">›</span>
+  <a href="../scheme-of-work.html#worksheets">Worksheets</a>
+  <span class="sep">›</span>
+  <span>WS2 · Cylinder flow patterns</span>
+</nav>
+
+<header class="hero">
+  <div class="tag-row">
+    <span class="tag">Worksheet 2</span>
+    <span class="tag amber">Week 7 · Wind Tunnel Testing &amp; Scaling</span>
+    <span class="tag">Learning Aim B</span>
+  </div>
+  <h1 class="title">Flow Patterns Around a <span class="accent">Cylinder</span></h1>
+  <p class="subtitle">Map the pressure distribution around a bluff body, introduce the pressure coefficient C<sub>p</sub>, and connect it to Reynolds-number scaling — the foundation of wind tunnel testing methodology.</p>
+</header>
+
+<main>
+  <div class="deck">
+
+    <section class="slide active">
+      <div class="slide-head"><span class="slide-label">Overview</span><span class="slide-num">01</span></div>
+      <h2>What you'll do in this worksheet</h2>
+      <p>Designers reduce drag on ships, cars and aircraft by shaping the body to control the flow around it. Two factors matter most:</p>
+      <ul>
+        <li>The <strong>profile</strong> the body presents to the flow (geometry)</li>
+        <li>The <strong>speed</strong> of the flow (captured by Reynolds number)</li>
+      </ul>
+      <p>To quantify how pressure varies around any shape, engineers use the dimensionless <strong>pressure coefficient C<sub>p</sub></strong>. In this worksheet you measure C<sub>p</sub> around a cylinder and produce a pressure-distribution diagram.</p>
+
+      <h3>Learning objectives</h3>
+      <ul>
+        <li>Define and calculate the pressure coefficient C<sub>p</sub></li>
+        <li>Record pressure across angle of attack 0° → 180° in 5° steps</li>
+        <li>Produce a C<sub>p</sub>-vs-angle graph and a pressure-distribution diagram</li>
+        <li>Compare experimental results to the theoretical inviscid-flow curve</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Theory</span><span class="slide-num">02</span></div>
+      <h2>Pressure coefficient C<sub>p</sub></h2>
+      <p>C<sub>p</sub> compares the local pressure on a surface to the free-stream conditions, non-dimensionalised by the dynamic pressure. It lets results from any tunnel speed or size collapse onto a single curve.</p>
+      <div class="formula">
+        C<sub>p</sub> = (P − P<sub>∞</sub>) / (½ ρ V²)
+        <span class="where">P = pressure at the point on the body (Pa) · P<sub>∞</sub> = free-stream pressure (Pa, from WS1) · ρ = 1.20 kg·m⁻³ · V = free-stream velocity (m·s⁻¹)</span>
+      </div>
+
+      <h3>Reynolds number — why scaling matters</h3>
+      <p>Two bodies of different sizes will produce the same flow pattern <em>only</em> if their Reynolds numbers match. For the cylinder:</p>
+      <div class="formula">
+        Re = ρ V D / μ
+        <span class="where">D = cylinder diameter · μ = dynamic viscosity of air (1.81 × 10⁻⁵ Pa·s)</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Equipment</span><span class="slide-num">03</span></div>
+      <h2>What you'll need</h2>
+      <ul>
+        <li>Matrix Wind Tunnel 125</li>
+        <li>Tapped cylinder attached to a circular protractor (with 5° resolution)</li>
+        <li>Two thumb-nuts to secure the holder</li>
+        <li>Digital pressure sensor (built into the controller)</li>
+        <li>WS1 results — the free-stream pressure P<sub>∞</sub> for each fan speed</li>
+      </ul>
+      <div class="callout">
+        <span class="l">Setup tip</span>
+        Line up the 90° mark on the protractor with the vertical marker on the test window. This sets your zero-angle reference.
+      </div>
+      <p><a href="../Wind%20tunnel%20v4.pdf#page=7" target="_blank">Open the User Manual at pp. 7–9 →</a> for the holder fitting diagram and twisting mechanism.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Procedure</span><span class="slide-num">04</span></div>
+      <h2>Sweeping the angle of attack</h2>
+      <ol>
+        <li>Place the cylinder holder into the test section. Secure with thumb-nuts.</li>
+        <li>Rotate to angle of attack <strong>α = 0°</strong> (the 90° protractor mark aligned with the vertical window marker).</li>
+        <li>Connect the pressure port on the holder to one port on the control unit. Leave the other port open to ambient pressure.</li>
+        <li>Zero the pressure sensor on the touch-screen <strong>before turning on the fan</strong>.</li>
+        <li>Turn the fan on. Set to <strong>20%</strong>.</li>
+        <li>Read and record the air speed and pressure shown on the digital meter.</li>
+        <li>Rotate the cylinder to <strong>α = 5°</strong>. Repeat reading.</li>
+        <li>Continue in 5° steps up to <strong>α = 180°</strong>, recording at every position.</li>
+      </ol>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Analysis</span><span class="slide-num">05</span></div>
+      <h2>Calculating C<sub>p</sub> and plotting</h2>
+      <ul>
+        <li>For each angle, use the formula to calculate C<sub>p</sub>. Both pressure values should be negative — record magnitudes carefully.</li>
+        <li>Plot a graph of C<sub>p</sub> vs angle of attack α for the 20% fan speed.</li>
+        <li>If you use Excel, you may need to convert degrees to radians (1° = 0.01745 rad).</li>
+      </ul>
+
+      <h3>Compare to theory</h3>
+      <p>The theoretical curve for inviscid (potential) flow around a cylinder is:</p>
+      <div class="formula">
+        C<sub>p</sub>(α) = 1 − 4 sin²(α)
+      </div>
+      <p>Compare your measured curve to this. Where do they diverge? Reasons usually include: viscous boundary layers, flow separation behind the cylinder, and wake effects — none of which inviscid theory accounts for.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Pressure Distribution</span><span class="slide-num">06</span></div>
+      <h2>Drawing the pressure-distribution diagram</h2>
+      <p>Engineers often present pressure data as <strong>arrows around the body</strong>:</p>
+      <ul>
+        <li><strong>Negative pressure</strong> — arrows point <em>away</em> from the body (suction)</li>
+        <li><strong>Positive pressure</strong> — arrows point <em>towards</em> the body</li>
+      </ul>
+      <p>Use your C<sub>p</sub> values to draw arrows on the template provided in the Student Handout. Your readings cover 0° → 180°; the cylinder is symmetric, so you can mirror the data for the other side.</p>
+
+      <div class="callout">
+        <span class="l">Why this matters</span>
+        Pressure-distribution diagrams are how aerodynamicists communicate where lift comes from and where drag arises. You'll meet them again in WS3 when you map the pressure around an aerofoil.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Challenge</span><span class="slide-num">07</span></div>
+      <h2>Reynolds-number sweep</h2>
+      <p>Repeat the whole procedure at fan speeds of <strong>50%, 80% and 100%</strong>. Calculate Reynolds number at each, and overlay the resulting C<sub>p</sub> curves on the same axes.</p>
+      <ul>
+        <li>Do the curves collapse onto each other? They should — that's the meaning of "non-dimensionalised".</li>
+        <li>If they don't, what does that tell you about the assumptions of inviscid C<sub>p</sub> theory?</li>
+        <li>Look for changes in the separation point as Reynolds increases.</li>
+      </ul>
+      <div class="callout amber">
+        <span class="l">Open question for the report</span>
+        At what Reynolds number does the cylinder's wake first show clearly turbulent behaviour in this rig? Cross-check your reasoning against published cylinder-drag-crisis data.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Data Capture</span><span class="slide-num">08</span></div>
+      <h2>Table to populate</h2>
+      <p>Fan speed = 20% (then repeat for 50%, 80%, 100% in the challenge)</p>
+      <table class="kv-table">
+        <thead><tr><th>α (°)</th><th>ΔP (Pa)</th><th>C<sub>p</sub></th><th>α (°)</th><th>ΔP (Pa)</th><th>C<sub>p</sub></th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td class="muted">—</td><td class="muted">—</td><td>95</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>5</td><td class="muted">—</td><td class="muted">—</td><td>100</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>…</td><td class="muted">…</td><td class="muted">…</td><td>…</td><td class="muted">…</td><td class="muted">…</td></tr>
+          <tr><td>90</td><td class="muted">—</td><td class="muted">—</td><td>180</td><td class="muted">—</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Wrap up</span><span class="slide-num">09</span></div>
+      <h2>What you should be able to do now</h2>
+      <ul>
+        <li>Calculate C<sub>p</sub> from raw pressure data and free-stream conditions</li>
+        <li>Construct a C<sub>p</sub>-vs-α curve and a pressure-distribution diagram</li>
+        <li>Compare experiment to inviscid theory and explain divergences</li>
+        <li>Connect Reynolds number to the validity of scaling between rigs</li>
+      </ul>
+
+      <h3>Homework — Wind Tunnel Data Log Check (Wk 7 milestone)</h3>
+      <p>Submit the complete C<sub>p</sub>-vs-α data set for 20% fan speed, plus a 250-word commentary on agreement with the theoretical curve.</p>
+
+      <h3>Next up</h3>
+      <p>Week 8 — Aircraft stability mechanics. A short return to the wind tunnel for streamline checks; then on to model gliders for CoG investigations.</p>
+    </section>
+
+    <div class="deck-controls">
+      <button type="button" data-prev>← Prev</button>
+      <span class="counter" data-counter>1 / 9</span>
+      <button type="button" data-next>Next →</button>
+    </div>
+    <div class="deck-dots"></div>
+
+  </div>
+</main>
+
+<footer class="page-foot">
+  <div>CP0704 · Worksheet 2 · Flow patterns around a cylinder</div>
+  <div class="signature">Use ← → keys to navigate</div>
+</footer>
+
+<script src="../slideshow.js"></script>
+</body>
+</html>

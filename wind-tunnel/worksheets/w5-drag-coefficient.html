@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worksheet 5 — Drag Coefficient · CP0704</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<nav class="crumbs">
+  <a href="../scheme-of-work.html">Scheme of Work</a>
+  <span class="sep">›</span>
+  <a href="../scheme-of-work.html#worksheets">Worksheets</a>
+  <span class="sep">›</span>
+  <span>WS5 · Drag coefficient</span>
+</nav>
+
+<header class="hero">
+  <div class="tag-row">
+    <span class="tag">Worksheet 5</span>
+    <span class="tag amber">Week 6 · Drag Components</span>
+    <span class="tag">Learning Aim B</span>
+  </div>
+  <h1 class="title">Drag <span class="accent">Coefficient</span></h1>
+  <p class="subtitle">Measure drag on six standard reference shapes — cone, smooth sphere, half-sphere, rough sphere, flat surface and teardrop — and compare experimental C<sub>d</sub> values to published data.</p>
+</header>
+
+<main>
+  <div class="deck">
+
+    <section class="slide active">
+      <div class="slide-head"><span class="slide-label">Overview</span><span class="slide-num">01</span></div>
+      <h2>What you'll do in this worksheet</h2>
+      <p>"Streamlined" is everyday speech for a shape that slips through a fluid with minimum resistance. In engineering we quantify that with the <strong>drag coefficient C<sub>d</sub></strong>.</p>
+      <p>You'll measure drag force on six different reference shapes, calculate C<sub>d</sub> for each, and compare with the published values used in industry.</p>
+
+      <h3>Learning objectives</h3>
+      <ul>
+        <li>Calculate the drag coefficient from measured force, velocity and reference area</li>
+        <li>Compare experimental and theoretical C<sub>d</sub> for six standard shapes</li>
+        <li>Explain why a real car's C<sub>d</sub> is around 0.2–0.3, and why golf balls are dimpled</li>
+        <li>Understand that C<sub>d</sub> can depend on Reynolds number, surface roughness and flow regime</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Theory</span><span class="slide-num">02</span></div>
+      <h2>The drag-coefficient formula</h2>
+      <div class="formula">
+        C<sub>d</sub> = D / (½ ρ V² A)
+        <span class="where">D = measured drag force (N) · ρ = 1.20 kg·m⁻³ · V = air speed (m·s⁻¹) · A = frontal area of the body (m²)</span>
+      </div>
+      <p>For the test shapes here, diameter d = 44 mm = 0.044 m. Frontal area A = πd²/4.</p>
+
+      <h3>Why drag varies with shape</h3>
+      <p>Two main contributions:</p>
+      <ul>
+        <li><strong>Form (pressure) drag</strong> — bigger when the body has a large wake (a flat plate or a half-sphere facing the flow). Reduced by streamlining the back of the body.</li>
+        <li><strong>Skin-friction drag</strong> — viscous drag along the surface. Smaller for shorter, smoother bodies; bigger for long thin ones.</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Equipment</span><span class="slide-num">03</span></div>
+      <h2>What you'll need</h2>
+      <ul>
+        <li>Matrix Wind Tunnel 125</li>
+        <li>Two-force module holder (same as WS4)</li>
+        <li>Six test shapes — cone · smooth sphere · half-sphere · rough sphere · flat surface · teardrop</li>
+        <li>Threaded shaft to mount each shape</li>
+        <li>Cables from holder to control unit</li>
+      </ul>
+      <p><a href="../Wind%20tunnel%20v4.pdf#page=15" target="_blank">Open the User Manual at pp. 15–16 →</a> for shape diagrams and the attachment procedure.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Procedure</span><span class="slide-num">04</span></div>
+      <h2>Per-shape measurement loop</h2>
+      <ol>
+        <li>Attach the first shape (start with the cone) to the two-force holder using the threaded shaft.</li>
+        <li>Place the holder in the test section and secure with thumb-nuts.</li>
+        <li>Connect both holder sockets to the control unit as in WS4.</li>
+        <li>Set α = 0° (relative to flow).</li>
+        <li>With the fan off, zero the sensors on the touch-screen.</li>
+        <li>Switch the fan on. Set to <strong>10%</strong>.</li>
+        <li>Read and record air speed and drag force.</li>
+        <li>Step the fan speed up to <strong>100%</strong> in 10% increments, recording at every step.</li>
+        <li>Switch off. Swap to the next shape and repeat.</li>
+      </ol>
+      <div class="callout">
+        <span class="l">Time saver</span>
+        Six shapes × ten fan speeds = 60 data points. Allocate roles in the lab pair: one operator, one recorder, one to check zeroing between shapes.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Analysis</span><span class="slide-num">05</span></div>
+      <h2>Calculating C<sub>d</sub></h2>
+      <ul>
+        <li>For each shape and fan speed, calculate C<sub>d</sub> using the formula on slide 2.</li>
+        <li>Look at the C<sub>d</sub>-vs-velocity profile for each shape. Is C<sub>d</sub> independent of velocity? It usually is over a wide range of Reynolds numbers, but watch for surprises with the spheres.</li>
+        <li>Compute a representative (mid-speed) C<sub>d</sub> for each shape and enter it in the comparison table on the next slide.</li>
+      </ul>
+
+      <h3>Published reference values</h3>
+      <table class="kv-table">
+        <thead><tr><th>Shape</th><th>Published C<sub>d</sub></th><th>Your C<sub>d</sub></th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Cone</td><td>0.5</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>Smooth sphere</td><td>0.47</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>Half-sphere</td><td>0.42</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>Rough sphere</td><td>0.20</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>Flat surface</td><td>1.10</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>Tear drop</td><td>0.04</td><td class="muted">—</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Discussion</span><span class="slide-num">06</span></div>
+      <h2>Two classic application questions</h2>
+      <h3>Q1 — Modern cars have C<sub>d</sub> around 0.2 to 0.3</h3>
+      <p>Looking at your six measured shapes, which would you base a streamlined car body on? Why? Where might you compromise — e.g. the wheels, the windscreen rake, the rear deck?</p>
+
+      <h3>Q2 — Why are golf balls dimpled?</h3>
+      <p>You measured a <em>rough</em> sphere with markedly lower drag than a <em>smooth</em> sphere. Use this result to explain — in your own words — why dimpling a golf ball lets it travel further.</p>
+      <div class="callout amber">
+        <span class="l">Hint</span>
+        Think about where on the sphere the boundary layer separates. Roughness triggers a turbulent boundary layer earlier, which stays attached further round the back of the ball — shrinking the wake and the pressure drag.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Extension</span><span class="slide-num">07</span></div>
+      <h2>Lift / drag balance and design</h2>
+      <p>Combine your worksheet results so far:</p>
+      <ul>
+        <li>From WS4 you have C<sub>L</sub>-vs-α for three aerofoils. From WS5 you have C<sub>d</sub> for six bluff bodies.</li>
+        <li>Pick one realistic vehicle (a glider, a Formula 1 car, a Boeing 787, a wind turbine blade) and discuss which combination of lift-producing and drag-minimising shapes the designers prioritise — and why.</li>
+      </ul>
+      <p>Use your own C<sub>d</sub> data, your own L/D ratios from WS4 and any reasonable open-source figures to justify the analysis.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Data Capture</span><span class="slide-num">08</span></div>
+      <h2>Table per shape</h2>
+      <table class="kv-table">
+        <thead><tr><th>Fan %</th><th>V (m·s⁻¹)</th><th>D (N)</th><th>C<sub>d</sub></th></tr></thead>
+        <tbody>
+          <tr><td>10</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>20</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>…</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td></tr>
+          <tr><td>100</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+      <p>Repeat for all six shapes — six tables total.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Wrap up</span><span class="slide-num">09</span></div>
+      <h2>What you should be able to do now</h2>
+      <ul>
+        <li>Calculate the drag coefficient for any test body in the tunnel</li>
+        <li>Compare your C<sub>d</sub> data against published industry values</li>
+        <li>Explain qualitatively how form drag, skin friction and surface roughness combine</li>
+        <li>Justify shape choices for real-world applications using your own data</li>
+      </ul>
+
+      <h3>Homework — Assignment 1 Submission (Wk 6 milestone)</h3>
+      <p>Final assignment combines WS1, WS3, WS4 and WS5. See assignment brief for structure.</p>
+
+      <h3>Next up</h3>
+      <p>Worksheet 2 — cylinder pressure mapping with Reynolds-number sweep (Wk 7 · wind tunnel testing &amp; scaling).</p>
+    </section>
+
+    <div class="deck-controls">
+      <button type="button" data-prev>← Prev</button>
+      <span class="counter" data-counter>1 / 9</span>
+      <button type="button" data-next>Next →</button>
+    </div>
+    <div class="deck-dots"></div>
+
+  </div>
+</main>
+
+<footer class="page-foot">
+  <div>CP0704 · Worksheet 5 · Drag coefficient</div>
+  <div class="signature">Use ← → keys to navigate</div>
+</footer>
+
+<script src="../slideshow.js"></script>
+</body>
+</html>

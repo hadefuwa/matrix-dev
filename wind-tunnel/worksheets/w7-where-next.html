@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worksheet 7 — Where Next? · CP0704</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<nav class="crumbs">
+  <a href="../scheme-of-work.html">Scheme of Work</a>
+  <span class="sep">›</span>
+  <a href="../scheme-of-work.html#worksheets">Worksheets</a>
+  <span class="sep">›</span>
+  <span>WS7 · Where next?</span>
+</nav>
+
+<header class="hero">
+  <div class="tag-row">
+    <span class="tag">Worksheet 7</span>
+    <span class="tag amber">Week 10 · Secondary Controls &amp; High-Lift Devices</span>
+    <span class="tag">Learning Aim C</span>
+  </div>
+  <h1 class="title">Where Next? — <span class="accent">Independent Investigation</span></h1>
+  <p class="subtitle">Choose your own engineering question, design a test article (3D-print it if you can), pick the right experimental procedure and run a complete investigation start to finish.</p>
+</header>
+
+<main>
+  <div class="deck">
+
+    <section class="slide active">
+      <div class="slide-head"><span class="slide-label">Overview</span><span class="slide-num">01</span></div>
+      <h2>Your turn</h2>
+      <p>The previous six worksheets handed you a fixed procedure and a fixed body. This one is open-ended. You decide:</p>
+      <ul>
+        <li>The engineering area you care about</li>
+        <li>The body you'll test (designed and ideally 3D-printed)</li>
+        <li>The procedure (pressure, force or smoke visualisation) you'll follow</li>
+        <li>The variable(s) you'll sweep and the data you'll capture</li>
+      </ul>
+
+      <h3>Learning objectives</h3>
+      <ul>
+        <li>Plan, justify and execute an independent wind-tunnel investigation</li>
+        <li>Select the correct procedure for the question being asked</li>
+        <li>Design a test article that fits the tunnel and produces meaningful data</li>
+        <li>Write up findings in a report format suitable for BTEC L3 Assignment 2</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Pick your area</span><span class="slide-num">02</span></div>
+      <h2>Areas of interest</h2>
+      <p>Pick the one that most interests you — or propose your own to your tutor:</p>
+      <ul>
+        <li><strong>Car body shape</strong> — fastback vs notchback rear; effect of a small rear spoiler</li>
+        <li><strong>Aeronautics</strong> — different aerofoil profiles, leading-edge slats, winglets, blended wing-body</li>
+        <li><strong>Ship hull design</strong> — half-submerged geometries (limited by the tunnel's air-only flow but you can still study near-surface bluff body drag)</li>
+        <li><strong>Wind turbine efficiency</strong> — blade pitch, blade chord-length, blade twist</li>
+        <li><strong>High-lift devices (Wk 10 focus)</strong> — flap deflection on a NACA aerofoil, effect of a slot or slat</li>
+        <li><strong>Sports aerodynamics</strong> — cycling helmet shapes, dimpled vs smooth balls (extend WS5), F1 wing details</li>
+      </ul>
+      <div class="callout amber">
+        <span class="l">Recommended for Week 10</span>
+        Studying a flap on an aerofoil ties directly into the BTEC Wk 10 content on secondary controls. Print a NACA 0015 with a slotted flap at 0°, 10°, 20°, 30° and compare lift/drag.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Design rules</span><span class="slide-num">03</span></div>
+      <h2>Test article guidelines</h2>
+      <ul>
+        <li>The wind tunnel test area is <strong>125 mm × 125 mm</strong>.</li>
+        <li>Your shape's frontal area must be <strong>less than 10%</strong> of the cross-section (so &lt; 1,560 mm² frontal). Bigger and you'll get severe blockage corrections.</li>
+        <li>Mount via a threaded insert compatible with the two-force module shaft.</li>
+        <li>If you want pressure measurements, include a hollow tapping that you can connect with tubing to the controller's pressure port (see WS2 / WS3 method).</li>
+        <li>Keep wall thickness ≥ 1.5 mm and add a small fillet at the mount — these are the parts most likely to fail.</li>
+      </ul>
+      <div class="callout">
+        <span class="l">Workflow</span>
+        Sketch → CAD model (Fusion 360 / OnShape) → check frontal area &lt; 10% → 3D-print at 30% infill → tap-test for fit → run a low-speed sanity check before full sweep.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Pick a procedure</span><span class="slide-num">04</span></div>
+      <h2>Match your question to a method</h2>
+      <h3>If your question is about <em>pressure</em>:</h3>
+      <p>Use the method from <a href="w2-cylinder.html">WS2 (cylinder)</a> or <a href="w3-aerofoil-pressure.html">WS3 (aerofoil)</a>. Include surface tappings in your CAD model, connect them to the controller's pressure port one at a time, and compute C<sub>p</sub>.</p>
+
+      <h3>If your question is about <em>forces</em>:</h3>
+      <p>Use the method from <a href="w4-lift-drag.html">WS4 (lift / drag)</a> or <a href="w5-drag-coefficient.html">WS5 (drag coefficient)</a>. Mount on the two-force module; sweep angle of attack and/or fan speed; record force readings.</p>
+
+      <h3>If your question is about <em>flow patterns</em>:</h3>
+      <p>Use the method from <a href="w6-streamlined.html">WS6 (smoke visualisation)</a>. Mount the object, use the smoke generator and capture stills + slow-motion video.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Plan</span><span class="slide-num">05</span></div>
+      <h2>Plan template</h2>
+      <p>Before you switch anything on, complete this plan and have your tutor sign it off.</p>
+      <ol>
+        <li><strong>Question</strong> — written as a single sentence (e.g. <em>"Does a 10 mm rear spoiler reduce the drag coefficient of a notchback car body model?"</em>)</li>
+        <li><strong>Hypothesis</strong> — your predicted answer with brief reasoning</li>
+        <li><strong>Variables</strong> — independent (what you change), dependent (what you measure), controlled (what you keep constant)</li>
+        <li><strong>Test article</strong> — sketch + dimensions + frontal area check</li>
+        <li><strong>Procedure</strong> — which worksheet you're following, with any modifications</li>
+        <li><strong>Data plan</strong> — what readings, how many, in what range</li>
+        <li><strong>Risk assessment</strong> — moving parts, electrical, smoke, hot surfaces</li>
+        <li><strong>Expected analysis</strong> — graphs you'll plot, calculations you'll perform</li>
+      </ol>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Worked example</span><span class="slide-num">06</span></div>
+      <h2>Example brief — flap study</h2>
+      <p>To anchor the format, here is a worked plan you could clone for a Wk 10 high-lift investigation:</p>
+      <table class="kv-table">
+        <tbody>
+          <tr><th>Question</th><td>How does a plain flap deflected 0–30° change the lift coefficient of a NACA 0015 aerofoil at α = 5°?</td></tr>
+          <tr><th>Hypothesis</th><td>Lift will increase with flap deflection up to ~25°, after which separation reduces gains. Drag will rise across the range.</td></tr>
+          <tr><th>Variables</th><td>IV: flap deflection (0°, 10°, 20°, 30°). DV: lift &amp; drag forces. CV: aerofoil α = 5°, fan = 50%.</td></tr>
+          <tr><th>Test article</th><td>3D-printed NACA 0015 with hinged flap, 25% chord. Frontal area &lt; 10%.</td></tr>
+          <tr><th>Procedure</th><td>Adapted from WS4. Print four flap configurations rather than hinge in software.</td></tr>
+          <tr><th>Data plan</th><td>Three repeats at each flap angle. Plot C<sub>L</sub> and C<sub>D</sub> vs flap deflection. Compute L/D.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Report</span><span class="slide-num">07</span></div>
+      <h2>Report structure</h2>
+      <p>Your final write-up should follow this structure (target ~1,500 words plus figures):</p>
+      <ol>
+        <li><strong>Introduction</strong> — context, motivation, the question</li>
+        <li><strong>Theory</strong> — relevant equations and concepts from the unit so far</li>
+        <li><strong>Method</strong> — equipment, procedure, test article description, controlled variables</li>
+        <li><strong>Results</strong> — data tables, graphs and any annotated images</li>
+        <li><strong>Discussion</strong> — what the data shows; comparison to expectations / published values; sources of uncertainty</li>
+        <li><strong>Conclusion</strong> — answer to the question with confidence statement</li>
+        <li><strong>Further work</strong> — what you'd try next given more time</li>
+      </ol>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Wrap up</span><span class="slide-num">08</span></div>
+      <h2>What you should be able to do now</h2>
+      <ul>
+        <li>Plan and execute an independent wind-tunnel investigation</li>
+        <li>Choose the right procedure for an engineering question</li>
+        <li>Design and fabricate a tunnel-compatible test article</li>
+        <li>Write a clear, structured engineering report based on real data</li>
+      </ul>
+
+      <h3>Submission — Assignment 2 (Wk 10 milestone)</h3>
+      <p>Submit your plan and signed risk assessment by mid-Week 10. Final report due end of Week 10.</p>
+
+      <h3>Next up</h3>
+      <p>Weeks 11–12 — manoeuvre aerodynamics, V-n diagrams and modern fly-by-wire systems. (These take you outside the tunnel.)</p>
+    </section>
+
+    <div class="deck-controls">
+      <button type="button" data-prev>← Prev</button>
+      <span class="counter" data-counter>1 / 8</span>
+      <button type="button" data-next>Next →</button>
+    </div>
+    <div class="deck-dots"></div>
+
+  </div>
+</main>
+
+<footer class="page-foot">
+  <div>CP0704 · Worksheet 7 · Where next?</div>
+  <div class="signature">Use ← → keys to navigate</div>
+</footer>
+
+<script src="../slideshow.js"></script>
+</body>
+</html>

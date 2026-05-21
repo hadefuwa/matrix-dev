@@ -1,0 +1,72 @@
+(function () {
+  const deck = document.querySelector(".deck");
+  if (!deck) return;
+
+  const slides = Array.from(deck.querySelectorAll(".slide"));
+  const prevBtn = document.querySelector("[data-prev]");
+  const nextBtn = document.querySelector("[data-next]");
+  const counter = document.querySelector("[data-counter]");
+  const dotsContainer = document.querySelector(".deck-dots");
+
+  if (!slides.length) return;
+
+  slides.forEach((s, i) => s.dataset.idx = String(i));
+
+  if (dotsContainer) {
+    slides.forEach((_, i) => {
+      const dot = document.createElement("button");
+      dot.className = "deck-dot";
+      dot.type = "button";
+      dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+      dot.addEventListener("click", () => go(i));
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  let current = 0;
+
+  function go(idx) {
+    if (idx < 0 || idx >= slides.length) return;
+    slides[current].classList.remove("active");
+    current = idx;
+    slides[current].classList.add("active");
+    if (counter) counter.textContent = (current + 1) + " / " + slides.length;
+    if (prevBtn) prevBtn.disabled = current === 0;
+    if (nextBtn) nextBtn.disabled = current === slides.length - 1;
+    if (dotsContainer) {
+      Array.from(dotsContainer.children).forEach((d, i) => {
+        d.classList.toggle("active", i === current);
+      });
+    }
+    if (history.replaceState) {
+      history.replaceState(null, "", "#slide-" + (current + 1));
+    }
+    window.scrollTo({ top: deck.offsetTop - 80, behavior: "smooth" });
+  }
+
+  if (prevBtn) prevBtn.addEventListener("click", () => go(current - 1));
+  if (nextBtn) nextBtn.addEventListener("click", () => go(current + 1));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); go(current + 1); }
+    if (e.key === "ArrowLeft"  || e.key === "PageUp")   { e.preventDefault(); go(current - 1); }
+    if (e.key === "Home") { e.preventDefault(); go(0); }
+    if (e.key === "End")  { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  // Open on a specific slide via #slide-N
+  const hash = window.location.hash.match(/^#slide-(\d+)$/);
+  const initial = hash ? Math.min(Math.max(parseInt(hash[1], 10) - 1, 0), slides.length - 1) : 0;
+  slides.forEach(s => s.classList.remove("active"));
+  current = initial;
+  slides[current].classList.add("active");
+  if (counter) counter.textContent = (current + 1) + " / " + slides.length;
+  if (prevBtn) prevBtn.disabled = current === 0;
+  if (nextBtn) nextBtn.disabled = current === slides.length - 1;
+  if (dotsContainer) {
+    Array.from(dotsContainer.children).forEach((d, i) => {
+      d.classList.toggle("active", i === current);
+    });
+  }
+})();

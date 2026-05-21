@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worksheet 1 — Pitot-static Tube · CP0704</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<nav class="crumbs">
+  <a href="../scheme-of-work.html">Scheme of Work</a>
+  <span class="sep">›</span>
+  <a href="../scheme-of-work.html#worksheets">Worksheets</a>
+  <span class="sep">›</span>
+  <span>WS1 · Pitot-static tube</span>
+</nav>
+
+<header class="hero">
+  <div class="tag-row">
+    <span class="tag">Worksheet 1</span>
+    <span class="tag amber">Week 3 · Bernoulli</span>
+    <span class="tag">Learning Aim A</span>
+  </div>
+  <h1 class="title">Pitot-static <span class="accent">Tube</span></h1>
+  <p class="subtitle">Measure air speed by comparing total and static pressure. The same instrument every airliner and racing car uses — built into the bench-top Wind Tunnel 125.</p>
+</header>
+
+<main>
+  <div class="deck">
+
+    <!-- ── Slide 1: Title / Overview ────────────── -->
+    <section class="slide active">
+      <div class="slide-head">
+        <span class="slide-label">Overview</span>
+        <span class="slide-num">01</span>
+      </div>
+      <h2>What you'll do in this worksheet</h2>
+      <p>The pitot-static tube measures the speed of a fluid by comparing two pressures: the <strong>pitot</strong> pressure (the tube pointing into the flow) and the <strong>static</strong> pressure (around the tube). The faster the air, the larger the difference between them.</p>
+
+      <h3>Learning objectives</h3>
+      <ul>
+        <li>Explain how a pitot-static tube measures fluid speed</li>
+        <li>Take air-speed measurements using a U-tube manometer and a digital pressure sensor</li>
+        <li>Apply Bernoulli's equation to convert pressure difference into velocity</li>
+        <li>Calculate the Reynolds number for each operating point</li>
+      </ul>
+
+      <div class="callout">
+        <span class="l">Where this fits</span>
+        Week 3 of the BTEC scheme — the lab that anchors the theory of static, dynamic and total pressure introduced in the Bernoulli lecture.
+      </div>
+    </section>
+
+    <!-- ── Slide 2: Theory ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Theory</span>
+        <span class="slide-num">02</span>
+      </div>
+      <h2>How a pitot-static tube works</h2>
+      <p>A pitot-static tube has two openings:</p>
+      <ul>
+        <li>The <strong>pitot port</strong> points directly into the air flow. The moving air is brought to rest at this port — its kinetic energy converts into a small extra pressure called <em>dynamic pressure</em>.</li>
+        <li>The <strong>static port(s)</strong> sit perpendicular to the flow. They sense only the <em>static pressure</em> of the surrounding air.</li>
+      </ul>
+      <p>Subtracting one from the other gives the dynamic pressure on its own, and Bernoulli's equation relates that directly to velocity.</p>
+
+      <div class="formula">
+        P<sub>total</sub> = P<sub>static</sub> + ½ ρ V²
+        <span class="where">Rearranging gives the velocity from the pressure difference Δp = P<sub>total</sub> − P<sub>static</sub>:</span>
+      </div>
+
+      <div class="formula">
+        V = √( 2 Δp / ρ )
+        <span class="where">where Δp is the pitot-static pressure difference in Pa and ρ is the density of air, taken as 1.20 kg·m⁻³.</span>
+      </div>
+    </section>
+
+    <!-- ── Slide 3: Equipment ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Equipment</span>
+        <span class="slide-num">03</span>
+      </div>
+      <h2>What you'll need</h2>
+      <ul>
+        <li>Matrix Wind Tunnel 125 with touch-screen controller</li>
+        <li>Pitot-static tube experiment holder + 2 thumb-nuts</li>
+        <li>U-tube manometer (filled with water to about 50 mm)</li>
+        <li>Built-in digital pressure meter on the controller</li>
+        <li>Stopwatch (optional, for steady-state checks)</li>
+        <li>Lab notebook / Student Handout sheet</li>
+      </ul>
+
+      <div class="callout amber">
+        <span class="l">Safety</span>
+        Never run the fan with the test section unsecured. Keep loose hair, sleeves and cables clear of the inlet grille. Switch off before changing connections.
+      </div>
+      <p><a href="../Wind%20tunnel%20v4.pdf#page=5" target="_blank">Open the User Manual at pp. 5–6 →</a> for full set-up photos and port-numbering diagrams.</p>
+    </section>
+
+    <!-- ── Slide 4: Part 1 procedure ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Procedure · Part 1</span>
+        <span class="slide-num">04</span>
+      </div>
+      <h2>Reading air speed with a U-tube manometer</h2>
+      <ol>
+        <li>Place the pitot-static holder into the test section. Secure with both thumb-nuts. <strong>The tube must point directly into the flow.</strong></li>
+        <li>Add water to the manometer via a side port so the water sits near the 50 mm mark.</li>
+        <li>Connect the experiment holder to the manometer ports. (Either way round is fine — only the difference in column heights matters.)</li>
+        <li>With the fan off (0%), record both column heights in the data table.</li>
+        <li>Switch on the fan, set to 10% on the touch-screen.</li>
+        <li>Read and record both column heights.</li>
+        <li>Increase the fan speed in 10% steps up to 100%, recording the column heights at each step.</li>
+      </ol>
+    </section>
+
+    <!-- ── Slide 5: Part 1 analysis ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Analysis · Part 1</span>
+        <span class="slide-num">05</span>
+      </div>
+      <h2>From column height to air speed</h2>
+      <p>The pressure difference across the manometer is the weight of the water column. For each fan speed:</p>
+      <div class="formula">
+        Δp = ρ<sub>w</sub> · g · h
+        <span class="where">ρ<sub>w</sub> = 1000 kg·m⁻³ · g = 9.81 N·kg⁻¹ · h = height difference in metres</span>
+      </div>
+      <p>Substituting into the velocity expression gives:</p>
+      <div class="formula">
+        V² = 2 ρ<sub>w</sub> · g · h / ρ<sub>air</sub>
+        <span class="where">with ρ<sub>air</sub> = 1.20 kg·m⁻³</span>
+      </div>
+      <p>For each fan-speed value, calculate <strong>h in metres</strong> and then <strong>V in m·s⁻¹</strong>. Plot a graph of air speed against height difference and draw a smooth curve through the points.</p>
+    </section>
+
+    <!-- ── Slide 6: Part 2 procedure ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Procedure · Part 2</span>
+        <span class="slide-num">06</span>
+      </div>
+      <h2>Reading air speed with the digital sensor</h2>
+      <ol>
+        <li>Detach the tubes from the manometer. Connect them to the two pressure ports on the wind tunnel control unit. (Again, polarity does not matter — you'll work with the magnitude.)</li>
+        <li>With the fan off, <strong>zero the sensors</strong> from the touch-screen.</li>
+        <li>Set the fan to 10%. Read air speed and pressure difference from the digital meter.</li>
+        <li>Step the fan up to 100% in 10% increments, recording both readings each time.</li>
+      </ol>
+      <div class="callout">
+        <span class="l">Why both methods?</span>
+        Comparing the manometer (manual, mechanical) with the digital sensor (electronic) trains learners in the trade-off between resolution, response time and human-reading error — a key BTEC technical skill.
+      </div>
+    </section>
+
+    <!-- ── Slide 7: Part 2 analysis ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Analysis · Part 2</span>
+        <span class="slide-num">07</span>
+      </div>
+      <h2>Plotting and comparing</h2>
+      <ul>
+        <li>Plot a second graph: air speed vs pressure difference, this time from the digital pressure meter.</li>
+        <li>Draw a smooth curve through the points.</li>
+        <li>Compare the two graphs. They should agree within experimental error — comment on which method is more precise and which is faster to use.</li>
+      </ul>
+
+      <h3>Challenge — Reynolds number</h3>
+      <p>For each fan-speed percentage, calculate the Reynolds number:</p>
+      <div class="formula">
+        Re = ρ V L / μ
+        <span class="where">ρ = 1.20 kg·m⁻³ · μ = 1.81 × 10⁻⁵ Pa·s (dynamic viscosity of air) · L = the chord or characteristic length of the test object</span>
+      </div>
+      <p>Comment on the regime (laminar, transitional, turbulent) the tunnel achieves at different fan settings.</p>
+    </section>
+
+    <!-- ── Slide 8: Data tables ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Data Capture</span>
+        <span class="slide-num">08</span>
+      </div>
+      <h2>Tables to populate</h2>
+
+      <h3>Part 1 — U-tube manometer</h3>
+      <table class="kv-table">
+        <thead><tr><th>Fan %</th><th>Left col (mm)</th><th>Right col (mm)</th><th>h (m)</th><th>V (m·s⁻¹)</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>10</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>20</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>…</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td></tr>
+          <tr><td>100</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Part 2 — digital pressure sensor</h3>
+      <table class="kv-table">
+        <thead><tr><th>Fan %</th><th>Pressure (Pa)</th><th>V (m·s⁻¹)</th><th>Re</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>10</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>…</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td></tr>
+          <tr><td>100</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── Slide 9: Wrap up ────────────── -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="slide-label">Wrap up</span>
+        <span class="slide-num">09</span>
+      </div>
+      <h2>What you should be able to do now</h2>
+      <ul>
+        <li>Explain in your own words why a pitot-static tube measures velocity, not pressure</li>
+        <li>Take readings using both manometer and digital sensor — and justify which you'd choose for which application</li>
+        <li>Apply Bernoulli's equation in both algebraic and numerical form</li>
+        <li>Calculate Reynolds number and explain its significance for flow regime</li>
+      </ul>
+
+      <h3>Homework — Lab Report Draft (Wk 3 milestone)</h3>
+      <p>Write up Parts 1 and 2 as a short technical report (≈ 600 words plus tables and graphs). Discuss agreement between the two methods and propose one source of uncertainty in each.</p>
+
+      <h3>Next up</h3>
+      <p>Week 4 — <a href="w6-streamlined.html">Worksheet 6: Smoke visualisation</a> for airfoil geometry and boundary layers.</p>
+    </section>
+
+    <!-- ── Controls ────────────── -->
+    <div class="deck-controls">
+      <button type="button" data-prev>← Prev</button>
+      <span class="counter" data-counter>1 / 9</span>
+      <button type="button" data-next>Next →</button>
+    </div>
+    <div class="deck-dots"></div>
+
+  </div>
+</main>
+
+<footer class="page-foot">
+  <div>CP0704 · Worksheet 1 · Pitot-static tube</div>
+  <div class="signature">Use ← → keys to navigate</div>
+</footer>
+
+<script src="../slideshow.js"></script>
+</body>
+</html>

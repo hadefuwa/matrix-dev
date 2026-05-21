@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worksheet 4 — Lift &amp; Drag on an Aerofoil · CP0704</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+
+<nav class="crumbs">
+  <a href="../scheme-of-work.html">Scheme of Work</a>
+  <span class="sep">›</span>
+  <a href="../scheme-of-work.html#worksheets">Worksheets</a>
+  <span class="sep">›</span>
+  <span>WS4 · Lift &amp; drag on an aerofoil</span>
+</nav>
+
+<header class="hero">
+  <div class="tag-row">
+    <span class="tag">Worksheet 4</span>
+    <span class="tag amber">Week 5 · Lift Generation</span>
+    <span class="tag">Learning Aim B</span>
+  </div>
+  <h1 class="title">Lift &amp; Drag on an <span class="accent">Aerofoil</span></h1>
+  <p class="subtitle">Use the two-force module to directly measure lift and drag as functions of angle of attack and air speed, across three different aerofoil profiles. Plot the C<sub>L</sub>-vs-α curve and identify the stall point.</p>
+</header>
+
+<main>
+  <div class="deck">
+
+    <section class="slide active">
+      <div class="slide-head"><span class="slide-label">Overview</span><span class="slide-num">01</span></div>
+      <h2>What you'll do in this worksheet</h2>
+      <p>WS3 inferred lift from a pressure map. This worksheet measures lift and drag <strong>directly</strong> with built-in load cells.</p>
+      <ul>
+        <li>You'll sweep angle of attack from −25° to +45° in 5° steps</li>
+        <li>At three fan speeds: 20%, 50%, 80%</li>
+        <li>For three different aerofoil profiles: <strong>NACA 0015</strong>, <strong>S1223</strong>, <strong>NACA 4415</strong></li>
+        <li>Then compare their lift / drag characteristics on the same axes</li>
+      </ul>
+
+      <h3>Learning objectives</h3>
+      <ul>
+        <li>Use the two-force module to capture lift and drag forces</li>
+        <li>Plot lift- and drag-vs-α curves at multiple air speeds</li>
+        <li>Identify the stall angle from the lift curve</li>
+        <li>Compare three aerofoils and select an appropriate one for a given application</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Theory</span><span class="slide-num">02</span></div>
+      <h2>The lift equation</h2>
+      <p>For any aerofoil, lift force scales with air density, the square of velocity, the planform area and a dimensionless coefficient:</p>
+      <div class="formula">
+        L = ½ ρ V² S C<sub>L</sub>
+        <span class="where">S = aerofoil planform area · C<sub>L</sub> = lift coefficient (depends on shape, angle of attack and Reynolds number)</span>
+      </div>
+      <p>The drag coefficient C<sub>D</sub> follows the same pattern. The <strong>lift / drag ratio</strong> C<sub>L</sub>/C<sub>D</sub> is a key efficiency metric — a glider wants a large value, a Formula 1 wing wants the opposite.</p>
+
+      <h3>Stall</h3>
+      <p>As angle of attack rises, lift grows linearly — until the flow on the top surface separates. C<sub>L</sub> drops sharply and drag spikes. That angle is the <strong>stall angle</strong>.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Equipment</span><span class="slide-num">03</span></div>
+      <h2>The two-force module</h2>
+      <ul>
+        <li>Two built-in load cells: one measures lift, the other drag</li>
+        <li>Stepper motor sets the angle of attack precisely</li>
+        <li>Three aerofoils with threaded inserts: <strong>NACA 0015</strong> (symmetric), <strong>S1223</strong> (high-lift Selig), <strong>NACA 4415</strong> (cambered)</li>
+        <li>Cables linking the holder to the wind tunnel control unit</li>
+      </ul>
+      <p><a href="../Wind%20tunnel%20v4.pdf#page=13" target="_blank">Open the User Manual at pp. 13–14 →</a> for connection diagrams and the aerofoil mounting procedure.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Procedure</span><span class="slide-num">04</span></div>
+      <h2>Step by step — NACA 0015</h2>
+      <ol>
+        <li>Thread the NACA 0015 aerofoil onto the two-force holder's shaft. Mount it in the test section with thumb-nuts.</li>
+        <li>Connect both holder sockets to the corresponding sockets on the control unit.</li>
+        <li>Set α = 0°. With the fan <em>off</em>, zero both load cells.</li>
+        <li>Switch the fan on and set to <strong>20%</strong>.</li>
+        <li>Sweep α from <strong>−25°</strong> to <strong>+45°</strong> in 5° steps. At each angle, record lift force and drag force.</li>
+        <li>Repeat the full sweep at <strong>50%</strong> fan speed.</li>
+        <li>Repeat once more at <strong>80%</strong> fan speed.</li>
+        <li>Switch off the fan. Swap to the S1223. Repeat steps 3–7.</li>
+        <li>Swap to the NACA 4415. Repeat once more.</li>
+      </ol>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Analysis · NACA 0015</span><span class="slide-num">05</span></div>
+      <h2>Lift and drag curves</h2>
+      <ul>
+        <li>For the NACA 0015 only: plot lift force vs α for all three fan speeds on a single set of axes. Label each curve with its speed.</li>
+        <li>On a second set of axes, plot drag force vs α for the same three speeds.</li>
+        <li>Draw smooth curves through the experimental points.</li>
+      </ul>
+      <h3>Questions</h3>
+      <ul>
+        <li>How does lift change with fan speed at fixed α? Does the data agree with the V² scaling in the lift equation?</li>
+        <li>At what angle does the lift on the NACA 0015 peak? What does the drag do at that same angle?</li>
+        <li>Is the lift curve symmetric about α = 0°? Why does that make sense for a symmetric aerofoil?</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Comparing aerofoils</span><span class="slide-num">06</span></div>
+      <h2>Three aerofoils, side by side</h2>
+      <p>Now collect all three aerofoils' results at the <strong>same fan speed (20%)</strong>:</p>
+      <ul>
+        <li>Plot a single graph of lift vs α with three curves (NACA 0015 · S1223 · NACA 4415).</li>
+        <li>Plot a second graph of drag vs α with the same three aerofoils.</li>
+      </ul>
+      <h3>Compare</h3>
+      <ul>
+        <li>Which aerofoil gives the most lift at small positive α?</li>
+        <li>Which stalls earliest? Which has the gentlest stall behaviour?</li>
+        <li>Which has the lowest drag at zero lift? (drag at α where L ≈ 0)</li>
+        <li>Compute the maximum L/D for each — which is most efficient for a glider?</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Application</span><span class="slide-num">07</span></div>
+      <h2>Picking the right aerofoil for the job</h2>
+      <p>Use your three plots to recommend an aerofoil for each application below, and justify with one or two metrics:</p>
+      <ul>
+        <li>A <strong>man-powered glider</strong> needing maximum L/D at low speed</li>
+        <li>A <strong>training light aircraft</strong> needing benign, predictable stall</li>
+        <li>A <strong>high-speed UAV</strong> where minimising drag at small α matters most</li>
+        <li>An <strong>aerobatic aircraft</strong> needing symmetric behaviour in inverted flight</li>
+      </ul>
+      <div class="callout">
+        <span class="l">Engineering judgement</span>
+        Real aircraft choose their aerofoil with many more constraints (structural depth, fuel volume, Mach number). The point of this exercise is to learn how to argue with data — not to find a single "right" answer.
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Data Capture</span><span class="slide-num">08</span></div>
+      <h2>One table per aerofoil per fan speed</h2>
+      <p>Nine tables in total (3 aerofoils × 3 fan speeds). Each follows this layout:</p>
+      <table class="kv-table">
+        <thead><tr><th>α (°)</th><th>Lift (N)</th><th>Drag (N)</th><th>L/D</th></tr></thead>
+        <tbody>
+          <tr><td>−25</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>−20</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>…</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td></tr>
+          <tr><td>0</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+          <tr><td>…</td><td class="muted">…</td><td class="muted">…</td><td class="muted">…</td></tr>
+          <tr><td>+45</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <div class="slide-head"><span class="slide-label">Wrap up</span><span class="slide-num">09</span></div>
+      <h2>What you should be able to do now</h2>
+      <ul>
+        <li>Operate the two-force module and capture lift / drag data</li>
+        <li>Plot and interpret lift- and drag-vs-α curves</li>
+        <li>Identify stall behaviour from experimental data</li>
+        <li>Compare aerofoil profiles using a chosen performance metric</li>
+      </ul>
+
+      <h3>Homework — Assignment 1 prep (Wk 6 submission)</h3>
+      <p>Combine WS3 and WS4 results. Write a 1,000-word lab report titled <em>"How lift is generated on a NACA 0015"</em> with pressure-mapping evidence and direct force measurement evidence.</p>
+
+      <h3>Next up</h3>
+      <p>Worksheet 5 — drag coefficient measurement on standard shapes for Week 6 (Drag Components &amp; Minimisation).</p>
+    </section>
+
+    <div class="deck-controls">
+      <button type="button" data-prev>← Prev</button>
+      <span class="counter" data-counter>1 / 9</span>
+      <button type="button" data-next>Next →</button>
+    </div>
+    <div class="deck-dots"></div>
+
+  </div>
+</main>
+
+<footer class="page-foot">
+  <div>CP0704 · Worksheet 4 · Lift &amp; drag on an aerofoil</div>
+  <div class="signature">Use ← → keys to navigate</div>
+</footer>
+
+<script src="../slideshow.js"></script>
+</body>
+</html>
