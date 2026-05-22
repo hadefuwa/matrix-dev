@@ -3,297 +3,540 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>BTEC L3 Aerodynamics &amp; Flight Principles — Scheme of Work</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<title>Aerodynamics &amp; Flight Principles · Matrix TSL Scheme of Work</title>
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<header class="hero">
-  <svg style="position:absolute; right:0; top:2rem; width:460px; max-width:45%; opacity:0.55; pointer-events:none" viewBox="0 0 600 400" fill="none" aria-hidden="true">
-    <defs>
-      <linearGradient id="line" x1="0" x2="1">
-        <stop offset="0" stop-color="#22d3ee" stop-opacity="0"/>
-        <stop offset="0.4" stop-color="#22d3ee" stop-opacity="0.9"/>
-        <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <g stroke="url(#line)" stroke-width="1.4" stroke-linecap="round">
-      <path d="M0,60 C180,40 320,90 600,60"/>
-      <path d="M0,120 C180,100 320,170 600,130"/>
-      <path d="M0,180 C200,170 340,230 600,200"/>
-      <path d="M0,240 C220,250 360,290 600,260"/>
-      <path d="M0,300 C200,320 340,340 600,320"/>
-      <path d="M0,360 C180,380 340,380 600,370"/>
-    </g>
-    <g transform="translate(180,180)">
-      <path d="M0,0 C 60,-30 200,-30 280,-8 C 240,4 100,18 0,0 Z"
-            fill="rgba(248,179,57,0.18)" stroke="#f8b339" stroke-width="1.4"/>
-    </g>
-  </svg>
-
-  <div class="tag-row">
-    <span class="tag">BTEC Level 3</span>
-    <span class="tag amber">National Engineering</span>
-    <span class="tag">60 GLH · 12 Weeks</span>
-  </div>
-
-  <h1 class="title">Aerodynamics &amp; <span class="accent">Flight Principles</span><br/>Scheme of Work</h1>
-  <p class="subtitle">A 12-week, 60 Guided Learning Hour programme that takes BTEC Level 3 National Engineering learners from fluid fundamentals through to fly-by-wire, with the Matrix Wind Tunnel 125 (CP0704) as the practical spine of the course.</p>
-
-  <div class="meta-grid">
-    <div class="meta"><div class="k">Qualification</div><div class="v">BTEC L3 National</div></div>
-    <div class="meta"><div class="k">Subject</div><div class="v">Engineering</div></div>
-    <div class="meta"><div class="k">GLH</div><div class="v">60 hours</div></div>
-    <div class="meta"><div class="k">Delivery</div><div class="v">12 weeks · ~5 hrs/wk</div></div>
-    <div class="meta"><div class="k">Equipment</div><div class="v">Matrix Wind Tunnel 125</div></div>
+<!-- ── Sticky site header ────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="scheme-of-work.html">
+      <span class="logo-mark">M</span>
+      <span class="brand-divider"></span>
+      <span class="brand-label">Wind Tunnel · Scheme of Work</span>
+    </a>
+    <nav class="site-nav">
+      <a href="#schedule">Schedule</a>
+      <a href="#worksheets">Worksheets</a>
+      <a href="#videos">Videos</a>
+      <a href="https://www.matrixtsl.com" target="_blank" rel="noopener">matrixtsl.com</a>
+    </nav>
   </div>
 </header>
 
-<main>
+<!-- ── Ticker bar ────────────────────── -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>BTEC NATIONAL · ENGINEERING · AERODYNAMICS · PITOT-STATIC · BERNOULLI · LIFT &amp; DRAG · BOUNDARY LAYERS · REYNOLDS · NACA AEROFOILS · DRAG COEFFICIENT · STREAMLINES · STABILITY · FLY-BY-WIRE</span>
+    <span>BTEC NATIONAL · ENGINEERING · AERODYNAMICS · PITOT-STATIC · BERNOULLI · LIFT &amp; DRAG · BOUNDARY LAYERS · REYNOLDS · NACA AEROFOILS · DRAG COEFFICIENT · STREAMLINES · STABILITY · FLY-BY-WIRE</span>
+  </div>
+</div>
 
-  <!-- ── Learning aims ────────────────────────── -->
-  <section>
-    <h2 class="section-title">Learning Aims</h2>
-    <p class="section-lead">The unit is built around three Learning Aims that progress from underlying fluid behaviour to the mechanics of full aircraft flight.</p>
+<!-- ── Hero ────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <span class="eyebrow">CP0704 · BTEC Level 3 · 60 GLH</span>
+    <h1>
+      Welcome to<br/>
+      <span class="accent">Aerodynamics</span><br/>
+      &amp; Flight Principles
+    </h1>
+    <p class="lead">
+      A 12-week, 60 Guided Learning Hour BTEC Level 3 National Engineering programme that uses the Matrix
+      Wind Tunnel 125 as its practical spine — taking learners from fluid fundamentals through to fly-by-wire.
+    </p>
+    <p class="lead lead--body">
+      Each week pairs theory with a hands-on lab. Seven CP0704 worksheets and seven Matrix tutorial videos
+      are built as interactive slideshow pages — designed to integrate with your existing BTEC delivery
+      and your wind tunnel kit.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-n">12</span>
+        <span class="stat-l">Weeks</span>
+      </div>
+      <span class="stat-divider"></span>
+      <div class="stat">
+        <span class="stat-n">60</span>
+        <span class="stat-l">GLH</span>
+      </div>
+      <span class="stat-divider"></span>
+      <div class="stat">
+        <span class="stat-n">7</span>
+        <span class="stat-l">Worksheets</span>
+      </div>
+      <span class="stat-divider"></span>
+      <div class="stat">
+        <span class="stat-n">7</span>
+        <span class="stat-l">Tutorial Videos</span>
+      </div>
+      <span class="stat-divider"></span>
+      <div class="stat">
+        <span class="stat-n">3</span>
+        <span class="stat-l">Assignments</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Learning aims ────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Learning Aims</h2>
+      <span class="hint">Three Aims · A → C</span>
+    </div>
+    <p class="section-lead">The unit progresses from underlying fluid behaviour to lift and drag, then to the full mechanics of aircraft flight.</p>
     <div class="aims-grid">
       <article class="aim">
-        <div class="letter">AIM A</div>
+        <span class="letter">AIM A</span>
         <h3>Properties of fluids &amp; fluid flow</h3>
-        <p>Explore air density, viscosity, pressure gradients, the continuity equation and Bernoulli's theorem. Underpins everything that follows.</p>
+        <p>Air density, viscosity, pressure gradients, the continuity equation and Bernoulli's theorem. Underpins everything that follows.</p>
       </article>
       <article class="aim b">
-        <div class="letter">AIM B</div>
+        <span class="letter">AIM B</span>
         <h3>Lift &amp; drag on aerodynamic shapes</h3>
-        <p>Investigate how airflow generates lift and drag on aerofoils and bluff bodies, including coefficients, stall, boundary layers and scaling.</p>
+        <p>How airflow generates lift and drag on aerofoils and bluff bodies — coefficients, stall, boundary layers and scaling.</p>
       </article>
       <article class="aim c">
-        <div class="letter">AIM C</div>
-        <h3>Stability, control &amp; the mechanics of flight</h3>
-        <p>Examine aircraft stability, primary and secondary control surfaces, manoeuvre loads and modern fly-by-wire envelope protection.</p>
+        <span class="letter">AIM C</span>
+        <h3>Stability, control &amp; mechanics of flight</h3>
+        <p>Aircraft stability, primary and secondary control surfaces, manoeuvre loads and modern fly-by-wire envelope protection.</p>
       </article>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ── 12-week schedule ────────────────────────── -->
-  <section>
-    <h2 class="section-title">12-Week Delivery Schedule</h2>
-    <p class="section-lead">Each row is one teaching week (~5 GLH). The "Practical / Lab" column links directly to the corresponding wind tunnel worksheet slideshow and Matrix tutorial videos where they apply.</p>
+<!-- ── 12-week schedule ────────────────────── -->
+<section class="section" id="schedule">
+  <div class="container">
+    <div class="section-head">
+      <h2>12-Week Delivery Schedule</h2>
+      <span class="hint">~5 GLH per week</span>
+    </div>
+    <p class="section-lead">Each row links directly to the wind tunnel worksheet and tutorial videos where they apply.</p>
+
     <div class="schedule-wrap">
-      <table class="schedule">
-        <thead>
-          <tr>
-            <th>Wk</th>
-            <th>Topic Focus</th>
-            <th>Key Theoretical Content</th>
-            <th>Practical / Lab Activities</th>
-            <th>Assessment Milestone</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr>
-            <td class="wk">01</td>
-            <td class="topic">Fluid Properties &amp; Atmospheric Physics</td>
-            <td class="theory">Air density, viscosity, pressure gradients. The International Standard Atmosphere (ISA) model. Units, fluid statics.</td>
-            <td class="practical">Calculating pressure changes with altitude. ISA atmosphere modelling spreadsheet exercise. Density measurement of air at lab conditions.</td>
-            <td class="assess">Diagnostic Quiz</td>
-          </tr>
-
-          <tr>
-            <td class="wk">02</td>
-            <td class="topic">Fluid Dynamics &amp; Continuity</td>
-            <td class="theory">Incompressible flow behaviour. Continuity equation A₁V₁ = A₂V₂. Mass flow rate conservation. Streamlines &amp; control volumes.</td>
-            <td class="practical">Venturi tube tracking and flow velocity calculations. Equipment familiarisation:
-              <span class="wt-chip"><a href="videos/v7-assembly.html">▶ Assembly</a></span>
-              <span class="wt-chip"><a href="videos/v3-setup.html">▶ Set up</a></span>
-            </td>
-            <td class="assess">Formal Formative Problem Set</td>
-          </tr>
-
-          <tr>
-            <td class="wk">03</td>
-            <td class="topic">Bernoulli's Theorem</td>
-            <td class="theory">Energy conservation in fluid flow. Static, dynamic and total pressure. P + ½ρV² = constant. Limits and assumptions of Bernoulli.</td>
-            <td class="practical">
-              <span class="wt-chip"><a href="worksheets/w1-pitot-static.html">WS1 · Pitot-static tube</a></span>
-              <span class="wt-chip"><a href="videos/v1-readings.html">▶ Manual &amp; electronic readings</a></span>
-            </td>
-            <td class="assess">Lab Report Draft</td>
-          </tr>
-
-          <tr>
-            <td class="wk">04</td>
-            <td class="topic">Airfoil Geometry &amp; Boundary Layers</td>
-            <td class="theory">Chord line, camber, thickness, angle of attack α. Laminar vs turbulent boundary layer transition. Separation.</td>
-            <td class="practical">
-              <span class="wt-chip"><a href="worksheets/w6-streamlined.html">WS6 · Smoke-tunnel visualisation</a></span>
-              <span class="wt-chip"><a href="videos/v4-smoke-visualisation.html">▶ Smoke visualisation</a></span>
-              <span class="wt-chip"><a href="videos/v5-attaching-experiments.html">▶ Attaching experiments</a></span>
-            </td>
-            <td class="assess">Assignment 1 Issued<br/>(Fluid Fundamentals)</td>
-          </tr>
-
-          <tr>
-            <td class="wk">05</td>
-            <td class="topic">Lift Generation Mechanics</td>
-            <td class="theory">Pressure distribution across upper / lower aerofoil surfaces. Circulation. Lift equation L = ½ρV²·S·C<sub>L</sub>. Stall.</td>
-            <td class="practical">
-              <span class="wt-chip"><a href="worksheets/w3-aerofoil-pressure.html">WS3 · Aerofoil pressure mapping</a></span>
-              <span class="wt-chip"><a href="worksheets/w4-lift-drag.html">WS4 · Lift &amp; drag</a></span>
-              <span class="wt-chip"><a href="videos/v6-software.html">▶ Wind tunnel software</a></span>
-            </td>
-            <td class="assess">Airfoil Analysis<br/>Peer Review</td>
-          </tr>
-
-          <tr>
-            <td class="wk">06</td>
-            <td class="topic">Drag Components &amp; Minimisation</td>
-            <td class="theory">Induced drag, parasite drag (skin friction, form, interference). Total drag curve. Lift-to-drag ratio.</td>
-            <td class="practical">
-              <span class="wt-chip"><a href="worksheets/w5-drag-coefficient.html">WS5 · Drag coefficient on standard shapes</a></span>
-              <span class="wt-chip amber">Drag curves across velocity profile</span>
-            </td>
-            <td class="assess">Assignment 1 Submission</td>
-          </tr>
-
-          <tr>
-            <td class="wk">07</td>
-            <td class="topic">Wind Tunnel Testing &amp; Scaling</td>
-            <td class="theory">Experimental aerodynamic methods. Reynolds number Re and Mach number M scaling laws. Tunnel blockage and corrections.</td>
-            <td class="practical">
-              <span class="wt-chip"><a href="worksheets/w2-cylinder.html">WS2 · Cylinder flow patterns</a></span>
-              <span class="wt-chip"><a href="videos/v2-experiments-available.html">▶ Available experiments</a></span>
-            </td>
-            <td class="assess">Wind Tunnel Data<br/>Log Check</td>
-          </tr>
-
-          <tr>
-            <td class="wk">08</td>
-            <td class="topic">Aircraft Stability Mechanics</td>
-            <td class="theory">Longitudinal, lateral and directional stability. Static vs dynamic stability modes (phugoid, dutch roll, spiral).</td>
-            <td class="practical">Adjusting centre of gravity (CoG) on model gliders to map stable glide paths. Optional: re-run WS6 with stable / unstable shapes for streamline contrast.</td>
-            <td class="assess">Assignment 2 Issued<br/>(Lift, Drag &amp; Testing)</td>
-          </tr>
-
-          <tr>
-            <td class="wk">09</td>
-            <td class="topic">Primary Flight Control Surfaces</td>
-            <td class="theory">Aerodynamic action of ailerons, elevators and rudders. Pitch, roll and yaw axes. Hinge moments and control feel.</td>
-            <td class="practical">Flight simulator session OR physical linkage rig inspection for control tracking and movement ratios.</td>
-            <td class="assess">Control Surface<br/>Mapping Exercise</td>
-          </tr>
-
-          <tr>
-            <td class="wk">10</td>
-            <td class="topic">Secondary Controls &amp; High-Lift Devices</td>
-            <td class="theory">Flaps, slats, slots and spoilers. Effect on the lift / drag polar. Take-off and landing configuration management.</td>
-            <td class="practical">
-              <span class="wt-chip"><a href="worksheets/w7-where-next.html">WS7 · Independent investigation (flap study)</a></span>
-            </td>
-            <td class="assess">Assignment 2 Submission</td>
-          </tr>
-
-          <tr>
-            <td class="wk">11</td>
-            <td class="topic">Manoeuvre Aerodynamics &amp; Loads</td>
-            <td class="theory">Forces in steady turns, climbs and descents. Load factors (g-loading) and structural limits.</td>
-            <td class="practical">Constructing V-n (velocity-load factor) manoeuvre diagrams for a chosen aircraft. Lift / load calculations at varied bank angles.</td>
-            <td class="assess">Assignment 3 Issued<br/>(Stability &amp; Performance)</td>
-          </tr>
-
-          <tr>
-            <td class="wk">12</td>
-            <td class="topic">Modern Actuation &amp; Flight Envelopes</td>
-            <td class="theory">Fly-by-wire (FBW), artificial stability augmentation systems (SAS) and flight envelope protection. Sidestick vs yoke.</td>
-            <td class="practical">Analysing block diagrams of active control loops and automated trim systems. Case study on Airbus / Boeing envelope philosophies.</td>
-            <td class="assess">Assignment 3 Submission<br/>Final Review</td>
-          </tr>
-
-        </tbody>
-      </table>
+      <div class="schedule-scroll">
+        <table class="schedule">
+          <thead>
+            <tr>
+              <th>Wk</th>
+              <th>Topic Focus</th>
+              <th>Key Theoretical Content</th>
+              <th>Practical / Lab Activities</th>
+              <th>Assessment Milestone</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="wk">01</td>
+              <td class="topic">Fluid Properties &amp; Atmospheric Physics</td>
+              <td class="theory">Air density, viscosity, pressure gradients. The International Standard Atmosphere (ISA) model. Units, fluid statics.</td>
+              <td class="practical">Calculating pressure changes with altitude. ISA atmosphere modelling spreadsheet. Density measurement of air at lab conditions.</td>
+              <td class="assess">Diagnostic Quiz</td>
+            </tr>
+            <tr>
+              <td class="wk">02</td>
+              <td class="topic">Fluid Dynamics &amp; Continuity</td>
+              <td class="theory">Incompressible flow. Continuity A₁V₁ = A₂V₂. Mass flow rate conservation. Streamlines and control volumes.</td>
+              <td class="practical">
+                Venturi tube tracking and flow velocity calculations. Kit familiarisation:
+                <span class="wt-chip video"><a href="videos/v7-assembly.html">▶ Assembly</a></span>
+                <span class="wt-chip video"><a href="videos/v3-setup.html">▶ Set up</a></span>
+              </td>
+              <td class="assess">Formative Problem Set</td>
+            </tr>
+            <tr>
+              <td class="wk">03</td>
+              <td class="topic">Bernoulli's Theorem</td>
+              <td class="theory">Energy conservation in fluid flow. Static, dynamic and total pressure. P + ½ρV² = constant. Limits and assumptions.</td>
+              <td class="practical">
+                <span class="wt-chip"><a href="worksheets/w1-pitot-static.html">WS1 · Pitot-static tube</a></span>
+                <span class="wt-chip video"><a href="videos/v1-readings.html">▶ Manual &amp; electronic readings</a></span>
+              </td>
+              <td class="assess">Lab Report Draft</td>
+            </tr>
+            <tr>
+              <td class="wk">04</td>
+              <td class="topic">Airfoil Geometry &amp; Boundary Layers</td>
+              <td class="theory">Chord, camber, thickness, angle of attack α. Laminar vs turbulent boundary layer transition. Flow separation.</td>
+              <td class="practical">
+                <span class="wt-chip"><a href="worksheets/w6-streamlined.html">WS6 · Smoke visualisation</a></span>
+                <span class="wt-chip video"><a href="videos/v4-smoke-visualisation.html">▶ Smoke visualisation</a></span>
+                <span class="wt-chip video"><a href="videos/v5-attaching-experiments.html">▶ Attaching experiments</a></span>
+              </td>
+              <td class="assess">Assignment 1 Issued</td>
+            </tr>
+            <tr>
+              <td class="wk">05</td>
+              <td class="topic">Lift Generation Mechanics</td>
+              <td class="theory">Pressure distribution across upper / lower aerofoil surfaces. Circulation. Lift equation L = ½ρV²·S·C<sub>L</sub>. Stall.</td>
+              <td class="practical">
+                <span class="wt-chip"><a href="worksheets/w3-aerofoil-pressure.html">WS3 · Aerofoil pressure mapping</a></span>
+                <span class="wt-chip"><a href="worksheets/w4-lift-drag.html">WS4 · Lift &amp; drag</a></span>
+                <span class="wt-chip video"><a href="videos/v6-software.html">▶ Wind tunnel software</a></span>
+              </td>
+              <td class="assess">Airfoil Analysis Peer Review</td>
+            </tr>
+            <tr>
+              <td class="wk">06</td>
+              <td class="topic">Drag Components &amp; Minimisation</td>
+              <td class="theory">Induced drag, parasite drag (skin friction, form, interference). Total drag curve. Lift-to-drag ratio.</td>
+              <td class="practical">
+                <span class="wt-chip"><a href="worksheets/w5-drag-coefficient.html">WS5 · Drag coefficient on standard shapes</a></span>
+              </td>
+              <td class="assess">Assignment 1 Submission</td>
+            </tr>
+            <tr>
+              <td class="wk">07</td>
+              <td class="topic">Wind Tunnel Testing &amp; Scaling</td>
+              <td class="theory">Experimental aerodynamic methods. Reynolds number Re and Mach number M scaling laws. Tunnel blockage and corrections.</td>
+              <td class="practical">
+                <span class="wt-chip"><a href="worksheets/w2-cylinder.html">WS2 · Cylinder flow patterns</a></span>
+                <span class="wt-chip video"><a href="videos/v2-experiments-available.html">▶ Available experiments</a></span>
+              </td>
+              <td class="assess">Wind Tunnel Data Log Check</td>
+            </tr>
+            <tr>
+              <td class="wk">08</td>
+              <td class="topic">Aircraft Stability Mechanics</td>
+              <td class="theory">Longitudinal, lateral and directional stability. Static vs dynamic stability (phugoid, dutch roll, spiral).</td>
+              <td class="practical">Adjusting centre of gravity (CoG) on model gliders to map stable glide paths. Optional WS6 re-run with stable / unstable shapes.</td>
+              <td class="assess">Assignment 2 Issued</td>
+            </tr>
+            <tr>
+              <td class="wk">09</td>
+              <td class="topic">Primary Flight Control Surfaces</td>
+              <td class="theory">Aerodynamic action of ailerons, elevators and rudders. Pitch, roll and yaw axes. Hinge moments and control feel.</td>
+              <td class="practical">Flight simulator session OR physical linkage rig inspection for control tracking and movement ratios.</td>
+              <td class="assess">Control Surface Mapping</td>
+            </tr>
+            <tr>
+              <td class="wk">10</td>
+              <td class="topic">Secondary Controls &amp; High-Lift Devices</td>
+              <td class="theory">Flaps, slats, slots and spoilers. Effect on the lift / drag polar. Take-off and landing configuration management.</td>
+              <td class="practical">
+                <span class="wt-chip"><a href="worksheets/w7-where-next.html">WS7 · Independent investigation (flap study)</a></span>
+              </td>
+              <td class="assess">Assignment 2 Submission</td>
+            </tr>
+            <tr>
+              <td class="wk">11</td>
+              <td class="topic">Manoeuvre Aerodynamics &amp; Loads</td>
+              <td class="theory">Forces in steady turns, climbs and descents. Load factors (g-loading) and structural limits.</td>
+              <td class="practical">Constructing V-n (velocity-load factor) manoeuvre diagrams for a chosen aircraft.</td>
+              <td class="assess">Assignment 3 Issued</td>
+            </tr>
+            <tr>
+              <td class="wk">12</td>
+              <td class="topic">Modern Actuation &amp; Flight Envelopes</td>
+              <td class="theory">Fly-by-wire (FBW), artificial stability augmentation (SAS) and flight envelope protection. Sidestick vs yoke.</td>
+              <td class="practical">Analysing block diagrams of active control loops and automated trim systems. Airbus vs Boeing envelope philosophies.</td>
+              <td class="assess">Assignment 3 · Final Review</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ── Assessment summary ────────────────────────── -->
-  <section>
-    <h2 class="section-title">Assessment Structure</h2>
+<!-- ── Worksheets library ────────────────────── -->
+<section class="section" id="worksheets">
+  <div class="container">
+    <div class="section-head">
+      <h2>Worksheet Library</h2>
+      <span class="hint">7 interactive slideshows · Bronze → Gold</span>
+    </div>
+    <p class="section-lead">Every CP0704 worksheet is an interactive slide deck — concept, equipment, procedure, analysis, data tables and wrap-up. Use ← → keys to navigate.</p>
+
+    <div class="lib-grid">
+      <a class="lib-card" href="worksheets/w1-pitot-static.html">
+        <div class="thumb thumb-grad-bronze">
+          <div class="thumb-icon">WS1</div>
+        </div>
+        <div class="body">
+          <div class="top-row">
+            <span class="unit">Worksheet 01 · Week 3</span>
+            <span class="tier bronze">Bronze</span>
+          </div>
+          <h3>Pitot-static tube</h3>
+          <p class="desc">Bernoulli's theorem applied. Read air speed with a U-tube manometer and the digital pressure sensor, then calculate Reynolds number.</p>
+          <span class="cta">Open worksheet
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="worksheets/w2-cylinder.html">
+        <div class="thumb thumb-grad-silver">
+          <div class="thumb-icon">WS2</div>
+        </div>
+        <div class="body">
+          <div class="top-row">
+            <span class="unit">Worksheet 02 · Week 7</span>
+            <span class="tier silver">Silver</span>
+          </div>
+          <h3>Flow around a cylinder</h3>
+          <p class="desc">Map pressure around a bluff body. Compute the pressure coefficient C<sub>p</sub>, plot the distribution and connect to Reynolds-number scaling.</p>
+          <span class="cta">Open worksheet
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="worksheets/w3-aerofoil-pressure.html">
+        <div class="thumb thumb-grad-silver">
+          <div class="thumb-icon">WS3</div>
+        </div>
+        <div class="body">
+          <div class="top-row">
+            <span class="unit">Worksheet 03 · Week 5</span>
+            <span class="tier silver">Silver</span>
+          </div>
+          <h3>Aerofoil pressure mapping</h3>
+          <p class="desc">Twenty-three tappings around a NACA 0015 aerofoil. Plot C<sub>p</sub>-vs-chord for the upper and lower surfaces at 0°, 5° and 12° angle of attack.</p>
+          <span class="cta">Open worksheet
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="worksheets/w4-lift-drag.html">
+        <div class="thumb thumb-grad-gold">
+          <div class="thumb-icon">WS4</div>
+        </div>
+        <div class="body">
+          <div class="top-row">
+            <span class="unit">Worksheet 04 · Week 5</span>
+            <span class="tier gold">Gold</span>
+          </div>
+          <h3>Lift &amp; drag on an aerofoil</h3>
+          <p class="desc">Two-force module across three aerofoils — NACA 0015, S1223 and NACA 4415. Sweep α from −25° to +45° at three fan speeds.</p>
+          <span class="cta">Open worksheet
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="worksheets/w5-drag-coefficient.html">
+        <div class="thumb thumb-grad-silver">
+          <div class="thumb-icon">WS5</div>
+        </div>
+        <div class="body">
+          <div class="top-row">
+            <span class="unit">Worksheet 05 · Week 6</span>
+            <span class="tier silver">Silver</span>
+          </div>
+          <h3>Drag coefficient</h3>
+          <p class="desc">C<sub>d</sub> on six reference shapes — cone, smooth sphere, half sphere, rough sphere, flat surface and teardrop. Compare to published values.</p>
+          <span class="cta">Open worksheet
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="worksheets/w6-streamlined.html">
+        <div class="thumb thumb-grad-bronze">
+          <div class="thumb-icon">WS6</div>
+        </div>
+        <div class="body">
+          <div class="top-row">
+            <span class="unit">Worksheet 06 · Week 4</span>
+            <span class="tier bronze">Bronze</span>
+          </div>
+          <h3>Streamlined?</h3>
+          <p class="desc">Smoke generator + phone camera. Capture stills and slow-motion video of flow patterns and identify laminar, transitional and turbulent regions.</p>
+          <span class="cta">Open worksheet
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="worksheets/w7-where-next.html">
+        <div class="thumb thumb-grad-gold">
+          <div class="thumb-icon">WS7</div>
+        </div>
+        <div class="body">
+          <div class="top-row">
+            <span class="unit">Worksheet 07 · Week 10</span>
+            <span class="tier gold">Gold</span>
+          </div>
+          <h3>Where next? — Independent investigation</h3>
+          <p class="desc">Learner-led project: design and 3D-print a test article, pick a procedure (pressure / force / smoke) and run a full investigation.</p>
+          <span class="cta">Open worksheet
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Videos library ────────────────────── -->
+<section class="section" id="videos">
+  <div class="container">
+    <div class="section-head">
+      <h2>Tutorial Video Library</h2>
+      <span class="hint">7 Matrix tutorials</span>
+    </div>
+    <p class="section-lead">Short equipment-focused videos placed at the moment each procedure is first needed in the schedule.</p>
+
+    <div class="lib-grid">
+      <a class="lib-card" href="videos/v7-assembly.html">
+        <div class="thumb thumb-grad-orange"><div class="thumb-icon">▶ 01</div></div>
+        <div class="body">
+          <div class="top-row"><span class="unit">Video 01 · Week 2</span><span class="tier video">Video</span></div>
+          <h3>Wind Tunnel 125 — Assembly</h3>
+          <p class="desc">First-build walkthrough — what comes in the box and how the parts fit together.</p>
+          <span class="cta">Watch video <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="videos/v3-setup.html">
+        <div class="thumb thumb-grad-orange"><div class="thumb-icon">▶ 02</div></div>
+        <div class="body">
+          <div class="top-row"><span class="unit">Video 02 · Week 2</span><span class="tier video">Video</span></div>
+          <h3>How to set up the wind tunnel</h3>
+          <p class="desc">Powering on, the touch-screen controller and the default operating state.</p>
+          <span class="cta">Watch video <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="videos/v5-attaching-experiments.html">
+        <div class="thumb thumb-grad-orange"><div class="thumb-icon">▶ 03</div></div>
+        <div class="body">
+          <div class="top-row"><span class="unit">Video 03 · Week 4</span><span class="tier video">Video</span></div>
+          <h3>How experiments are attached</h3>
+          <p class="desc">Fitting the holders — pitot tube, cylinder, aerofoil and two-force module — into the test section.</p>
+          <span class="cta">Watch video <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="videos/v1-readings.html">
+        <div class="thumb thumb-grad-orange"><div class="thumb-icon">▶ 04</div></div>
+        <div class="body">
+          <div class="top-row"><span class="unit">Video 04 · Week 3</span><span class="tier video">Video</span></div>
+          <h3>Manual &amp; electronic readings</h3>
+          <p class="desc">U-tube manometer and digital pressure sensor — both reading methods explained side by side.</p>
+          <span class="cta">Watch video <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="videos/v6-software.html">
+        <div class="thumb thumb-grad-orange"><div class="thumb-icon">▶ 05</div></div>
+        <div class="body">
+          <div class="top-row"><span class="unit">Video 05 · Week 5</span><span class="tier video">Video</span></div>
+          <h3>Wind tunnel software</h3>
+          <p class="desc">Data acquisition, logging and the on-controller display — when learners have many readings to capture.</p>
+          <span class="cta">Watch video <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="videos/v4-smoke-visualisation.html">
+        <div class="thumb thumb-grad-orange"><div class="thumb-icon">▶ 06</div></div>
+        <div class="body">
+          <div class="top-row"><span class="unit">Video 06 · Week 4</span><span class="tier video">Video</span></div>
+          <h3>Smoke visualisation</h3>
+          <p class="desc">Generating clean streamlines and capturing slow-motion footage of the flow patterns.</p>
+          <span class="cta">Watch video <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="lib-card" href="videos/v2-experiments-available.html">
+        <div class="thumb thumb-grad-orange"><div class="thumb-icon">▶ 07</div></div>
+        <div class="body">
+          <div class="top-row"><span class="unit">Video 07 · Week 7</span><span class="tier video">Video</span></div>
+          <h3>Available experiments</h3>
+          <p class="desc">An overview of the seven CP0704 investigations and the broader space of open-ended studies the kit supports.</p>
+          <span class="cta">Watch video <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Assessment structure ────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Assessment Structure</h2>
+      <span class="hint">3 assignments · aligned to A / B / C</span>
+    </div>
     <p class="section-lead">Three summative assignments aligned to the three Learning Aims, scaffolded by weekly formative milestones and a final review.</p>
-    <div class="schedule-wrap" style="overflow:visible">
-      <table class="schedule" style="min-width:0">
-        <thead>
-          <tr>
-            <th>Assignment</th>
-            <th>Learning Aim</th>
-            <th>Issued / Due</th>
-            <th>Deliverable</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="wk">A1</td>
-            <td class="topic">Fluid Fundamentals</td>
-            <td class="practical">Issued Wk 4 · Due Wk 6</td>
-            <td class="theory">Lab report on pitot-static + smoke visualisation results, with Bernoulli analysis and boundary-layer commentary.</td>
-          </tr>
-          <tr>
-            <td class="wk">A2</td>
-            <td class="topic">Lift, Drag &amp; Testing</td>
-            <td class="practical">Issued Wk 8 · Due Wk 10</td>
-            <td class="theory">Comparative aerofoil and drag-coefficient report; lift / drag polars across three aerofoils plus Reynolds-number commentary.</td>
-          </tr>
-          <tr>
-            <td class="wk">A3</td>
-            <td class="topic">Stability &amp; Performance</td>
-            <td class="practical">Issued Wk 11 · Due Wk 12</td>
-            <td class="theory">Stability case study with V-n diagram for a chosen aircraft and a written analysis of an FBW envelope-protection scheme.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
 
-  <!-- ── Wind tunnel resources ────────────────────────── -->
-  <section>
-    <h2 class="section-title">Wind Tunnel Resource Library</h2>
-    <p class="section-lead">All worksheets are interactive slideshows; all videos are embedded for in-class playback.</p>
-    <h3 id="worksheets" style="margin:1.2rem 0 0.6rem; font-size:1rem; color:var(--cyan); font-family:'JetBrains Mono',monospace; letter-spacing:0.14em; text-transform:uppercase">CP0704 Worksheets</h3>
-    <div class="lib">
-      <a class="lib-card" href="worksheets/w1-pitot-static.html"><span class="icon">WS1</span><div><p class="name">Pitot-static tube</p><p class="desc">Bernoulli, manometer + digital sensor readings, Reynolds number.</p></div></a>
-      <a class="lib-card" href="worksheets/w2-cylinder.html"><span class="icon">WS2</span><div><p class="name">Flow patterns around a cylinder</p><p class="desc">Pressure coefficient C<sub>p</sub>, angle of attack sweep, pressure distribution diagrams.</p></div></a>
-      <a class="lib-card" href="worksheets/w3-aerofoil-pressure.html"><span class="icon">WS3</span><div><p class="name">Flow around an aerofoil</p><p class="desc">23-tapping pressure mapping on NACA0015; top vs lower surface C<sub>p</sub>-vs-x.</p></div></a>
-      <a class="lib-card" href="worksheets/w4-lift-drag.html"><span class="icon">WS4</span><div><p class="name">Lift &amp; drag on an aerofoil</p><p class="desc">Two-force module across three aerofoils (NACA0015, S1223, NACA4415).</p></div></a>
-      <a class="lib-card" href="worksheets/w5-drag-coefficient.html"><span class="icon">WS5</span><div><p class="name">Drag coefficient</p><p class="desc">C<sub>d</sub> for cones, spheres, half-spheres, rough spheres, flat surface, teardrop.</p></div></a>
-      <a class="lib-card" href="worksheets/w6-streamlined.html"><span class="icon">WS6</span><div><p class="name">Streamlined?</p><p class="desc">Smoke-line flow visualisation with stills + slow-motion video capture.</p></div></a>
-      <a class="lib-card" href="worksheets/w7-where-next.html"><span class="icon">WS7</span><div><p class="name">Where next? (Independent investigation)</p><p class="desc">Learner-led project: car body, hull, turbine or high-lift device design.</p></div></a>
-    </div>
+    <table class="assess-table">
+      <thead>
+        <tr>
+          <th>Assignment</th>
+          <th>Learning Aim</th>
+          <th>Issued · Due</th>
+          <th>Deliverable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="a-code">A1</td>
+          <td>Fluid Fundamentals</td>
+          <td>Issued Wk 4 · Due Wk 6</td>
+          <td>Lab report on pitot-static + smoke visualisation, with Bernoulli analysis and boundary-layer commentary.</td>
+        </tr>
+        <tr>
+          <td class="a-code">A2</td>
+          <td>Lift, Drag &amp; Testing</td>
+          <td>Issued Wk 8 · Due Wk 10</td>
+          <td>Comparative aerofoil and drag-coefficient report; lift / drag polars across three aerofoils plus Reynolds-number commentary.</td>
+        </tr>
+        <tr>
+          <td class="a-code">A3</td>
+          <td>Stability &amp; Performance</td>
+          <td>Issued Wk 11 · Due Wk 12</td>
+          <td>Stability case study with V-n diagram for a chosen aircraft and a written analysis of an FBW envelope-protection scheme.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 
-    <h3 id="videos" style="margin:1.6rem 0 0.6rem; font-size:1rem; color:var(--cyan); font-family:'JetBrains Mono',monospace; letter-spacing:0.14em; text-transform:uppercase">Matrix Tutorial Videos</h3>
-    <div class="lib">
-      <a class="lib-card" href="videos/v7-assembly.html"><span class="icon">V1</span><div><p class="name">Wind Tunnel 125 — Assembly</p><p class="desc">First-build walkthrough — what comes in the box and how it fits together.</p></div></a>
-      <a class="lib-card" href="videos/v3-setup.html"><span class="icon">V2</span><div><p class="name">How to set up the wind tunnel</p><p class="desc">Powering on, the touch-screen controller and the default operating state.</p></div></a>
-      <a class="lib-card" href="videos/v5-attaching-experiments.html"><span class="icon">V3</span><div><p class="name">How experiments are attached</p><p class="desc">Fitting the holders into the test section — pitot, cylinder, aerofoil, two-force.</p></div></a>
-      <a class="lib-card" href="videos/v1-readings.html"><span class="icon">V4</span><div><p class="name">Manual &amp; electronic readings</p><p class="desc">U-tube manometer and digital pressure sensor — both reading methods explained.</p></div></a>
-      <a class="lib-card" href="videos/v6-software.html"><span class="icon">V5</span><div><p class="name">Wind tunnel software</p><p class="desc">Data acquisition, logging and the on-controller display.</p></div></a>
-      <a class="lib-card" href="videos/v4-smoke-visualisation.html"><span class="icon">V6</span><div><p class="name">Smoke visualisation</p><p class="desc">Generating clean streamlines and capturing slow-motion flow patterns.</p></div></a>
-      <a class="lib-card" href="videos/v2-experiments-available.html"><span class="icon">V7</span><div><p class="name">Available experiments</p><p class="desc">An overview of the seven experiments the wind tunnel kit supports.</p></div></a>
+<!-- ── Source documents ────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Source Documents</h2>
+      <span class="hint">Originals · PDF</span>
     </div>
-
-    <h3 style="margin:1.6rem 0 0.6rem; font-size:1rem; color:var(--cyan); font-family:'JetBrains Mono',monospace; letter-spacing:0.14em; text-transform:uppercase">Source documents</h3>
-    <div class="lib">
-      <a class="lib-card" href="Wind%20tunnel%20v4.pdf" target="_blank"><span class="icon">PDF</span><div><p class="name">Wind Tunnel User Manual (v4)</p><p class="desc">The full manufacturer manual — slideshow pages link to the relevant sections.</p></div></a>
-      <a class="lib-card" href="CP0704%20-%20Aerodynamics.pdf" target="_blank"><span class="icon">PDF</span><div><p class="name">CP0704 Student Worksheets</p><p class="desc">The original printable worksheet pack covering all seven investigations.</p></div></a>
-      <a class="lib-card" href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank"><span class="icon">PDF</span><div><p class="name">CP0704T Teacher Guide</p><p class="desc">Model answers, expected results and delivery notes for the seven worksheets.</p></div></a>
+    <div class="related">
+      <a class="related-card" href="Wind%20tunnel%20v4.pdf" target="_blank">
+        <span class="ic">PDF</span>
+        <div>
+          <p class="name">Wind Tunnel User Manual (v4)</p>
+          <p class="desc">The full manufacturer manual — slideshow pages link to the relevant sections.</p>
+        </div>
+      </a>
+      <a class="related-card" href="CP0704%20-%20Aerodynamics.pdf" target="_blank">
+        <span class="ic">PDF</span>
+        <div>
+          <p class="name">CP0704 Student Worksheets</p>
+          <p class="desc">The original printable worksheet pack covering all seven investigations.</p>
+        </div>
+      </a>
+      <a class="related-card" href="CP0704T%20-%20Aerodynamics%20-%20Teacher%20Guide.pdf" target="_blank">
+        <span class="ic">PDF</span>
+        <div>
+          <p class="name">CP0704T Teacher Guide</p>
+          <p class="desc">Model answers, expected results and delivery notes for the seven worksheets.</p>
+        </div>
+      </a>
     </div>
-  </section>
-
-</main>
+  </div>
+</section>
 
 <footer class="page-foot">
   <div>BTEC L3 Aerodynamics &amp; Flight Principles · Scheme of Work · Matrix TSL</div>
-  <div class="signature">v1.0 · 60 GLH</div>
+  <div class="signature">v1.1 · 60 GLH</div>
 </footer>
 
 </body>
