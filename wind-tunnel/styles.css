@@ -1017,6 +1017,236 @@ table.schedule a:hover { color: var(--accent-2); }
   letter-spacing: 0.1em;
 }
 
+/* ──────────────────────────────────────────────────────
+   FULLSCREEN DECK MODE
+   When body has .deck-fullscreen, the whole slideshow fills
+   the viewport. Header / ticker / controls stay visible;
+   each active slide fills the remaining space and scrolls
+   internally if its content is taller than the viewport.
+   No page-level scrollbar appears.
+   ────────────────────────────────────────────────────── */
+html { height: 100%; }
+
+body.deck-fullscreen {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body.deck-fullscreen .site-header,
+body.deck-fullscreen .ticker {
+  flex-shrink: 0;
+}
+
+body.deck-fullscreen main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+body.deck-fullscreen .deck {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 24px 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+body.deck-fullscreen .slide {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  padding: clamp(20px, 3vh, 32px) clamp(20px, 3vw, 36px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+body.deck-fullscreen .slide.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom subtle scrollbar inside slides */
+body.deck-fullscreen .slide::-webkit-scrollbar { width: 8px; }
+body.deck-fullscreen .slide::-webkit-scrollbar-track { background: transparent; }
+body.deck-fullscreen .slide::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.10);
+  border-radius: 4px;
+}
+body.deck-fullscreen .slide::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+body.deck-fullscreen .slide .slide-head {
+  margin-bottom: clamp(10px, 1.6vh, 18px);
+  padding-bottom: clamp(8px, 1.2vh, 14px);
+  flex-shrink: 0;
+}
+
+body.deck-fullscreen .slide h2 {
+  font-size: clamp(22px, 3vh, 32px);
+  margin: 0 0 clamp(8px, 1.2vh, 14px);
+}
+body.deck-fullscreen .slide h3 {
+  font-size: clamp(14px, 1.7vh, 16px);
+  margin: clamp(12px, 1.8vh, 18px) 0 clamp(4px, 0.6vh, 8px);
+}
+body.deck-fullscreen .slide p,
+body.deck-fullscreen .slide li {
+  font-size: clamp(13.5px, 1.6vh, 15.5px);
+  line-height: 1.55;
+}
+body.deck-fullscreen .slide p { margin: 0 0 clamp(8px, 1.2vh, 12px); }
+body.deck-fullscreen .slide ul,
+body.deck-fullscreen .slide ol { margin: 0 0 clamp(10px, 1.4vh, 14px); }
+body.deck-fullscreen .slide li { margin-bottom: clamp(2px, 0.4vh, 5px); }
+
+body.deck-fullscreen .slide .callout {
+  padding: clamp(8px, 1.2vh, 12px) clamp(12px, 1.6vw, 16px);
+  margin: clamp(8px, 1vh, 12px) 0;
+}
+body.deck-fullscreen .slide .formula {
+  padding: clamp(8px, 1.2vh, 12px) clamp(12px, 1.6vw, 16px);
+  margin: clamp(8px, 1vh, 12px) 0;
+  font-size: clamp(14px, 1.8vh, 16px);
+}
+body.deck-fullscreen .slide .formula .where {
+  font-size: clamp(11px, 1.3vh, 13px);
+}
+
+body.deck-fullscreen .slide table.kv-table,
+body.deck-fullscreen .slide table.assess-table,
+body.deck-fullscreen .slide table.schedule {
+  font-size: clamp(11.5px, 1.4vh, 13.5px);
+}
+body.deck-fullscreen .slide table.kv-table th,
+body.deck-fullscreen .slide table.kv-table td,
+body.deck-fullscreen .slide table.assess-table th,
+body.deck-fullscreen .slide table.assess-table td {
+  padding: clamp(5px, 0.8vh, 9px) clamp(8px, 1vw, 12px);
+}
+body.deck-fullscreen .slide table.schedule th,
+body.deck-fullscreen .slide table.schedule td {
+  padding: clamp(7px, 1vh, 12px) clamp(8px, 1vw, 14px);
+}
+
+body.deck-fullscreen .slide .schedule-wrap {
+  max-height: 60vh;
+  overflow: hidden;
+}
+body.deck-fullscreen .slide .schedule-scroll {
+  max-height: 58vh;
+  overflow: auto;
+}
+
+body.deck-fullscreen .slide .lib-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+body.deck-fullscreen .slide .lib-card .thumb {
+  aspect-ratio: 16 / 8;
+}
+body.deck-fullscreen .slide .lib-card .body {
+  padding: 12px 14px 14px;
+}
+body.deck-fullscreen .slide .lib-card h3 {
+  font-size: 15px;
+  margin: 4px 0 4px;
+}
+body.deck-fullscreen .slide .lib-card .desc {
+  font-size: 12.5px;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+body.deck-fullscreen .slide .stats-row {
+  padding: 12px 0 4px;
+}
+body.deck-fullscreen .slide .stat-n {
+  font-size: clamp(20px, 2.8vh, 28px);
+}
+
+body.deck-fullscreen .slide .video-wrap {
+  max-height: 45vh;
+  margin: 4px auto 12px;
+}
+body.deck-fullscreen .slide .video-wrap iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+
+body.deck-fullscreen .slide .takeaways {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+body.deck-fullscreen .slide .takeaway {
+  padding: 10px 12px;
+}
+
+body.deck-fullscreen .slide .aims-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+body.deck-fullscreen .slide .aim {
+  padding: 14px 16px;
+}
+body.deck-fullscreen .slide .related {
+  gap: 10px;
+}
+
+/* Deck controls + pills - keep fixed at bottom */
+body.deck-fullscreen .deck-foot {
+  flex-shrink: 0;
+  padding: 8px 24px 14px;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+body.deck-fullscreen .deck-controls {
+  margin-top: 0;
+}
+body.deck-fullscreen .deck-dots {
+  margin-top: 8px;
+  max-height: 64px;
+  overflow-y: auto;
+}
+body.deck-fullscreen .deck-dots::-webkit-scrollbar { height: 4px; }
+body.deck-fullscreen .deck-dots::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Hide page footer in fullscreen mode (controls take that role) */
+body.deck-fullscreen .page-foot { display: none; }
+
+/* Small screens — give more breathing room */
+@media (max-width: 720px) {
+  body.deck-fullscreen .deck { padding: 8px 14px 4px; }
+  body.deck-fullscreen .slide { padding: 18px 16px; }
+  body.deck-fullscreen main > div:last-of-type { padding: 8px 14px 12px; }
+}
+
+/* Short viewports — compact further */
+@media (max-height: 700px) {
+  body.deck-fullscreen .ticker { display: none; }
+  body.deck-fullscreen .slide-head { margin-bottom: 8px; padding-bottom: 6px; }
+}
+@media (max-height: 560px) {
+  body.deck-fullscreen .site-header { height: 56px; }
+  body.deck-fullscreen .site-header .header-inner { height: 56px; }
+  body.deck-fullscreen .deck-dots { display: none; }
+}
+
 /* ── Print ─────────────────────── */
 @media print {
   body {
