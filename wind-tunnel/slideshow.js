@@ -20,7 +20,6 @@
 
   if (dotsContainer) {
     if (useSectionNav) {
-      // Build one pill per unique section
       const sections = [];
       slides.forEach((s, i) => {
         const name = s.dataset.section || "Slides";
@@ -31,7 +30,7 @@
           last.end = i;
         }
       });
-      sections.forEach((sec, idx) => {
+      sections.forEach((sec) => {
         const pill = document.createElement("button");
         pill.className = "deck-section-pill";
         pill.type = "button";
@@ -57,9 +56,27 @@
   let current = 0;
 
   function activate(slide) {
-    // Lazy-load iframes (video embeds) only when the slide is shown
+    // Lazy-load iframes (YouTube embeds etc.) only when the slide is shown.
+    // Use removeAttribute so we don't retry on subsequent visits.
     slide.querySelectorAll("iframe[data-src]").forEach((iframe) => {
-      if (!iframe.src) iframe.src = iframe.dataset.src;
+      const src = iframe.getAttribute("data-src");
+      if (src) {
+        iframe.setAttribute("src", src);
+        iframe.removeAttribute("data-src");
+      }
+    });
+  }
+
+  function updateDotsState() {
+    if (!dotsContainer) return;
+    Array.from(dotsContainer.children).forEach((d, i) => {
+      if (useSectionNav) {
+        const start = parseInt(d.dataset.start, 10);
+        const end = parseInt(d.dataset.end, 10);
+        d.classList.toggle("active", current >= start && current <= end);
+      } else {
+        d.classList.toggle("active", i === current);
+      }
     });
   }
 
@@ -73,21 +90,14 @@
     if (sectionLabel) sectionLabel.textContent = slides[current].dataset.section || "";
     if (prevBtn) prevBtn.disabled = current === 0;
     if (nextBtn) nextBtn.disabled = current === slides.length - 1;
-    if (dotsContainer) {
-      Array.from(dotsContainer.children).forEach((d) => {
-        if (useSectionNav) {
-          const start = parseInt(d.dataset.start, 10);
-          const end = parseInt(d.dataset.end, 10);
-          d.classList.toggle("active", current >= start && current <= end);
-        } else {
-          d.classList.toggle("active", parseInt(d.getAttribute("aria-label").match(/\d+/)[0], 10) - 1 === current);
-        }
-      });
-    }
+    updateDotsState();
     if (history.replaceState) {
       history.replaceState(null, "", "#slide-" + (current + 1));
     }
-    window.scrollTo({ top: deck.offsetTop - 80, behavior: "smooth" });
+    // Scroll deck into view (only matters when not in fullscreen mode)
+    if (!document.body.classList.contains("deck-fullscreen")) {
+      window.scrollTo({ top: deck.offsetTop - 80, behavior: "smooth" });
+    }
   }
 
   if (prevBtn) prevBtn.addEventListener("click", () => go(current - 1));
@@ -101,9 +111,20 @@
     if (e.key === "End")  { e.preventDefault(); go(slides.length - 1); }
   });
 
-  // Open on a specific slide via #slide-N
-  const hash = window.location.hash.match(/^#slide-(\d+)$/);
-  const initial = hash ? Math.min(Math.max(parseInt(hash[1], 10) - 1, 0), slides.length - 1) : 0;
+  // Listen for hash changes so in-page #slide-N links jump the deck.
+  function slideFromHash() {
+    const m = window.location.hash.match(/^#slide-(\d+)$/);
+    if (!m) return null;
+    return Math.min(Math.max(parseInt(m[1], 10) - 1, 0), slides.length - 1);
+  }
+
+  window.addEventListener("hashchange", () => {
+    const idx = slideFromHash();
+    if (idx !== null && idx !== current) go(idx);
+  });
+
+  // Initial state
+  const initial = slideFromHash() ?? 0;
   slides.forEach(s => s.classList.remove("active"));
   current = initial;
   slides[current].classList.add("active");
@@ -112,15 +133,5 @@
   if (sectionLabel) sectionLabel.textContent = slides[current].dataset.section || "";
   if (prevBtn) prevBtn.disabled = current === 0;
   if (nextBtn) nextBtn.disabled = current === slides.length - 1;
-  if (dotsContainer) {
-    Array.from(dotsContainer.children).forEach((d) => {
-      if (useSectionNav) {
-        const start = parseInt(d.dataset.start, 10);
-        const end = parseInt(d.dataset.end, 10);
-        d.classList.toggle("active", current >= start && current <= end);
-      } else {
-        d.classList.toggle("active", parseInt(d.getAttribute("aria-label").match(/\d+/)[0], 10) - 1 === current);
-      }
-    });
-  }
+  updateDotsState();
 })();

@@ -419,6 +419,8 @@ table.schedule a:hover { color: var(--accent-2); }
 .lib-card .thumb {
   aspect-ratio: 16 / 10;
   background: linear-gradient(135deg, #0a1226 0%, #16213d 100%);
+  background-size: cover;
+  background-position: center;
   position: relative;
   border-bottom: 1px solid var(--border-soft);
   overflow: hidden;
@@ -435,6 +437,36 @@ table.schedule a:hover { color: var(--accent-2); }
   color: var(--accent);
   opacity: 0.55;
 }
+.lib-card .thumb-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(8,12,21,0.15) 0%, rgba(8,12,21,0.55) 100%);
+  transition: background 0.2s;
+}
+.lib-card .thumb-play::before {
+  content: "";
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,107,31,0.92);
+  display: block;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  transition: transform 0.2s, background 0.2s;
+}
+.lib-card .thumb-play::after {
+  content: "";
+  position: absolute;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 9px 0 9px 15px;
+  border-color: transparent transparent transparent #fff;
+  margin-left: 4px;
+}
+.lib-card:hover .thumb-play { background: linear-gradient(180deg, rgba(8,12,21,0.05) 0%, rgba(8,12,21,0.30) 100%); }
+.lib-card:hover .thumb-play::before { transform: scale(1.08); background: var(--accent); }
 .lib-card .thumb-grad-bronze { background: linear-gradient(135deg, #2a1a08 0%, #4a3520 100%); }
 .lib-card .thumb-grad-silver { background: linear-gradient(135deg, #1a2030 0%, #3a4150 100%); }
 .lib-card .thumb-grad-gold   { background: linear-gradient(135deg, #2a2208 0%, #4a4020 100%); }
@@ -869,21 +901,20 @@ table.schedule a:hover { color: var(--accent-2); }
 /* ── Video page embed ─────────────────────── */
 .video-wrap {
   position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  margin: 8px 0 32px;
+  margin: 8px auto 32px;
   border: 1px solid var(--border);
   background: #000;
 }
 .video-wrap iframe {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
+  display: block;
 }
 
 .takeaways {
@@ -1180,12 +1211,12 @@ body.deck-fullscreen .slide .stat-n {
 }
 
 body.deck-fullscreen .slide .video-wrap {
-  max-height: 45vh;
+  /* Cap by viewport height; aspect-ratio derives width.
+     If the slide is wider than the height cap allows,
+     the wrapper just centres at its computed size. */
+  max-height: 50vh;
+  max-width: min(720px, 100%);
   margin: 4px auto 12px;
-}
-body.deck-fullscreen .slide .video-wrap iframe {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
 }
 
 body.deck-fullscreen .slide .takeaways {
@@ -1220,11 +1251,8 @@ body.deck-fullscreen .deck-controls {
 }
 body.deck-fullscreen .deck-dots {
   margin-top: 8px;
-  max-height: 64px;
-  overflow-y: auto;
+  /* Let the section-pill row size naturally and wrap. */
 }
-body.deck-fullscreen .deck-dots::-webkit-scrollbar { height: 4px; }
-body.deck-fullscreen .deck-dots::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 /* Hide page footer in fullscreen mode (controls take that role) */
 body.deck-fullscreen .page-foot { display: none; }
