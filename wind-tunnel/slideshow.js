@@ -6,36 +6,82 @@
   const prevBtn = document.querySelector("[data-prev]");
   const nextBtn = document.querySelector("[data-next]");
   const counter = document.querySelector("[data-counter]");
+  const sectionLabel = document.querySelector("[data-section-label]");
   const dotsContainer = document.querySelector(".deck-dots");
 
   if (!slides.length) return;
 
   slides.forEach((s, i) => s.dataset.idx = String(i));
 
+  // Hide dot indicators when there are too many slides (keep UI usable).
+  // For long decks we render section pills instead.
+  const MAX_DOTS = 20;
+  const useSectionNav = slides.length > MAX_DOTS;
+
   if (dotsContainer) {
-    slides.forEach((_, i) => {
-      const dot = document.createElement("button");
-      dot.className = "deck-dot";
-      dot.type = "button";
-      dot.setAttribute("aria-label", "Go to slide " + (i + 1));
-      dot.addEventListener("click", () => go(i));
-      dotsContainer.appendChild(dot);
-    });
+    if (useSectionNav) {
+      // Build one pill per unique section
+      const sections = [];
+      slides.forEach((s, i) => {
+        const name = s.dataset.section || "Slides";
+        const last = sections[sections.length - 1];
+        if (!last || last.name !== name) {
+          sections.push({ name, start: i, end: i });
+        } else {
+          last.end = i;
+        }
+      });
+      sections.forEach((sec, idx) => {
+        const pill = document.createElement("button");
+        pill.className = "deck-section-pill";
+        pill.type = "button";
+        pill.textContent = sec.name;
+        pill.dataset.start = String(sec.start);
+        pill.dataset.end = String(sec.end);
+        pill.addEventListener("click", () => go(sec.start));
+        dotsContainer.appendChild(pill);
+      });
+      dotsContainer.classList.add("deck-sections");
+    } else {
+      slides.forEach((_, i) => {
+        const dot = document.createElement("button");
+        dot.className = "deck-dot";
+        dot.type = "button";
+        dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+        dot.addEventListener("click", () => go(i));
+        dotsContainer.appendChild(dot);
+      });
+    }
   }
 
   let current = 0;
+
+  function activate(slide) {
+    // Lazy-load iframes (video embeds) only when the slide is shown
+    slide.querySelectorAll("iframe[data-src]").forEach((iframe) => {
+      if (!iframe.src) iframe.src = iframe.dataset.src;
+    });
+  }
 
   function go(idx) {
     if (idx < 0 || idx >= slides.length) return;
     slides[current].classList.remove("active");
     current = idx;
     slides[current].classList.add("active");
+    activate(slides[current]);
     if (counter) counter.textContent = (current + 1) + " / " + slides.length;
+    if (sectionLabel) sectionLabel.textContent = slides[current].dataset.section || "";
     if (prevBtn) prevBtn.disabled = current === 0;
     if (nextBtn) nextBtn.disabled = current === slides.length - 1;
     if (dotsContainer) {
-      Array.from(dotsContainer.children).forEach((d, i) => {
-        d.classList.toggle("active", i === current);
+      Array.from(dotsContainer.children).forEach((d) => {
+        if (useSectionNav) {
+          const start = parseInt(d.dataset.start, 10);
+          const end = parseInt(d.dataset.end, 10);
+          d.classList.toggle("active", current >= start && current <= end);
+        } else {
+          d.classList.toggle("active", parseInt(d.getAttribute("aria-label").match(/\d+/)[0], 10) - 1 === current);
+        }
       });
     }
     if (history.replaceState) {
@@ -61,12 +107,20 @@
   slides.forEach(s => s.classList.remove("active"));
   current = initial;
   slides[current].classList.add("active");
+  activate(slides[current]);
   if (counter) counter.textContent = (current + 1) + " / " + slides.length;
+  if (sectionLabel) sectionLabel.textContent = slides[current].dataset.section || "";
   if (prevBtn) prevBtn.disabled = current === 0;
   if (nextBtn) nextBtn.disabled = current === slides.length - 1;
   if (dotsContainer) {
-    Array.from(dotsContainer.children).forEach((d, i) => {
-      d.classList.toggle("active", i === current);
+    Array.from(dotsContainer.children).forEach((d) => {
+      if (useSectionNav) {
+        const start = parseInt(d.dataset.start, 10);
+        const end = parseInt(d.dataset.end, 10);
+        d.classList.toggle("active", current >= start && current <= end);
+      } else {
+        d.classList.toggle("active", parseInt(d.getAttribute("aria-label").match(/\d+/)[0], 10) - 1 === current);
+      }
     });
   }
 })();

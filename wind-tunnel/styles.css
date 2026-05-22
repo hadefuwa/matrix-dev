@@ -772,6 +772,7 @@ table.schedule a:hover { color: var(--accent-2); }
   gap: 6px;
   justify-content: center;
   margin-top: 16px;
+  flex-wrap: wrap;
 }
 .deck-dot {
   width: 8px; height: 8px;
@@ -786,6 +787,83 @@ table.schedule a:hover { color: var(--accent-2); }
   background: var(--accent);
   border-color: var(--accent);
   box-shadow: 0 0 12px rgba(255,107,31,0.5);
+}
+.deck-sections {
+  gap: 8px;
+  margin-top: 18px;
+}
+.deck-section-pill {
+  appearance: none;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+}
+.deck-section-pill:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.deck-section-pill.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(255,107,31,0.3);
+}
+
+/* Section-label shown in deck controls (between buttons) */
+.deck-controls .section-label-current {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* Overview slides (wider content allowed on intro pages) */
+.slide.wide {
+  padding: 32px 28px;
+}
+.slide .lib-grid {
+  margin-top: 8px;
+}
+.slide table.schedule {
+  font-size: 13px;
+}
+.slide .schedule-wrap {
+  margin-top: 8px;
+}
+
+/* Inline video embed inside a slide */
+.slide .video-wrap {
+  margin: 4px 0 16px;
+  border-radius: 10px;
+}
+.slide .takeaways {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 8px 0 0;
+}
+.slide .takeaway {
+  padding: 12px 14px;
+}
+.slide .takeaway p {
+  font-size: 13px;
+}
+.slide .stats-row {
+  padding: 16px 0 8px;
+}
+.slide .aims-grid {
+  margin-top: 8px;
 }
 
 /* ── Video page embed ─────────────────────── */
