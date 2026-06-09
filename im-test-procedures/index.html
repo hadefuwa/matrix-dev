@@ -1197,6 +1197,23 @@ function validate() {
         setTimeout(() => banner.classList.remove('show'), 5000);
         return false;
     }
+    // All steps must have a result and a sign-off
+    const unsigned = Array.from(document.querySelectorAll(`.signoff-input[data-tab="${activeTab}"]`))
+        .filter(el => !el.value.trim());
+    const pending = Array.from(document.querySelectorAll(`.result-group[data-tab="${activeTab}"]`))
+        .filter(g => g.dataset.result === 'PENDING');
+    if (pending.length) {
+        banner.textContent = `${pending.length} step${pending.length > 1 ? 's' : ''} still need a Pass / Fail / N/A result`;
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 5000);
+        return false;
+    }
+    if (unsigned.length) {
+        banner.textContent = `${unsigned.length} step${unsigned.length > 1 ? 's' : ''} missing a sign-off`;
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 5000);
+        return false;
+    }
     banner.classList.remove('show');
     return true;
 }
