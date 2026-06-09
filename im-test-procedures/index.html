@@ -940,9 +940,7 @@ let activeTab = 'im0004';
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    currentReportId = nextReportId(activeTab);
-    document.getElementById('reportId').value = currentReportId;
-    document.getElementById('display-report-id').textContent = currentReportId;
+    refreshReportId();
 
     const today = new Date().toISOString().slice(0, 10);
     document.getElementById('reportDate').value = today;
@@ -951,25 +949,28 @@ document.addEventListener('DOMContentLoaded', () => {
     TABS.forEach(buildPanel);
     updateOverall();
 
-    // required-fields banner
+    // required-fields banner + live report ID update from serial number
     ['operator','product','serialNumber'].forEach(id => {
         document.getElementById(id).addEventListener('input', () => {
             document.getElementById(id).classList.remove('error');
             checkRequiredFields();
+            if (id === 'serialNumber') refreshReportId();
         });
     });
     checkRequiredFields();
 });
 
-function formatReportId(tab, n) {
+function buildReportId(tab, serial) {
     const code = PROCEDURES[tab].code.replace('IM', '');
-    return 'IM-' + code + '-' + String(n).padStart(4, '0');
+    const sn   = (serial || '').trim().replace(/[^\w-]/g, '') || '----';
+    return 'IM-' + code + '-' + sn;
 }
 
-function nextReportId(tab) {
-    const n = parseInt(localStorage.getItem('im_seq') || '0') + 1;
-    localStorage.setItem('im_seq', n);
-    return formatReportId(tab, n);
+function refreshReportId() {
+    const serial = document.getElementById('serialNumber').value;
+    currentReportId = buildReportId(activeTab, serial);
+    document.getElementById('reportId').value = currentReportId;
+    document.getElementById('display-report-id').textContent = currentReportId;
 }
 
 // ── BUILD PANEL ───────────────────────────────────────────────────────────────
@@ -1051,11 +1052,7 @@ function switchTab(tab, btn) {
     document.getElementById(`panel-${tab}`).classList.add('active');
     btn.classList.add('active');
     activeTab = tab;
-    // Reformat report ID to reflect the active product code
-    const seqN = parseInt(localStorage.getItem('im_seq') || '1');
-    currentReportId = formatReportId(tab, seqN);
-    document.getElementById('reportId').value = currentReportId;
-    document.getElementById('display-report-id').textContent = currentReportId;
+    refreshReportId();
     updateOverall();
 }
 
@@ -1254,9 +1251,7 @@ function clearForm() {
     document.querySelectorAll('.comments-cell-input').forEach(el => el.value = '');
     document.querySelectorAll('.signoff-input').forEach(el => el.value = '');
 
-    currentReportId = nextReportId(activeTab);
-    document.getElementById('reportId').value = currentReportId;
-    document.getElementById('display-report-id').textContent = currentReportId;
+    refreshReportId();
 
     const today = new Date().toISOString().slice(0, 10);
     document.getElementById('reportDate').value = today;
