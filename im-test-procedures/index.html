@@ -1072,6 +1072,14 @@ function onResultBtn(btn, tab) {
         group.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         group.dataset.result = btn.dataset.value;
+        // Auto sign-off on Pass or Fail
+        if (btn.dataset.value === 'PASS' || btn.dataset.value === 'FAIL') {
+            const sig = document.querySelector(`.signoff-input[data-tab="${tab}"][data-step="${group.dataset.step}"]`);
+            if (sig && !sig.value) {
+                const name = document.getElementById('operator').value.trim();
+                if (name) sig.value = name.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 4);
+            }
+        }
     }
     updateSection(tab, group.dataset.section);
     updateChip(tab);
