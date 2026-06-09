@@ -85,6 +85,16 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 405, { error: "Method not allowed" });
     }
 
+    if (pathname === "/api/reports/submit") {
+      if (req.method === "POST") return handleReportSubmit(req, res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+
+    if (pathname === "/api/reports/export") {
+      if (req.method === "GET") return handleReportsExport(res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+
     if (pathname.startsWith("/api/")) {
       const key = pathname.replace("/api/", "");
       if (key.endsWith(".csv")) {
@@ -203,6 +213,66 @@ async function handlePutCsv(req, res, key) {
   } catch (error) {
     return sendJson(res, 500, { error: `Could not write ${JSON_FILES[key]}` });
   }
+}
+
+const REPORTS_FILE = path.join(DATA_DIR, "reports.json");
+
+async function handleReportSubmit(req, res) {
+  let body;
+  try {
+    body = await readJsonBody(req);
+  } catch (_) {
+    return sendJson(res, 400, { error: "Invalid JSON" });
+  }
+
+  const row = {
+    reportId:       String(body.reportId      || ""),
+    date:           String(body.date          || ""),
+    submittedAt:    new Date().toISOString(),
+    operator:       String(body.operator      || ""),
+    product:        String(body.product       || ""),
+    serialNumber:   String(body.serialNumber  || ""),
+    buildReference: String(body.buildReference|| ""),
+    procedure:      String(body.procedure     || ""),
+    overallResult:  String(body.overallResult || ""),
+    totalSteps:     Number(body.totalSteps    || 0),
+    stepsPassed:    Number(body.stepsPassed   || 0),
+    stepsFailed:    Number(body.stepsFailed   || 0),
+    comments:       String(body.comments      || ""),
+  };
+
+  let reports = [];
+  try {
+    reports = JSON.parse(await fs.readFile(REPORTS_FILE, "utf8"));
+  } catch (_) {}
+
+  reports.push(row);
+  await fs.writeFile(REPORTS_FILE, JSON.stringify(reports, null, 2));
+  return sendJson(res, 200, { ok: true, reportId: row.reportId });
+}
+
+async function handleReportsExport(res) {
+  let reports = [];
+  try {
+    reports = JSON.parse(await fs.readFile(REPORTS_FILE, "utf8"));
+  } catch (_) {}
+
+  const cols = ["reportId","date","submittedAt","operator","product","serialNumber","buildReference","procedure","overallResult","totalSteps","stepsPassed","stepsFailed","comments"];
+  const headers = ["Report ID","Date","Submitted At","Operator","Product","Serial Number","Build Reference","Procedure","Overall Result","Total Steps","Steps Passed","Steps Failed","Comments"];
+
+  const escape = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+  const lines = [
+    headers.map(escape).join(","),
+    ...reports.map(r => cols.map(c => escape(r[c])).join(","))
+  ];
+
+  res.writeHead(200, {
+    "Content-Type": "text/csv; charset=utf-8",
+    "Content-Disposition": 'attachment; filename="im-test-reports.csv"',
+    "Cache-Control": "no-cache",
+    "Access-Control-Allow-Origin": "*",
+  });
+  res.end(lines.join("\r\n"));
 }
 
 async function handleImageUpload(req, res) {

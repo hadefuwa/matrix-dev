@@ -664,9 +664,13 @@
             New Report
         </button>
         <div class="btn-spacer"></div>
-        <button class="btn btn-success" onclick="exportJSON()">
+        <button class="btn btn-ghost" onclick="exportJSON()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21,15v4a2,2 0 01-2,2H5a2,2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Export JSON
+            Download JSON
+        </button>
+        <button class="btn btn-success" id="submit-btn" onclick="submitReport()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5,12 12,5 19,12"/></svg>
+            Submit Report
         </button>
     </div>
 </div>
@@ -1281,6 +1285,50 @@ function exportJSON() {
 
     document.getElementById('display-status').textContent = 'EXPORTED';
     toast('success', 'Exported: ' + filename);
+}
+
+// ── SUBMIT REPORT ─────────────────────────────────────────────────────────────
+async function submitReport() {
+    if (!validate()) return;
+
+    const data = collectData();
+    const all        = Array.from(document.querySelectorAll(`.result-group[data-tab="${activeTab}"]`));
+    const totalSteps = all.length;
+    const stepsFailed = all.filter(g => g.dataset.result === 'FAIL').length;
+    const stepsPassed = all.filter(g => g.dataset.result === 'PASS' || g.dataset.result === 'N/A').length;
+
+    const payload = {
+        reportId:       data.reportId,
+        date:           data.date,
+        operator:       data.operator,
+        product:        data.product,
+        serialNumber:   data.serialNumber,
+        buildReference: data.buildReference,
+        procedure:      data.procedure,
+        overallResult:  data.overallResult,
+        totalSteps, stepsPassed, stepsFailed,
+        comments:       data.comments,
+    };
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = 'Submitting...';
+
+    try {
+        const res = await fetch('/api/reports/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error('Server error');
+        document.getElementById('display-status').textContent = 'SUBMITTED';
+        toast('success', 'Report submitted — ' + data.reportId);
+    } catch (e) {
+        toast('error', 'Submission failed — check your connection');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5,12 12,5 19,12"/></svg> Submit Report';
+    }
 }
 
 // ── AUTO SIGN-OFF ─────────────────────────────────────────────────────────────
