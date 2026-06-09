@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PI-308 Production Test Report</title>
+    <title>Industrial Maintenance Test</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -360,28 +360,32 @@
         }
         .signoff-input:focus { outline: none; border-color: var(--teal); }
 
-        .result-select {
-            border: 1.5px solid var(--border);
-            border-radius: 3px;
-            padding: 5px 24px 5px 8px;
+        .result-group { display: flex; flex-direction: column; gap: 4px; }
+        .result-btn-row { display: flex; gap: 4px; }
+        .result-btn {
             font-family: 'Barlow Condensed', sans-serif;
-            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 6px 6px;
+            border-radius: 3px;
+            border: 1.5px solid transparent;
             cursor: pointer;
-            background: white;
-            color: var(--muted);
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 7px center;
-            min-width: 95px;
             transition: all 0.15s;
+            flex: 1;
+            white-space: nowrap;
+            line-height: 1;
         }
-        .result-select:focus { outline: none; border-color: var(--teal); }
-        .result-select.v-pass { color: var(--pass); border-color: var(--pass); background-color: var(--pass-bg); }
-        .result-select.v-fail { color: var(--fail); border-color: var(--fail); background-color: var(--fail-bg); }
+        .r-pass { background: transparent; border-color: var(--pass); color: var(--pass); }
+        .r-pass:hover { background: rgba(16,185,129,0.08); }
+        .r-pass.active { background: var(--pass); color: white; }
+        .r-fail { background: transparent; border-color: var(--fail); color: var(--fail); }
+        .r-fail:hover { background: rgba(239,68,68,0.08); }
+        .r-fail.active { background: var(--fail); color: white; }
+        .r-na { background: transparent; border-color: var(--border); color: var(--muted); font-size: 10px; width: 100%; }
+        .r-na:hover { background: var(--bg); border-color: #B0BCC8; }
+        .r-na.active { background: var(--border); color: var(--text-mid); }
 
         /* ── OVERALL ─────────────────────────────────────────── */
         .overall-card {
@@ -553,7 +557,7 @@
     <div class="header-top">
         <img src="assets/matrix dark.png" alt="Matrix TSL" class="header-logo">
         <div>
-            <div class="header-title">PI-308 Production Test Report</div>
+            <div class="header-title">Industrial Maintenance Test</div>
             <div class="header-subtitle">Electrical Test Procedure System</div>
         </div>
     </div>
@@ -997,7 +1001,7 @@ function buildPanel(tab) {
             <th style="width:52px">Step</th>
             <th>Criteria</th>
             <th style="width:160px">Comments</th>
-            <th style="width:105px">Pass / Fail</th>
+            <th style="width:120px">Pass / Fail</th>
             <th style="width:75px">Sign Off</th>
         </tr></thead>`;
 
@@ -1010,15 +1014,16 @@ function buildPanel(tab) {
                 <td><span class="criteria-text">${s.criteria}</span></td>
                 <td><textarea class="comments-cell-input" data-tab="${tab}" data-step="${s.id}" rows="1" placeholder="Notes..."></textarea></td>
                 <td>
-                    <select class="result-select"
+                    <div class="result-group"
                         data-tab="${tab}" data-step="${s.id}"
                         data-section="${sec.title.split('.')[0].trim()}"
-                        onchange="onResult(this,'${tab}')">
-                        <option value="PENDING">Pending</option>
-                        <option value="PASS">✓ PASS</option>
-                        <option value="FAIL">✗ FAIL</option>
-                        <option value="N/A">N/A</option>
-                    </select>
+                        data-result="PENDING">
+                        <div class="result-btn-row">
+                            <button class="result-btn r-pass" data-value="PASS" onclick="onResultBtn(this,'${tab}')">✓ Pass</button>
+                            <button class="result-btn r-fail" data-value="FAIL" onclick="onResultBtn(this,'${tab}')">✗ Fail</button>
+                        </div>
+                        <button class="result-btn r-na" data-value="N/A" onclick="onResultBtn(this,'${tab}')">N/A</button>
+                    </div>
                 </td>
                 <td><input type="text" class="signoff-input" data-tab="${tab}" data-step="${s.id}" placeholder="Click" maxlength="6" onclick="autoSignOff(this)" title="Click to auto-fill your initials"></td>`;
             tbody.appendChild(row);
@@ -1045,24 +1050,28 @@ function switchTab(tab, btn) {
 }
 
 // ── RESULT CHANGE ─────────────────────────────────────────────────────────────
-function onResult(sel, tab) {
-    styleResult(sel);
-    updateSection(tab, sel.dataset.section);
+function onResultBtn(btn, tab) {
+    const group = btn.closest('.result-group');
+    const prev  = group.dataset.result;
+    // Toggle off if already active
+    if (prev === btn.dataset.value) {
+        btn.classList.remove('active');
+        group.dataset.result = 'PENDING';
+    } else {
+        group.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        group.dataset.result = btn.dataset.value;
+    }
+    updateSection(tab, group.dataset.section);
     updateChip(tab);
     updateOverall();
-}
-
-function styleResult(sel) {
-    sel.classList.remove('v-pass', 'v-fail');
-    if (sel.value === 'PASS') sel.classList.add('v-pass');
-    if (sel.value === 'FAIL') sel.classList.add('v-fail');
 }
 
 // ── SECTION BADGE ─────────────────────────────────────────────────────────────
 function updateSection(tab, sectionKey) {
     const results = Array.from(
-        document.querySelectorAll(`.result-select[data-tab="${tab}"][data-section="${sectionKey}"]`)
-    ).map(s => s.value);
+        document.querySelectorAll(`.result-group[data-tab="${tab}"][data-section="${sectionKey}"]`)
+    ).map(g => g.dataset.result);
 
     const badge = document.getElementById(`sbadge-${tab}-${sectionKey}`);
     if (!badge) return;
@@ -1078,19 +1087,19 @@ function updateSection(tab, sectionKey) {
 
 // ── TAB CHIP ──────────────────────────────────────────────────────────────────
 function updateChip(tab) {
-    const all      = document.querySelectorAll(`.result-select[data-tab="${tab}"]`);
-    const complete = Array.from(all).filter(s => s.value !== 'PENDING').length;
+    const all      = document.querySelectorAll(`.result-group[data-tab="${tab}"]`);
+    const complete = Array.from(all).filter(g => g.dataset.result !== 'PENDING').length;
     document.getElementById(`chip-${tab}`).textContent = `${complete}/${all.length}`;
 }
 
 // ── OVERALL RESULT ────────────────────────────────────────────────────────────
 function updateOverall() {
     // Only count steps for the currently active procedure
-    const all      = Array.from(document.querySelectorAll(`.result-select[data-tab="${activeTab}"]`));
+    const all      = Array.from(document.querySelectorAll(`.result-group[data-tab="${activeTab}"]`));
     const total    = all.length;
-    const complete = all.filter(s => s.value !== 'PENDING').length;
-    const failed   = all.filter(s => s.value === 'FAIL').length;
-    const passed   = all.filter(s => s.value === 'PASS' || s.value === 'N/A').length;
+    const complete = all.filter(g => g.dataset.result !== 'PENDING').length;
+    const failed   = all.filter(g => g.dataset.result === 'FAIL').length;
+    const passed   = all.filter(g => g.dataset.result === 'PASS' || g.dataset.result === 'N/A').length;
 
     const el    = document.getElementById('overall-result');
     const stats = document.getElementById('overall-stats');
@@ -1129,7 +1138,7 @@ function collectData() {
             step:     s.id,
             criteria: s.criteria,
             comments: (document.querySelector(`.comments-cell-input[data-tab="${tab}"][data-step="${s.id}"]`) || {}).value || '',
-            result:   (document.querySelector(`.result-select[data-tab="${tab}"][data-step="${s.id}"]`) || {}).value || 'PENDING',
+            result:   (document.querySelector(`.result-group[data-tab="${tab}"][data-step="${s.id}"]`) || { dataset: { result: 'PENDING' } }).dataset.result,
             signOff:  (document.querySelector(`.signoff-input[data-tab="${tab}"][data-step="${s.id}"]`) || {}).value || '',
         }));
     });
@@ -1201,10 +1210,15 @@ function loadDraft() {
                 const saved = d.sections[tab][sec.title];
                 if (!saved) return;
                 saved.forEach(row => {
-                    const sel = document.querySelector(`.result-select[data-tab="${tab}"][data-step="${row.step}"]`);
+                    const grp = document.querySelector(`.result-group[data-tab="${tab}"][data-step="${row.step}"]`);
                     const cmt = document.querySelector(`.comments-cell-input[data-tab="${tab}"][data-step="${row.step}"]`);
                     const sig = document.querySelector(`.signoff-input[data-tab="${tab}"][data-step="${row.step}"]`);
-                    if (sel) { sel.value = row.result; styleResult(sel); }
+                    if (grp) {
+                        grp.dataset.result = row.result || 'PENDING';
+                        grp.querySelectorAll('.result-btn').forEach(b => {
+                            b.classList.toggle('active', b.dataset.value === row.result);
+                        });
+                    }
                     if (cmt) cmt.value = row.comments || '';
                     if (sig) sig.value = row.signOff || '';
                 });
@@ -1223,8 +1237,9 @@ function clearForm() {
         document.getElementById(id).value = '';
     });
     checkRequiredFields();
-    document.querySelectorAll('.result-select').forEach(sel => {
-        sel.value = 'PENDING'; sel.classList.remove('v-pass','v-fail');
+    document.querySelectorAll('.result-group').forEach(g => {
+        g.dataset.result = 'PENDING';
+        g.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active'));
     });
     document.querySelectorAll('.comments-cell-input').forEach(el => el.value = '');
     document.querySelectorAll('.signoff-input').forEach(el => el.value = '');
