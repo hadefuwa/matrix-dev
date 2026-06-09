@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PI-308 Production Test Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy:        #0B1D35;
+            --navy-light:  #162B4D;
+            --navy-mid:    #1E3A5F;
+            --teal:        #00C4A0;
+            --teal-dim:    rgba(0,196,160,0.12);
+            --pass:        #10B981;
+            --pass-bg:     #ECFDF5;
+            --fail:        #EF4444;
+            --fail-bg:     #FEF2F2;
+            --pending:     #F59E0B;
+            --bg:          #EEF0F4;
+            --border:      #D4DAE4;
+            --border-light:#EAECF1;
+            --text:        #1A2535;
+            --text-mid:    #3D4F65;
+            --muted:       #7A8CA0;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ──────────────────────────────────────────── */
+        .app-header { background: var(--navy); }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--navy-mid);
+            gap: 14px;
+        }
+
+        .header-logo {
+            height: 36px;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        /* ── PRODUCT HERO ────────────────────────────────────── */
+        .product-hero {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .product-hero-info {
+            padding: 20px 24px;
+            flex: 1;
+        }
+
+        .product-hero-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--teal);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .product-hero-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--navy);
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+        }
+
+        .product-hero-img {
+            height: 140px;
+            width: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+            padding: 12px 20px 12px 0;
+        }
+
+        .header-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: #fff;
+            letter-spacing: 0.03em;
+        }
+
+        .header-subtitle {
+            font-size: 11px;
+            color: rgba(255,255,255,0.42);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        .header-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-top: 1px solid var(--navy-mid);
+        }
+
+        .meta-field {
+            padding: 10px 28px;
+            border-right: 1px solid var(--navy-mid);
+        }
+        .meta-field:last-child { border-right: none; }
+
+        .meta-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 2px;
+        }
+
+        .meta-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--teal);
+            font-weight: 500;
+        }
+
+        /* ── REPORT INFO ─────────────────────────────────────── */
+        .report-info {
+            background: white;
+            border-bottom: 2px solid var(--border);
+            padding: 18px 28px;
+        }
+
+        .report-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px 20px;
+        }
+
+        .field-group { display: flex; flex-direction: column; gap: 4px; }
+
+        .field-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .field-input {
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: white;
+            transition: border-color 0.15s;
+        }
+        .field-input:focus { outline: none; border-color: var(--teal); }
+        .field-input.readonly { background: var(--bg); color: var(--text-mid); cursor: default; }
+        .field-input.error { border-color: var(--fail) !important; background: var(--fail-bg); }
+
+        /* ── TABS ────────────────────────────────────────────── */
+        .tab-nav {
+            background: white;
+            border-bottom: 2px solid var(--border);
+            padding: 0 28px;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            padding: 13px 22px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            color: var(--muted);
+            transition: all 0.15s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { color: var(--navy); border-bottom-color: var(--teal); }
+
+        .tab-chip {
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            background: var(--border-light);
+            color: var(--muted);
+            font-family: 'Barlow', sans-serif;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .tab-btn.active .tab-chip { background: var(--teal-dim); color: var(--teal); }
+
+        /* ── MAIN CONTENT ────────────────────────────────────── */
+        .main-content {
+            padding: 22px 28px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── SECTION CARD ────────────────────────────────────── */
+        .section-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 22px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .section-header {
+            background: var(--navy);
+            padding: 11px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .section-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .section-badge.pass    { background: var(--pass); color: white; }
+        .section-badge.fail    { background: var(--fail); color: white; }
+        .section-badge.pending { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+
+        /* ── STEP TABLE ──────────────────────────────────────── */
+        .step-table { width: 100%; border-collapse: collapse; }
+
+        .step-table thead tr {
+            background: #F8FAFC;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .step-table th {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 9px 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Section group header row */
+        .step-table tr.group-heading td {
+            background: #F0F4F9;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 7px 12px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--navy);
+        }
+
+        .step-table tbody tr.step-row {
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.1s;
+        }
+        .step-table tbody tr.step-row:hover { background: #FAFBFD; }
+
+        .step-table td { padding: 9px 12px; vertical-align: top; }
+
+        .step-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+            padding-top: 2px;
+        }
+
+        .criteria-text {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: var(--text);
+        }
+
+        /* ── TABLE INPUTS ────────────────────────────────────── */
+        .comments-cell-input {
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            padding: 5px 8px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 12px;
+            color: var(--text);
+            width: 100%;
+            min-width: 130px;
+            background: white;
+            resize: none;
+            height: 34px;
+            transition: border-color 0.15s;
+        }
+        .comments-cell-input:focus { outline: none; border-color: var(--teal); }
+
+        .signoff-input {
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            padding: 5px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text);
+            width: 70px;
+            background: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: border-color 0.15s;
+        }
+        .signoff-input:focus { outline: none; border-color: var(--teal); }
+
+        .result-select {
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            padding: 5px 24px 5px 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            background: white;
+            color: var(--muted);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 7px center;
+            min-width: 95px;
+            transition: all 0.15s;
+        }
+        .result-select:focus { outline: none; border-color: var(--teal); }
+        .result-select.v-pass { color: var(--pass); border-color: var(--pass); background-color: var(--pass-bg); }
+        .result-select.v-fail { color: var(--fail); border-color: var(--fail); background-color: var(--fail-bg); }
+
+        /* ── OVERALL ─────────────────────────────────────────── */
+        .overall-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .overall-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .overall-result {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+        }
+        .overall-result.pass    { color: var(--pass); }
+        .overall-result.fail    { color: var(--fail); }
+        .overall-result.pending { color: var(--pending); }
+
+        .overall-stats {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--muted);
+            text-align: right;
+            line-height: 1.7;
+        }
+
+        /* ── COMMENTS CARD ───────────────────────────────────── */
+        .comments-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .comments-card label {
+            display: block;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .comments-textarea {
+            width: 100%;
+            min-height: 76px;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            padding: 9px 12px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            resize: vertical;
+            transition: border-color 0.15s;
+        }
+        .comments-textarea:focus { outline: none; border-color: var(--teal); }
+
+        /* ── ACTIONS ─────────────────────────────────────────── */
+        .actions-bar {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            padding: 9px 18px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .btn-success { background: var(--teal); color: var(--navy); }
+        .btn-success:hover { filter: brightness(0.9); }
+        .btn-ghost { background: transparent; color: var(--text-mid); border: 1.5px solid var(--border); }
+        .btn-ghost:hover { background: var(--bg); border-color: #B0BCC8; }
+        .btn-spacer { flex: 1; }
+
+        /* ── VALIDATION BANNER ───────────────────────────────── */
+        .validation-banner {
+            background: var(--fail-bg);
+            border: 1px solid #FECACA;
+            border-left: 4px solid var(--fail);
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--fail);
+            display: none;
+        }
+        .validation-banner.show { display: block; }
+
+        /* ── NOTIFICATION ────────────────────────────────────── */
+        .notification {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            padding: 12px 18px;
+            border-radius: 5px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9999;
+            max-width: 380px;
+        }
+        .notification.show { transform: translateY(0); opacity: 1; }
+        .notification.success { background: var(--navy); color: white; border-left: 4px solid var(--teal); }
+        .notification.error   { background: #1C0A0A; color: white; border-left: 4px solid var(--fail); }
+
+        /* ── RESPONSIVE ──────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .main-content, .header-top, .report-info, .tab-nav { padding-left: 16px; padding-right: 16px; }
+            .report-info-grid { grid-template-columns: 1fr 1fr; }
+            .step-table { display: block; overflow-x: auto; }
+        }
+        @media (max-width: 600px) {
+            .report-info-grid { grid-template-columns: 1fr; }
+            .header-meta { grid-template-columns: 1fr; }
+            .meta-field { border-right: none; border-bottom: 1px solid var(--navy-mid); }
+            .overall-card { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .overall-stats { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────────── -->
+<header class="app-header">
+    <div class="header-top">
+        <img src="assets/matrix dark.png" alt="Matrix TSL" class="header-logo">
+        <div>
+            <div class="header-title">PI-308 Production Test Report</div>
+            <div class="header-subtitle">Electrical Test Procedure System</div>
+        </div>
+    </div>
+    <div class="header-meta">
+        <div class="meta-field">
+            <div class="meta-label">Report ID</div>
+            <div class="meta-value" id="display-report-id">—</div>
+        </div>
+        <div class="meta-field">
+            <div class="meta-label">Date</div>
+            <div class="meta-value" id="display-date">—</div>
+        </div>
+        <div class="meta-field">
+            <div class="meta-label">Status</div>
+            <div class="meta-value" id="display-status">DRAFT</div>
+        </div>
+    </div>
+</header>
+
+<!-- ── REPORT INFO ──────────────────────────────────────────────── -->
+<div class="report-info">
+    <div class="report-info-grid">
+        <div class="field-group">
+            <label class="field-label">Report ID</label>
+            <input type="text" id="reportId" class="field-input readonly" readonly>
+        </div>
+        <div class="field-group">
+            <label class="field-label">Date</label>
+            <input type="date" id="reportDate" class="field-input"
+                onchange="document.getElementById('display-date').textContent=this.value">
+        </div>
+        <div class="field-group">
+            <label class="field-label">Operator Name <span style="color:var(--fail)">*</span></label>
+            <input type="text" id="operator" class="field-input" placeholder="Enter operator name">
+        </div>
+        <div class="field-group">
+            <label class="field-label">Product Name <span style="color:var(--fail)">*</span></label>
+            <input type="text" id="product" class="field-input" placeholder="Enter product name">
+        </div>
+        <div class="field-group">
+            <label class="field-label">Serial Number <span style="color:var(--fail)">*</span></label>
+            <input type="text" id="serialNumber" class="field-input" placeholder="e.g. SN12345">
+        </div>
+        <div class="field-group">
+            <label class="field-label">Build Reference</label>
+            <input type="text" id="buildRef" class="field-input" placeholder="e.g. BLD-2026-001">
+        </div>
+    </div>
+</div>
+
+<!-- ── TAB NAV ─────────────────────────────────────────────────── -->
+<div class="tab-nav">
+    <button class="tab-btn active" id="tabbtn-im0004" onclick="switchTab('im0004',this)">
+        IM0004 <span class="tab-chip" id="chip-im0004">—</span>
+    </button>
+    <button class="tab-btn" id="tabbtn-im3214" onclick="switchTab('im3214',this)">
+        IM3214 <span class="tab-chip" id="chip-im3214">—</span>
+    </button>
+    <button class="tab-btn" id="tabbtn-im6930" onclick="switchTab('im6930',this)">
+        IM6930 <span class="tab-chip" id="chip-im6930">—</span>
+    </button>
+</div>
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────────────── -->
+<div class="main-content">
+
+    <div class="validation-banner" id="val-banner"></div>
+    <div class="validation-banner" id="required-banner" style="background:#FFF7ED;border-color:#FED7AA;border-left-color:#F97316;color:#C2410C;">
+        <strong>Complete the header fields before starting:</strong> Operator Name, Product Name and Serial Number are required.
+    </div>
+
+    <div id="panel-im0004" class="tab-panel active"></div>
+    <div id="panel-im3214" class="tab-panel"></div>
+    <div id="panel-im6930" class="tab-panel"></div>
+
+    <!-- Overall Result -->
+    <div class="overall-card">
+        <div>
+            <div class="overall-label" id="overall-label">IM0004 Result</div>
+            <div class="overall-result pending" id="overall-result">PENDING</div>
+        </div>
+        <div class="overall-stats" id="overall-stats"></div>
+    </div>
+
+    <!-- Comments -->
+    <div class="comments-card">
+        <label for="comments">Additional Comments &amp; Notes</label>
+        <textarea id="comments" class="comments-textarea"
+            placeholder="Enter any additional comments, observations or issues..."></textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-bar">
+        <button class="btn btn-ghost" onclick="saveDraft()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+            Save Draft
+        </button>
+        <button class="btn btn-ghost" onclick="loadDraft()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-3.81L1 10"/></svg>
+            Load Draft
+        </button>
+        <button class="btn btn-ghost" onclick="clearForm()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2 0 01-2,2H7a2,2 0 01-2-2V6m3,0V4a2,2 0 012-2h4a2,2 0 012,2v2"/></svg>
+            New Report
+        </button>
+        <div class="btn-spacer"></div>
+        <button class="btn btn-success" onclick="exportJSON()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21,15v4a2,2 0 01-2,2H5a2,2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export JSON
+        </button>
+    </div>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+// ── PROCEDURE DEFINITIONS ────────────────────────────────────────────────────
+const PROCEDURES = {
+    im0004: {
+        code: 'IM0004',
+        subtitle: 'Maintenance on Closed Loop Systems',
+        image: 'im0004-1.png',
+        sections: [
+            {
+                title: '1. Documentation Verification',
+                steps: [
+                    { id:'1.1', criteria:'Verify that you have the latest Electrical drawings - as mentioned on the front of this document.' },
+                    { id:'1.2', criteria:'Ensure all documents are the latest revisions and properly approved.' },
+                    { id:'1.3', criteria:'Have Electrical wiring drawings available, along with a sufficient means of marking the drawings, such as a green highlighter.' },
+                    { id:'1.4', criteria:'Ensure all test equipment meets the applicable regulations. IEC/EN 61010-1 (Cat III 600V Minimum).' },
+                ]
+            },
+            {
+                title: '2. Visual Inspection',
+                steps: [
+                    { id:'2.1', criteria:'Check that the product is free from any physical damage and is in a good clean condition.' },
+                    { id:'2.2', criteria:'Ensure that all labels, tags, and nameplates are correctly installed and legible.' },
+                    { id:'2.3', criteria:'Confirm that all components are properly mounted and secure. Ensure all DIN rails have the appropriate End Stops installed to prevent components from sliding off.' },
+                    { id:'2.4', criteria:'Confirm power input (DC barrel jack) is correctly fused and marked "24V DC ONLY".' },
+                    { id:'2.5', criteria:'Confirm all wires are labelled and have a wire number. Checking accuracy of these numbers will be done later.' },
+                    { id:'2.6', criteria:'Confirm Terminals X1, X2, and X3 have the correct jumper bars installed. Shown on sheet 7 & 8 of the drawings.' },
+                ]
+            },
+            {
+                title: '3. Preparation & Dead Testing',
+                steps: [
+                    { id:'3.1',  criteria:'Verify PSU is not connected. No LED indicators should be lit.' },
+                    { id:'3.2',  criteria:'Ensure all circuit breakers, namely MCB1, is turned off. The status colour strip on the breaker should be green with the switch in the down position.' },
+                    { id:'3.3',  criteria:'Confirm the tank is empty of water, if not, drain tank.' },
+                    { id:'3.4',  criteria:'Ensure Emergency Stop is not pressed, and that the button is reset in the up position.' },
+                    { id:'3.5',  criteria:'Perform cable pull test on all removable wires, front and back of panel. Ensure all wires are mechanically terminated correctly.' },
+                    { id:'3.6',  criteria:'Perform a green line test on the 24V circuits, checking wire continuity is correct and then marking the drawings with a green highlighter. The 24V circuits are (L1 and L2) outlined on sheet 2 of the drawings. Ensure correct continuity on both the 24V and 0V wires. Mark the physical drawings with your results.' },
+                    { id:'3.7',  criteria:'Confirm MCB1 is wired correctly, from fuse on X0-1, by performing a continuity test, as shown on sheet 7. Mark drawings.' },
+                    { id:'3.8',  criteria:'Work through the rest of the drawings, conducting a green line test on all 24V circuits (L1 and L2) on each sheet. Regarding DRV1 & DRV2, these spade terminals are insulated and as such you will need to partially remove them to test continuity. Ensure you push them back on after test. Correct continuity here is vital.' },
+                    { id:'3.9',  criteria:'Starting with the digital inputs on sheet 3, verify the wiring of the emergency stop. Press the emergency stop. Perform a continuity test on all the wiring S1 & S2. One side of each of the outer modules, should be wired to terminals X1. The other side should be wired to the first and second input on the PLC (0 & 1). Mark the drawings and reset the emergency stop.' },
+                    { id:'3.10', criteria:'Perform the same test for the blue reset button S3. No need to press this button. Mark drawings.' },
+                    { id:'3.11', criteria:'Conduct a continuity test between the terminals on X3 and their accompanying pin on connector CN2. Confirm continuity between X3-1 and CN2-1. Repeat for the other terminals on X3. Mark drawings. Use the Connector Layout sheet to assist.' },
+                    { id:'3.12', criteria:'Complete basic continuity test on sheet 5, PLC outputs. There are no male/female connectors for these wires. For the H2 Status LED, you cannot test continuity so confirm the wire colours are correct at the PLC end. Blue to 0V at X3-6 and then black, brown and white to the PLC outputs.' },
+                    { id:'3.13', criteria:'Confirm network/ethernet cable is installed correctly as shown on sheet 10.' },
+                    { id:'3.14', criteria:'Only proceed onto the next section if continuity tests are correct.' },
+                ]
+            },
+            {
+                title: '4. Power-Up Sequence',
+                steps: [
+                    { id:'4.1',  criteria:'Ensure the tank is connected to the rig and plugged in.' },
+                    { id:'4.2',  criteria:'Use a 24V power supply unit (PSU) of at least 2A minimum current. Confirm the circuit breaker MCB1 is off and plug in the PSU\'s DC barrel into the socket at the back of the training rig. Confirm nothing has turned on, no lights should be on.' },
+                    { id:'4.3',  criteria:'Turn on MCB1, you should now see many components power on.' },
+                    { id:'4.4',  criteria:'Confirm the PLC and its module (attached to the right) has turned on.' },
+                    { id:'4.5',  criteria:'Confirm the HMI has turned on.' },
+                    { id:'4.6',  criteria:'Confirm the temperature sensor LED is on.' },
+                    { id:'4.7',  criteria:'Turn the power off to program the PLC using the SD card. Insert the SD card. Power on the system. The "RUN/STOP" lamp will then flash for a period and then the "MAINT" lamp will start flashing. Power off the system. Remove the SD card. Power on the system, wait a minute and confirm PLC output LEDs (the ones at the bottom) are flashing. The "RUN/STOP" LED on the PLC must be steady green.' },
+                    { id:'4.8',  criteria:'With the power on, check the firmware version of the HMI. This is done by selecting the third option on the left, system properties. You then select "Panel Information" and look at the Runtime version. If the runtime version does not state V20.X.X.X then it must be updated. This is done using the IM0004 USB stick. Select the Service and Commissioning button on the HMI, bottom of the left menu. Select Update OS. Scroll down and click on UBP_4_12_V20_0.fwf and then click Update OS button at the bottom and click OK on the popup alert. Then wait 5 minutes whilst the HMI reboots and upgrades. It is essential that power is kept on this entire time. Once the HMI has booted back into the standard menu, then proceed.' },
+                    { id:'4.9',  criteria:'With the power on, program the HMI using the USB stick. Insert the USB into the back of the HMI, if you have not already done so. Select Runtime Properties, the 4th button in the menu on the left. Select Load project from storage. Select the USB stick in the dropdown menu. Click on HMI_RT in the projects on external storage table. Scroll down and press "Load project." If asked for a password, enter "Matrix123?".' },
+                    { id:'4.10', criteria:'Select the System Properties and the Display option and increase the brightness to 100%.' },
+                    { id:'4.11', criteria:'Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.' },
+                    { id:'4.12', criteria:'Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.' },
+                    { id:'4.13', criteria:'Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage.' },
+                ]
+            },
+            {
+                title: '5. Functional Testing',
+                steps: [
+                    { id:'5.1', criteria:'Fill the tank with approximately 4 litres of water and secure the lid to the tank.' },
+                    { id:'5.2', criteria:'Navigate to the Faults screen of the HMI. Main Menu > Faults. Press the reset button and confirm you have no faults. If faults are present, begin troubleshooting. The User Manual can help you here.' },
+                    { id:'5.3', criteria:'If no faults, press the emergency stop and confirm the status LED turns red.' },
+                    { id:'5.4', criteria:'Reset the fault and confirm the status LED becomes green again.' },
+                    { id:'5.5', criteria:'Check the proximity sensor LED is on whilst the tank lid is on. Apply a small amount of pressure to the tank bracket under the proximity sensor — it should not immediately turn off the proximity sensor LED. If it does, please adjust the proximity sensor lower down towards the bracket.' },
+                ]
+            },
+            {
+                title: '6. Load Testing',
+                steps: [
+                    { id:'6.1', criteria:'Ensure the hand/gate valve is open (turn fully anti-clockwise), then run the system by pressing the Start button on the HMI. Main Menu > Start Program > Start.' },
+                    { id:'6.2', criteria:'Confirm the pump is running.' },
+                    { id:'6.3', criteria:'Confirm the HMI setpoint is 150 and that the physical gauge on the training rig is reading roughly 150 after 5–10 seconds. If there is no flow, there may be air locked in the system. To release this, unclip the latches that hold the valve assembly to the lid and tilt it 45 degrees anti-clockwise, whilst the pump is running.' },
+                    { id:'6.4', criteria:'Shut the hand/gate valve by turning fully clockwise and confirm the flow drops to 0. Leave the system running for 5 minutes.' },
+                    { id:'6.5', criteria:'Confirm after roughly 10–20 seconds, the system shuts off and a fault occurs. Reset the fault and open the hand/gate valve.' },
+                    { id:'6.6', criteria:'Don\'t run the system again, instead press the Valve Override button on the bottom right of the Operator Screen, this will help drain water out of the pipes. You may need to unclip the latches that hold the valve assembly to the lid and tilt the assembly 45 degrees anti-clockwise to aid in draining the system.' },
+                    { id:'6.7', criteria:'Once the pipes are drained of water, turn off the valve override on the screen, turn off the circuit breaker MCB1 and empty the tank.' },
+                ]
+            },
+            {
+                title: '7. Documentation',
+                steps: [
+                    { id:'7.1', criteria:'Note any discrepancies, comments or issues on the final page of this test procedure and rectify as required.' },
+                    { id:'7.2', criteria:'Sign off on the test procedure, confirming that all tests have been performed and that the product is functional and safe to use.' },
+                ]
+            },
+        ]
+    },
+
+    im3214: {
+        code: 'IM3214',
+        subtitle: 'Locktronics — PLC LOGO Board',
+        image: 'im3214.png',
+        sections: [
+            {
+                title: '1. Documentation Verification',
+                steps: [
+                    { id:'1.1', criteria:'Verify that electrical & mechanical drawings are available.' },
+                    { id:'1.2', criteria:'Ensure all documents are the latest revisions and properly approved.' },
+                    { id:'1.3', criteria:'Ensure all test equipment meets the applicable regulations. IEC/EN 61010-1 (Cat III 600V Minimum).' },
+                ]
+            },
+            {
+                title: '2. Visual Inspection',
+                steps: [
+                    { id:'2.1', criteria:'Check that the product is free from any physical damage and is in a good clean condition.' },
+                    { id:'2.2', criteria:'Ensure that all labels, tags, and nameplates are correctly installed and legible.' },
+                    { id:'2.3', criteria:'Confirm that all components are properly mounted and secure.' },
+                    { id:'2.4', criteria:'Ensure the PLC does not slide off from the DIN Rail and that the End Stops are secure and correctly stop the PLC from moving.' },
+                    { id:'2.5', criteria:'Visually inspect the Locktronics legs, ensure they all look aligned.' },
+                ]
+            },
+            {
+                title: '3. Preparation & Dead Testing',
+                steps: [
+                    { id:'3.1', criteria:'Ensure the LOGO! is powered off and disconnected from 24V and that no LEDs are on.' },
+                    { id:'3.2', criteria:'Place the PLC Module into a Locktronics baseboard. Ensure the legs can be secured into the baseboard and that the product sits well.' },
+                    { id:'3.3', criteria:'Remove the PLC Module from the baseboard. Conduct a pull test on each cable on the PLC. Ensure the cables are secured into the PLC.' },
+                    { id:'3.4', criteria:'Check electrical continuity of each leg to the accompanying PLC terminal with a multimeter. Use the Electrical wiring diagram (sheet 2) to support you in this. For example, the top right leg should have continuity to the I5 terminal screw on the PLC.' },
+                    { id:'3.5', criteria:'Only proceed onto the next section if continuity tests are correct.' },
+                ]
+            },
+            {
+                title: '4. Power-Up Sequence',
+                steps: [
+                    { id:'4.1', criteria:'Use a 24V power supply unit (PSU), either a DC barrel with a Locktronics component or a benchtop power supply. Ensure the PSU can do more than 1A. A Locktronics baseboard is necessary here.' },
+                    { id:'4.2', criteria:'Place 24V on the (+) and 0V on the (−). Top left and bottom left respectively. Confirm the green LED (+), in the top left, illuminates.' },
+                    { id:'4.3', criteria:'Confirm the LOGO! PLC has turned on. The screen/HMI should be illuminated.' },
+                ]
+            },
+            {
+                title: '5. Functional Testing',
+                steps: [
+                    { id:'5.1', criteria:'Place a 4mm cable from the (+) pillar to the input 1 (I1). Confirm the LED turns on. Repeat this for I2, I3, I4 and I5.' },
+                    { id:'5.2', criteria:'Place a 4mm cable between the (+) pillar and (Q1). Confirm the LED turns on. Repeat this for Q2, Q3 and Q4. Remove this connector when complete.' },
+                ]
+            },
+            {
+                title: '6. Load Testing',
+                steps: [
+                    { id:'6.1', criteria:'Remove the Micro SD card from the LOGO!. You may need to use a screwdriver to open the SD card slot. Be aware, the SD card slot is not fully removable.' },
+                    { id:'6.2', criteria:'Insert the Micro SD card into your computer and copy Program 1 onto the SD card. Overwrite the file if there is one present. Note the file will be in a folder called Worksheet 1 but the file you need will be called LOGO_U_P.bin.' },
+                    { id:'6.3', criteria:'Install the Micro SD Card back into the LOGO!. Take note of the direction of insertion; the pull out tab has a diagram underneath it to aid in correct insertion.' },
+                    { id:'6.4', criteria:'Start the Program on the LOGO! by navigating to Card > Load program and follow the on-screen instructions to load the binary file into the controller.' },
+                    { id:'6.5', criteria:'Confirm you can see the output LEDs turning on and off.' },
+                ]
+            },
+            {
+                title: '7. Documentation',
+                steps: [
+                    { id:'7.1', criteria:'Add serial number to the bottom of the LOGO!.' },
+                    { id:'7.2', criteria:'Note any discrepancies, comments or issues on the final page of this test procedure and rectify as required.' },
+                    { id:'7.3', criteria:'Sign off on the test procedure, confirming that all tests have been performed and that the product is safe to use.' },
+                ]
+            },
+        ]
+    },
+
+    im6930: {
+        code: 'IM6930',
+        subtitle: 'PLC Fundamentals Trainer',
+        image: 'IM6930.png',
+        sections: [
+            {
+                title: '1. Documentation Verification',
+                steps: [
+                    { id:'1.1', criteria:'Verify that you have the latest Electrical drawings - as mentioned on the front of this document.' },
+                    { id:'1.2', criteria:'Ensure all documents are the latest revisions and properly approved.' },
+                    { id:'1.3', criteria:'Have Electrical wiring drawings printed out, along with a sufficient means of marking the drawings, such as a green highlighter.' },
+                    { id:'1.4', criteria:'Ensure all test equipment meets the applicable regulations. IEC/EN 61010-1 (Cat III 600V Minimum).' },
+                ]
+            },
+            {
+                title: '2. Visual Inspection',
+                steps: [
+                    { id:'2.1', criteria:'Check that the product is free from any physical damage and is in a good clean condition.' },
+                    { id:'2.2', criteria:'Ensure that all labels, tags, and nameplates are correctly installed and legible.' },
+                    { id:'2.3', criteria:'Confirm that all components are properly mounted and secure. Ensure all DIN rails have the appropriate End Stops installed to prevent components from sliding.' },
+                    { id:'2.4', criteria:'Confirm power input (DC barrel jack) is correctly fused and marked "24V DC ONLY".' },
+                    { id:'2.5', criteria:'Confirm all wires are labelled and have a wire number. Checking accuracy of these numbers will be done later.' },
+                    { id:'2.6', criteria:'Confirm Terminals X1, X2, X3 & X4 have the correct jumper bars installed. Shown on sheet 9 & 10 of the drawings.' },
+                ]
+            },
+            {
+                title: '3. Preparation & Dead Testing',
+                steps: [
+                    { id:'3.1',  criteria:'Verify PSU is not connected. No LED indicators should be lit.' },
+                    { id:'3.2',  criteria:'Ensure circuit breaker MCB1 is turned off. The status colour strip on the breaker should be green with the switch in the down position.' },
+                    { id:'3.3',  criteria:'Ensure Emergency Stop is not pressed, and that the button is reset in the up position.' },
+                    { id:'3.4',  criteria:'Perform cable pull test on all removable wires, front and back of panel. Ensure all wires are mechanically terminated correctly.' },
+                    { id:'3.5',  criteria:'Perform a green line test on the 24V circuits, checking wire continuity is correct and then marking the drawings with a green highlighter. The 24V circuits are (L1 and L2) outlined on sheet 2 of the drawings. Ensure correct continuity on both the 24V and 0V wires. Mark the physical drawings with your results.' },
+                    { id:'3.6',  criteria:'Confirm MCB1 is wired correctly, from fuse on X0-1, by performing a continuity test, as shown on sheet 9. Mark drawings.' },
+                    { id:'3.7',  criteria:'Starting with the digital inputs on sheet 3, verify the wiring of the emergency stop. Press the emergency stop. Perform a continuity test on all the wiring S1 & S2. One side of each of the outer modules, should be wired to terminals X1. The other side should be wired to the first and second input on the PLC (0 & 1). Mark the drawings and reset the emergency stop.' },
+                    { id:'3.8',  criteria:'Perform the same test for the blue reset button S3. No need to press this button. Mark drawings.' },
+                    { id:'3.9',  criteria:'Conduct a continuity test between the terminals on X3 and their correct destination in the PLC. Visually check X5-1 is a black wire, wired from the proximity sensor to Input 6 on the PLC. Use sheet 3. Mark drawings.' },
+                    { id:'3.10', criteria:'Repeat the same test for R2. Wired from the potentiometer to the analogue input 0 on the PLC. Use sheet 4.' },
+                    { id:'3.11', criteria:'Repeat the same test for TT1. Wired from the temperature sensor to the analogue input 1 on the PLC. Use sheet 4.' },
+                    { id:'3.12', criteria:'Complete basic continuity test on sheet 5, PLC outputs. There are no male/female connectors for these wires. For the H10 Status LED, confirm the wire colours are correct. Blue to 0V and then black & brown to the PLC outputs.' },
+                    { id:'3.13', criteria:'Complete continuity tests for the remaining wires on sheet 6. Ensure all wires on drawings are "green-lined".' },
+                    { id:'3.15', criteria:'Confirm network/ethernet cable is installed correctly as shown on sheet 13.' },
+                    { id:'3.16', criteria:'Only proceed onto the next section if continuity tests are correct.' },
+                ]
+            },
+            {
+                title: '4. Power-Up Sequence',
+                steps: [
+                    { id:'4.1',  criteria:'Use a 24V power supply unit (PSU) of at least 2A minimum current. Confirm the circuit breaker MCB1 is off and plug in the PSU\'s DC barrel into the socket at the back of the training rig. Confirm nothing has turned on, no lights should be on.' },
+                    { id:'4.2',  criteria:'Turn on MCB1, you should now see some components power on.' },
+                    { id:'4.3',  criteria:'Confirm the PLC has turned on. You should see LEDs on.' },
+                    { id:'4.4',  criteria:'Confirm the HMI has turned on.' },
+                    { id:'4.5',  criteria:'Confirm the temperature sensor LED is on.' },
+                    { id:'4.6',  criteria:'Turn the power off to program the PLC using the SD card. Insert the SD card. Power on the system. The "RUN/STOP" lamp will then flash for a period and then the "MAINT" lamp will start flashing. Power off the system. Remove the SD card. Power on the system, wait a minute and confirm PLC output LEDs (the ones at the bottom) are flashing. The "RUN/STOP" LED on the PLC must be steady green.' },
+                    { id:'4.7',  criteria:'With the power on, check the firmware version of the HMI. This is done by selecting the third option on the left, system properties. You then select "Panel Information" and look at the Runtime version. If the runtime version does not state V20.X.X.X then it must be updated. This is done using the IM0004 USB stick. Select the Service and Commissioning button on the HMI, bottom of the left menu. Select Update OS. Scroll down and click on UBP_4_12_V20_0.fwf and then click Update OS button at the bottom and click OK on the popup alert. Then wait 5 minutes whilst the HMI reboots and upgrades. It is essential that power is kept on this entire time. Once the HMI has booted back into the standard menu, then proceed.' },
+                    { id:'4.8',  criteria:'With the power on, program the HMI using the USB stick. Insert the USB into the back of the HMI, if you have not already done so. Select Runtime Properties, the 4th button in the menu on the left. Select Load project from storage. Select the USB stick in the dropdown menu. Click on HMI_RT in the projects on external storage table. Scroll down and press "Load project." If asked for a password, enter "Matrix123?".' },
+                    { id:'4.9',  criteria:'Select the System Properties and the Display option and increase the brightness to 100%.' },
+                    { id:'4.10', criteria:'Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.' },
+                    { id:'4.11', criteria:'Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.' },
+                    { id:'4.12', criteria:'Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage.' },
+                ]
+            },
+            {
+                title: '5. Functional Testing',
+                steps: [
+                    { id:'5.1', criteria:'Navigate to the Faults screen of the HMI. Main Menu > Faults. Press the reset button and confirm you have no faults. If faults are present, begin troubleshooting. The User Manual can help you here.' },
+                    { id:'5.2', criteria:'If no faults, press the emergency stop and confirm the status LED turns red.' },
+                    { id:'5.3', criteria:'Reset the fault and confirm the status LED becomes green again.' },
+                ]
+            },
+            {
+                title: '6. Load Testing',
+                steps: [
+                    { id:'6.1', criteria:'On the HMI, press the Start button and ensure all 6 LEDs on the right side of the rig are powered on. 3 Green, 3 Red.' },
+                    { id:'6.2', criteria:'Navigate to the IO screen and then systematically activate each input. Ensure you are on the inputs screen and not the outputs screen.' },
+                    { id:'6.3', criteria:'Press the first 4 buttons, confirm you can see all 4 inputs change state on the HMI. Inputs 0, 1 and 3 will go green on the screen. Whilst Input 2 will turn off, from green to grey when pressed.' },
+                    { id:'6.4', criteria:'Ensure the switch I4/I5 changes state as you turn the switch to the left and right. Ensure when the switch is left, Input 4 is on and Input 5 is off. Vice versa for the switch being right.' },
+                    { id:'6.5', criteria:'Trigger the proximity sensor and confirm that Input 6 goes green on the HMI. You may need to adjust the height of the sensor to ensure that flipping the swell latch beneath it, correctly triggers the sensor. This is vital. Applying little pressure to the swell latch should not immediately turn off the proximity sensor. If it does, adjust the proximity sensor lower.' },
+                    { id:'6.6', criteria:'Spin the potentiometer at Analogue Input 0, confirm you can see the value of the Analogue Input changing on the HMI.' },
+                    { id:'6.7', criteria:'Hold your fingers on the temperature sensor and confirm you can see Analogue Input 1 changing on the HMI. Hopefully increasing in value.' },
+                    { id:'6.8', criteria:'Use the HMI to navigate to worksheet 11 and press the start button. Then you should see the right motor M2 start up as you spin the potentiometer on AI0. Confirm the motor runs.' },
+                    { id:'6.9', criteria:'Use the HMI to navigate to worksheet 12 and run the left motor M1 by pressing the green button on Input 0. Confirm the motor runs.' },
+                ]
+            },
+            {
+                title: '7. Documentation',
+                steps: [
+                    { id:'7.1', criteria:'Note any discrepancies, comments or issues on the final page of this test procedure and rectify as required.' },
+                    { id:'7.2', criteria:'Sign off on the test procedure, confirming that all tests have been performed and that the product is functional and safe to use.' },
+                ]
+            },
+        ]
+    },
+};
+
+const TABS = ['im0004', 'im3214', 'im6930'];
+let currentReportId;
+let activeTab = 'im0004';
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    currentReportId = nextReportId();
+    document.getElementById('reportId').value = currentReportId;
+    document.getElementById('display-report-id').textContent = currentReportId;
+
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('reportDate').value = today;
+    document.getElementById('display-date').textContent = today;
+
+    TABS.forEach(buildPanel);
+    updateOverall();
+
+    // required-fields banner
+    ['operator','product','serialNumber'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+            document.getElementById(id).classList.remove('error');
+            checkRequiredFields();
+        });
+    });
+    checkRequiredFields();
+});
+
+function nextReportId() {
+    const n = parseInt(localStorage.getItem('pi308_seq') || '0') + 1;
+    localStorage.setItem('pi308_seq', n);
+    return 'PI-308-' + String(n).padStart(4, '0');
+}
+
+// ── BUILD PANEL ───────────────────────────────────────────────────────────────
+function buildPanel(tab) {
+    const proc  = PROCEDURES[tab];
+    const panel = document.getElementById(`panel-${tab}`);
+    panel.innerHTML = '';
+
+    // Product hero card
+    const hero = document.createElement('div');
+    hero.className = 'product-hero';
+    hero.innerHTML = `
+        <div class="product-hero-info">
+            <div class="product-hero-code">${proc.code}</div>
+            <div class="product-hero-name">${proc.subtitle}</div>
+        </div>
+        <img src="assets/${proc.image}" alt="${proc.subtitle}" class="product-hero-img">`;
+    panel.appendChild(hero);
+
+    proc.sections.forEach(sec => {
+        const card = document.createElement('div');
+        card.className = 'section-card';
+
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        header.innerHTML = `
+            <span class="section-title">${sec.title}</span>
+            <span class="section-badge pending" id="sbadge-${tab}-${sec.title.split('.')[0].trim()}">PENDING</span>`;
+        card.appendChild(header);
+
+        const table = document.createElement('table');
+        table.className = 'step-table';
+        table.innerHTML = `<thead><tr>
+            <th style="width:52px">Step</th>
+            <th>Criteria</th>
+            <th style="width:160px">Comments</th>
+            <th style="width:105px">Pass / Fail</th>
+            <th style="width:75px">Sign Off</th>
+        </tr></thead>`;
+
+        const tbody = document.createElement('tbody');
+        sec.steps.forEach(s => {
+            const row = document.createElement('tr');
+            row.className = 'step-row';
+            row.innerHTML = `
+                <td><span class="step-num">${s.id}</span></td>
+                <td><span class="criteria-text">${s.criteria}</span></td>
+                <td><textarea class="comments-cell-input" data-tab="${tab}" data-step="${s.id}" rows="1" placeholder="Notes..."></textarea></td>
+                <td>
+                    <select class="result-select"
+                        data-tab="${tab}" data-step="${s.id}"
+                        data-section="${sec.title.split('.')[0].trim()}"
+                        onchange="onResult(this,'${tab}')">
+                        <option value="PENDING">Pending</option>
+                        <option value="PASS">✓ PASS</option>
+                        <option value="FAIL">✗ FAIL</option>
+                        <option value="N/A">N/A</option>
+                    </select>
+                </td>
+                <td><input type="text" class="signoff-input" data-tab="${tab}" data-step="${s.id}" placeholder="Click" maxlength="6" onclick="autoSignOff(this)" title="Click to auto-fill your initials"></td>`;
+            tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+        card.appendChild(table);
+        panel.appendChild(card);
+    });
+
+    updateChip(tab);
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+    TABS.forEach(t => {
+        document.getElementById(`panel-${t}`).classList.remove('active');
+        document.getElementById(`tabbtn-${t}`).classList.remove('active');
+    });
+    document.getElementById(`panel-${tab}`).classList.add('active');
+    btn.classList.add('active');
+    activeTab = tab;
+    updateOverall();
+}
+
+// ── RESULT CHANGE ─────────────────────────────────────────────────────────────
+function onResult(sel, tab) {
+    styleResult(sel);
+    updateSection(tab, sel.dataset.section);
+    updateChip(tab);
+    updateOverall();
+}
+
+function styleResult(sel) {
+    sel.classList.remove('v-pass', 'v-fail');
+    if (sel.value === 'PASS') sel.classList.add('v-pass');
+    if (sel.value === 'FAIL') sel.classList.add('v-fail');
+}
+
+// ── SECTION BADGE ─────────────────────────────────────────────────────────────
+function updateSection(tab, sectionKey) {
+    const results = Array.from(
+        document.querySelectorAll(`.result-select[data-tab="${tab}"][data-section="${sectionKey}"]`)
+    ).map(s => s.value);
+
+    const badge = document.getElementById(`sbadge-${tab}-${sectionKey}`);
+    if (!badge) return;
+
+    if (results.some(r => r === 'FAIL')) {
+        badge.textContent = 'FAIL'; badge.className = 'section-badge fail';
+    } else if (results.every(r => r === 'PASS' || r === 'N/A')) {
+        badge.textContent = 'PASS'; badge.className = 'section-badge pass';
+    } else {
+        badge.textContent = 'PENDING'; badge.className = 'section-badge pending';
+    }
+}
+
+// ── TAB CHIP ──────────────────────────────────────────────────────────────────
+function updateChip(tab) {
+    const all      = document.querySelectorAll(`.result-select[data-tab="${tab}"]`);
+    const complete = Array.from(all).filter(s => s.value !== 'PENDING').length;
+    document.getElementById(`chip-${tab}`).textContent = `${complete}/${all.length}`;
+}
+
+// ── OVERALL RESULT ────────────────────────────────────────────────────────────
+function updateOverall() {
+    // Only count steps for the currently active procedure
+    const all      = Array.from(document.querySelectorAll(`.result-select[data-tab="${activeTab}"]`));
+    const total    = all.length;
+    const complete = all.filter(s => s.value !== 'PENDING').length;
+    const failed   = all.filter(s => s.value === 'FAIL').length;
+    const passed   = all.filter(s => s.value === 'PASS' || s.value === 'N/A').length;
+
+    const el    = document.getElementById('overall-result');
+    const stats = document.getElementById('overall-stats');
+    const label = document.getElementById('overall-label');
+
+    if (label) label.textContent = `${activeTab.toUpperCase()} Result`;
+    stats.innerHTML = `${complete} / ${total} steps complete<br>${passed} passed &nbsp;·&nbsp; ${failed} failed`;
+
+    el.classList.remove('pass', 'fail', 'pending');
+    if (failed > 0) {
+        el.textContent = 'FAIL'; el.classList.add('fail');
+        document.getElementById('display-status').textContent = 'FAIL';
+    } else if (complete === total) {
+        el.textContent = 'PASS'; el.classList.add('pass');
+        document.getElementById('display-status').textContent = 'PASS';
+    } else {
+        el.textContent = 'PENDING'; el.classList.add('pending');
+        document.getElementById('display-status').textContent = 'DRAFT';
+    }
+
+    // refresh section badges for active tab only
+    PROCEDURES[activeTab].sections.forEach(sec => {
+        updateSection(activeTab, sec.title.split('.')[0].trim());
+    });
+}
+
+// ── COLLECT DATA ──────────────────────────────────────────────────────────────
+function collectData() {
+    // Only collect data for the active procedure
+    const tab      = activeTab;
+    const proc     = PROCEDURES[tab];
+    const sections = {};
+
+    proc.sections.forEach(sec => {
+        sections[sec.title] = sec.steps.map(s => ({
+            step:     s.id,
+            criteria: s.criteria,
+            comments: (document.querySelector(`.comments-cell-input[data-tab="${tab}"][data-step="${s.id}"]`) || {}).value || '',
+            result:   (document.querySelector(`.result-select[data-tab="${tab}"][data-step="${s.id}"]`) || {}).value || 'PENDING',
+            signOff:  (document.querySelector(`.signoff-input[data-tab="${tab}"][data-step="${s.id}"]`) || {}).value || '',
+        }));
+    });
+
+    return {
+        procedure:      tab.toUpperCase(),
+        reportId:       document.getElementById('reportId').value,
+        createdAt:      new Date().toISOString(),
+        date:           document.getElementById('reportDate').value,
+        operator:       document.getElementById('operator').value,
+        product:        document.getElementById('product').value,
+        serialNumber:   document.getElementById('serialNumber').value,
+        buildReference: document.getElementById('buildRef').value,
+        overallResult:  document.getElementById('overall-result').textContent,
+        sections,
+        comments:       document.getElementById('comments').value,
+    };
+}
+
+// ── VALIDATE ──────────────────────────────────────────────────────────────────
+function validate() {
+    const required = ['operator', 'product', 'serialNumber'];
+    const missing  = [];
+    required.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) {
+            el.classList.add('error');
+            missing.push(el.previousElementSibling.textContent.replace(' *','').trim());
+        } else {
+            el.classList.remove('error');
+        }
+    });
+    const banner = document.getElementById('val-banner');
+    if (missing.length) {
+        banner.textContent = 'Required fields missing: ' + missing.join(', ');
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 5000);
+        return false;
+    }
+    banner.classList.remove('show');
+    return true;
+}
+
+// ── SAVE / LOAD DRAFT ─────────────────────────────────────────────────────────
+function saveDraft() {
+    localStorage.setItem('pi308_draft', JSON.stringify(collectData()));
+    toast('success', 'Draft saved to browser storage');
+}
+
+function loadDraft() {
+    const raw = localStorage.getItem('pi308_draft');
+    if (!raw) { toast('error', 'No saved draft found'); return; }
+    const d = JSON.parse(raw);
+
+    document.getElementById('reportId').value = d.reportId || '';
+    document.getElementById('display-report-id').textContent = d.reportId || '—';
+    document.getElementById('reportDate').value = d.date || '';
+    document.getElementById('display-date').textContent = d.date || '—';
+    document.getElementById('operator').value    = d.operator || '';
+    document.getElementById('product').value     = d.product || '';
+    document.getElementById('serialNumber').value = d.serialNumber || '';
+    document.getElementById('buildRef').value    = d.buildReference || '';
+    document.getElementById('comments').value    = d.comments || '';
+
+    if (d.sections) {
+        TABS.forEach(tab => {
+            if (!d.sections[tab]) return;
+            PROCEDURES[tab].sections.forEach(sec => {
+                const saved = d.sections[tab][sec.title];
+                if (!saved) return;
+                saved.forEach(row => {
+                    const sel = document.querySelector(`.result-select[data-tab="${tab}"][data-step="${row.step}"]`);
+                    const cmt = document.querySelector(`.comments-cell-input[data-tab="${tab}"][data-step="${row.step}"]`);
+                    const sig = document.querySelector(`.signoff-input[data-tab="${tab}"][data-step="${row.step}"]`);
+                    if (sel) { sel.value = row.result; styleResult(sel); }
+                    if (cmt) cmt.value = row.comments || '';
+                    if (sig) sig.value = row.signOff || '';
+                });
+            });
+            updateChip(tab);
+        });
+    }
+    updateOverall();
+    toast('success', 'Draft loaded successfully');
+}
+
+// ── CLEAR FORM ────────────────────────────────────────────────────────────────
+function clearForm() {
+    if (!confirm('Start a new report? All unsaved data will be cleared.')) return;
+    ['operator','product','serialNumber','buildRef','comments'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    checkRequiredFields();
+    document.querySelectorAll('.result-select').forEach(sel => {
+        sel.value = 'PENDING'; sel.classList.remove('v-pass','v-fail');
+    });
+    document.querySelectorAll('.comments-cell-input').forEach(el => el.value = '');
+    document.querySelectorAll('.signoff-input').forEach(el => el.value = '');
+
+    currentReportId = nextReportId();
+    document.getElementById('reportId').value = currentReportId;
+    document.getElementById('display-report-id').textContent = currentReportId;
+
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('reportDate').value = today;
+    document.getElementById('display-date').textContent = today;
+    document.getElementById('display-status').textContent = 'DRAFT';
+
+    TABS.forEach(updateChip);
+    updateOverall();
+    toast('success', 'New report started — ' + currentReportId);
+}
+
+// ── EXPORT JSON ───────────────────────────────────────────────────────────────
+function exportJSON() {
+    if (!validate()) return;
+
+    const data     = collectData();
+    const sn       = (data.serialNumber || 'UNKNOWN').replace(/[^\w-]/g,'');
+    const date     = data.date || new Date().toISOString().slice(0,10);
+    const id       = data.reportId.replace(/[^\w-]/g,'');
+    const filename = `PI-308_${data.procedure}_${sn}_${date}_${id}.json`;
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+
+    document.getElementById('display-status').textContent = 'EXPORTED';
+    toast('success', 'Exported: ' + filename);
+}
+
+// ── AUTO SIGN-OFF ─────────────────────────────────────────────────────────────
+function autoSignOff(el) {
+    if (el.value) return; // already has a value — don't overwrite
+    const name = document.getElementById('operator').value.trim();
+    if (!name) {
+        const opField = document.getElementById('operator');
+        opField.classList.add('error');
+        opField.focus();
+        toast('error', 'Enter Operator Name first to auto-fill sign-off');
+        return;
+    }
+    const initials = name.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 4);
+    el.value = initials;
+}
+
+// ── REQUIRED FIELDS BANNER ────────────────────────────────────────────────────
+function checkRequiredFields() {
+    const missing = ['operator','product','serialNumber'].some(
+        id => !document.getElementById(id).value.trim()
+    );
+    const banner = document.getElementById('required-banner');
+    if (missing) {
+        banner.classList.add('show');
+    } else {
+        banner.classList.remove('show');
+    }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(type, msg) {
+    const icons = {
+        success: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>`,
+        error:   `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+    };
+    const el = document.getElementById('notification');
+    el.className = `notification ${type}`;
+    el.innerHTML = icons[type] + msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
