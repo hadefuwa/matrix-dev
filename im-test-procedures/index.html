@@ -940,7 +940,7 @@ let activeTab = 'im0004';
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    currentReportId = nextReportId();
+    currentReportId = nextReportId(activeTab);
     document.getElementById('reportId').value = currentReportId;
     document.getElementById('display-report-id').textContent = currentReportId;
 
@@ -961,10 +961,15 @@ document.addEventListener('DOMContentLoaded', () => {
     checkRequiredFields();
 });
 
-function nextReportId() {
-    const n = parseInt(localStorage.getItem('pi308_seq') || '0') + 1;
-    localStorage.setItem('pi308_seq', n);
-    return 'PI-308-' + String(n).padStart(4, '0');
+function formatReportId(tab, n) {
+    const code = PROCEDURES[tab].code.replace('IM', '');
+    return 'IM-' + code + '-' + String(n).padStart(4, '0');
+}
+
+function nextReportId(tab) {
+    const n = parseInt(localStorage.getItem('im_seq') || '0') + 1;
+    localStorage.setItem('im_seq', n);
+    return formatReportId(tab, n);
 }
 
 // ── BUILD PANEL ───────────────────────────────────────────────────────────────
@@ -1046,6 +1051,11 @@ function switchTab(tab, btn) {
     document.getElementById(`panel-${tab}`).classList.add('active');
     btn.classList.add('active');
     activeTab = tab;
+    // Reformat report ID to reflect the active product code
+    const seqN = parseInt(localStorage.getItem('im_seq') || '1');
+    currentReportId = formatReportId(tab, seqN);
+    document.getElementById('reportId').value = currentReportId;
+    document.getElementById('display-report-id').textContent = currentReportId;
     updateOverall();
 }
 
@@ -1244,7 +1254,7 @@ function clearForm() {
     document.querySelectorAll('.comments-cell-input').forEach(el => el.value = '');
     document.querySelectorAll('.signoff-input').forEach(el => el.value = '');
 
-    currentReportId = nextReportId();
+    currentReportId = nextReportId(activeTab);
     document.getElementById('reportId').value = currentReportId;
     document.getElementById('display-report-id').textContent = currentReportId;
 
