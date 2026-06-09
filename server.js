@@ -90,6 +90,11 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 405, { error: "Method not allowed" });
     }
 
+    if (pathname === "/api/reports/export/detail") {
+      if (req.method === "GET") return handleReportsDetailExport(res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+
     if (pathname === "/api/reports/export") {
       if (req.method === "GET") return handleReportsExport(res);
       return sendJson(res, 405, { error: "Method not allowed" });
@@ -239,6 +244,7 @@ async function handleReportSubmit(req, res) {
     stepsPassed:    Number(body.stepsPassed   || 0),
     stepsFailed:    Number(body.stepsFailed   || 0),
     comments:       String(body.comments      || ""),
+    sections:       body.sections             || {},
   };
 
   let reports = [];
@@ -249,6 +255,47 @@ async function handleReportSubmit(req, res) {
   reports.push(row);
   await fs.writeFile(REPORTS_FILE, JSON.stringify(reports, null, 2));
   return sendJson(res, 200, { ok: true, reportId: row.reportId });
+}
+
+async function handleReportsDetailExport(res) {
+  let reports = [];
+  try {
+    reports = JSON.parse(await fs.readFile(REPORTS_FILE, "utf8"));
+  } catch (_) {}
+
+  const escape = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+  const headers = [
+    "Report ID","Date","Submitted At","Operator","Serial Number",
+    "Procedure","Overall Result","Section","Step","Criteria","Result","Comments","Sign Off"
+  ];
+  const lines = [headers.map(escape).join(",")];
+
+  reports.forEach(r => {
+    const prefix = [r.reportId, r.date, r.submittedAt, r.operator, r.serialNumber, r.procedure, r.overallResult];
+    const sections = r.sections || {};
+    Object.entries(sections).forEach(([sectionTitle, steps]) => {
+      if (!Array.isArray(steps)) return;
+      steps.forEach(s => {
+        lines.push([
+          ...prefix.map(escape),
+          escape(sectionTitle),
+          escape(s.step),
+          escape(s.criteria),
+          escape(s.result),
+          escape(s.comments),
+          escape(s.signOff),
+        ].join(","));
+      });
+    });
+  });
+
+  res.writeHead(200, {
+    "Content-Type": "text/csv; charset=utf-8",
+    "Content-Disposition": 'attachment; filename="im-test-reports-detail.csv"',
+    "Cache-Control": "no-cache",
+    "Access-Control-Allow-Origin": "*",
+  });
+  res.end(lines.join("\r\n"));
 }
 
 async function handleReportsExport(res) {
