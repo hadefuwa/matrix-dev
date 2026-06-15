@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs/promises");
 const path = require("path");
 const os = require("os");
+const crypto = require("crypto");
 const { execFile } = require("child_process");
 
 const PORT = Number(process.env.PORT || 3000);
@@ -11,6 +12,168 @@ const UPLOADS_DIR = path.resolve(process.env.IMAGE_UPLOAD_DIR || path.join(ROOT_
 const ADMIN_TOKEN = (process.env.ADMIN_TOKEN || "").trim();
 const SITE_USERNAME = (process.env.SITE_USERNAME || "admin").trim();
 const SITE_PASSWORD = (process.env.SITE_PASSWORD || "").trim();
+// Site password gate — protects the whole site except the public Industrial Maintenance USP page.
+const GATE_PASSWORD = (process.env.GATE_PASSWORD || "matrix123").trim();
+const GATE_COOKIE_NAME = "matrix_site_auth";
+const GATE_TOKEN = crypto.createHash("sha256").update(`matrix-dev-gate::${GATE_PASSWORD}`).digest("hex");
+const GATE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const GATE_PAGE_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Matrix Development Site</title>
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 50% -10%, #14243a 0%, #0b1320 55%, #080d16 100%);
+      color: #e6edf6;
+    }
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(17, 26, 41, 0.92);
+      border: 1px solid rgba(120, 150, 190, 0.18);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+    h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: 0.2px; }
+    .sub { margin: 0 0 20px; color: #93a3b8; font-size: 13px; }
+    .alert {
+      border: 1px solid rgba(245, 180, 80, 0.45);
+      background: rgba(245, 180, 80, 0.10);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .alert strong { color: #ffd28a; }
+    .alert a { color: #ffd28a; }
+    .actions { margin-top: 20px; display: grid; gap: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      font-size: 14px; font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-primary { background: #2f6fed; color: #fff; }
+    .btn-primary:hover { background: #2a63d4; }
+    .btn-ghost { background: transparent; border-color: rgba(120, 150, 190, 0.3); color: #cdd8e6; }
+    .btn-ghost:hover { border-color: rgba(120, 150, 190, 0.55); }
+    .divider { margin: 22px 0 0; border-top: 1px solid rgba(120, 150, 190, 0.14); }
+    .access-link {
+      margin-top: 14px;
+      text-align: center;
+    }
+    .access-link button {
+      background: none; border: none; color: #6f8197;
+      font-size: 12px; cursor: pointer; text-decoration: underline; padding: 4px;
+    }
+    .access-link button:hover { color: #93a3b8; }
+    .hidden { display: none !important; }
+    .login { margin-top: 16px; }
+    .login label { display: block; font-size: 12px; color: #93a3b8; margin-bottom: 6px; }
+    .login input {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      border: 1px solid rgba(120, 150, 190, 0.3);
+      background: #0d1626; color: #e6edf6; font-size: 14px;
+    }
+    .login input:focus { outline: none; border-color: #2f6fed; }
+    .err { color: #ff8a8a; font-size: 13px; margin-top: 10px; min-height: 16px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Matrix Development Site</h1>
+    <p class="sub">Internal work in progress</p>
+
+    <div class="alert">
+      <strong>This is not the official Matrix TSL website.</strong><br>
+      This is a site used to host development work. If you have found yourself here by mistake,
+      please go to <a href="https://www.matrixtsl.com/">www.matrixtsl.com</a>.
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="/industrial-maintenance-usp/">
+        Industrial Maintenance USP information &rarr;
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="access-link">
+      <button type="button" id="reveal-1">Staff / developer access</button>
+    </div>
+
+    <div class="access-link hidden" id="step-2">
+      <button type="button" id="reveal-2">Continue to login</button>
+    </div>
+
+    <form class="login hidden" id="login-form" autocomplete="off">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="off" spellcheck="false">
+      <div class="err" id="err" role="alert"></div>
+      <button type="submit" class="btn btn-primary" style="margin-top:12px;">Enter</button>
+    </form>
+  </main>
+
+  <script>
+    (function () {
+      var r1 = document.getElementById("reveal-1");
+      var step2 = document.getElementById("step-2");
+      var r2 = document.getElementById("reveal-2");
+      var form = document.getElementById("login-form");
+      var pw = document.getElementById("password");
+      var err = document.getElementById("err");
+
+      r1.addEventListener("click", function () {
+        r1.parentElement.classList.add("hidden");
+        step2.classList.remove("hidden");
+      });
+      r2.addEventListener("click", function () {
+        step2.classList.add("hidden");
+        form.classList.remove("hidden");
+        pw.focus();
+      });
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        err.textContent = "";
+        fetch("/api/site-auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pw.value })
+        }).then(function (res) {
+          if (res.ok) { window.location.reload(); return; }
+          return res.json().then(function (data) {
+            err.textContent = (data && data.error) || "Incorrect password.";
+            pw.value = "";
+            pw.focus();
+          });
+        }).catch(function () {
+          err.textContent = "Something went wrong. Please try again.";
+        });
+      });
+    })();
+  </script>
+</body>
+</html>`;
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
 const GEMINI_MODEL = "gemini-2.5-flash-lite";
 const MAX_IMAGE_BYTES = 1024 * 1024;
@@ -46,12 +209,20 @@ const MIME_TYPES = {
 
 const server = http.createServer(async (req, res) => {
   try {
-    if (SITE_PASSWORD && !isBasicAuthAuthorized(req)) {
-      return sendBasicAuthRequired(res);
-    }
-
     const url = new URL(req.url, "http://localhost");
     const pathname = decodeURIComponent(url.pathname);
+
+    // Password gate: allow the public USP page through, gate everything else.
+    if (pathname === "/api/site-auth") {
+      if (req.method === "POST") return handleSiteAuth(req, res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+    if (!isPublicPath(pathname) && !isGateAuthorized(req)) {
+      if (pathname.startsWith("/api/")) {
+        return sendJson(res, 401, { error: "This area is password protected." });
+      }
+      return sendGatePage(res);
+    }
 
     if (pathname === "/api/health" && req.method === "GET") {
       return sendJson(res, 200, {
@@ -957,31 +1128,70 @@ function injectRobotsMetaTag(htmlBuffer) {
   );
 }
 
-function isBasicAuthAuthorized(req) {
-  const authHeader = String(req.headers.authorization || "");
-  if (!authHeader.toLowerCase().startsWith("basic ")) return false;
-
-  try {
-    const encoded = authHeader.slice(6).trim();
-    const decoded = Buffer.from(encoded, "base64").toString("utf8");
-    const separatorIndex = decoded.indexOf(":");
-    if (separatorIndex === -1) return false;
-
-    const username = decoded.slice(0, separatorIndex);
-    const password = decoded.slice(separatorIndex + 1);
-    return username === SITE_USERNAME && password === SITE_PASSWORD;
-  } catch (_) {
-    return false;
-  }
+// Paths reachable without the site password.
+function isPublicPath(pathname) {
+  if (pathname === "/industrial-maintenance-usp" || pathname.startsWith("/industrial-maintenance-usp/")) return true;
+  if (pathname === "/favicon.ico" || pathname === "/favicon.png") return true;
+  if (pathname === "/api/health") return true;
+  return false;
 }
 
-function sendBasicAuthRequired(res) {
-  res.writeHead(401, {
-    "Content-Type": "text/plain; charset=utf-8",
-    "WWW-Authenticate": 'Basic realm="Matrix Private Site"',
+function readCookie(req, name) {
+  const header = String(req.headers.cookie || "");
+  for (const part of header.split(";")) {
+    const idx = part.indexOf("=");
+    if (idx === -1) continue;
+    if (part.slice(0, idx).trim() === name) return part.slice(idx + 1).trim();
+  }
+  return "";
+}
+
+function isGateAuthorized(req) {
+  return readCookie(req, GATE_COOKIE_NAME) === GATE_TOKEN;
+}
+
+function isSecureRequest(req) {
+  const proto = String(req.headers["x-forwarded-proto"] || "").split(",")[0].trim().toLowerCase();
+  return proto === "https";
+}
+
+async function handleSiteAuth(req, res) {
+  let body;
+  try {
+    body = await readJsonBody(req, { maxBytes: 4 * 1024 });
+  } catch (_) {
+    return sendJson(res, 400, { error: "Invalid request." });
+  }
+
+  const submitted = typeof body.password === "string" ? body.password : "";
+  if (submitted !== GATE_PASSWORD) {
+    return sendJson(res, 401, { error: "Incorrect password." });
+  }
+
+  const cookieParts = [
+    `${GATE_COOKIE_NAME}=${GATE_TOKEN}`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Lax",
+    `Max-Age=${GATE_MAX_AGE}`
+  ];
+  if (isSecureRequest(req)) cookieParts.push("Secure");
+
+  res.writeHead(200, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Set-Cookie": cookieParts.join("; "),
     "X-Robots-Tag": "noindex, nofollow"
   });
-  res.end("Authentication required.");
+  res.end(JSON.stringify({ ok: true }));
+}
+
+function sendGatePage(res) {
+  res.writeHead(200, {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": "no-store",
+    "X-Robots-Tag": "noindex, nofollow"
+  });
+  res.end(GATE_PAGE_HTML);
 }
 
 function getClientIp(req) {
