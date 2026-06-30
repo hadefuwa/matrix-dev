@@ -924,11 +924,25 @@ async function buildBlockRels(paraNodes, extraRelEntries = []) {
   const mediaFiles = [];
   const linkedToEmbeddedIds = new Set();
 
+  // Relationship types that are document-wide structural resources.
+  // Their IDs never appear in paragraph attributes so usedRids won't catch them,
+  // but they must be present in document.xml.rels for Word to apply styles/numbering/theme.
+  const STRUCTURAL_REL_SUFFIXES = ["/styles", "/numbering", "/theme", "/fontTable",
+    "/settings", "/webSettings", "/endnotes", "/footnotes", "/customXml"];
+
   for (const [rId, rel] of currentRels) {
-    if (!usedRids.has(rId)) continue;
+    const isStructural = STRUCTURAL_REL_SUFFIXES.some(s => rel.type.endsWith(s));
+    if (!isStructural && !usedRids.has(rId)) continue;
 
     const isImageRel = rel.type.includes("/image");
     console.log(`[DOCX-IMG] processing rId=${rId} mode=${rel.mode} isImage=${isImageRel} target=${rel.target}`);
+
+    // Structural rels (styles, numbering, theme, etc.) are already added to the ZIP
+    // by buildMiniDocx — just emit the relationship entry with their original target path.
+    if (isStructural) {
+      relEntries.push(`  <Relationship Id="${escapeXml(rId)}" Type="${escapeXml(rel.type)}" Target="${escapeXml(rel.target)}"/>`);
+      continue;
+    }
 
     if (rel.mode === "External") {
       if (isImageRel) {
