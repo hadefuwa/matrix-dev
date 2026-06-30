@@ -1022,7 +1022,7 @@
               </div>
               <div>
                 <h2>Upload</h2>
-                <p>Accepts <code>.docx</code> + optional <code>.zip</code> media bundle</p>
+                <p>Accepts <code>.docx</code> + optional <code>.zip</code> media bundle &nbsp;·&nbsp; <span id="last-updated" style="color:var(--muted)"></span></p>
               </div>
             </div>
             <span class="pill">Accepts <code>.docx</code> + <code>.zip</code></span>
@@ -1221,10 +1221,9 @@
   </main>
 
   <script src="upload-media.js"></script>
-  <footer style="text-align:center;padding:1.5rem;font-size:0.75rem;color:var(--muted);">Last updated: <span id="last-updated"></span></footer>
   <script>
     const d = new Date(document.lastModified);
-    document.getElementById("last-updated").textContent = isNaN(d) ? "unknown" : d.toUTCString();
+    document.getElementById("last-updated").textContent = "Updated " + (isNaN(d) ? "unknown" : d.toUTCString());
   </script>
 </body>
 </html>
