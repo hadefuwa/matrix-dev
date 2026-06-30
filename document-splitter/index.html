@@ -1221,6 +1221,10 @@
   </main>
 
   <script src="upload-media.js"></script>
-  <footer style="text-align:center;padding:1.5rem;font-size:0.75rem;color:var(--muted);">Last updated: 30 Jun 2026 16:00 UTC</footer>
+  <footer style="text-align:center;padding:1.5rem;font-size:0.75rem;color:var(--muted);">Last updated: <span id="last-updated"></span></footer>
+  <script>
+    const d = new Date(document.lastModified);
+    document.getElementById("last-updated").textContent = isNaN(d) ? "unknown" : d.toUTCString();
+  </script>
 </body>
 </html>
