@@ -1012,6 +1012,12 @@
         <div class="tool-divider-line"></div>
       </div>
 
+      <!-- Deploy timestamp -->
+      <div style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.9rem;margin-bottom:0.75rem;background:var(--accent-xsoft);border:1px solid var(--accent-soft);border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;color:var(--accent);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="last-updated"></span>
+      </div>
+
       <!-- Upload panel: always visible -->
       <div class="upload-area">
         <section class="panel">
@@ -1022,7 +1028,7 @@
               </div>
               <div>
                 <h2>Upload</h2>
-                <p>Accepts <code>.docx</code> + optional <code>.zip</code> media bundle &nbsp;·&nbsp; <span id="last-updated" style="color:var(--muted)"></span></p>
+                <p>Accepts <code>.docx</code> + optional <code>.zip</code> media bundle</p>
               </div>
             </div>
             <span class="pill">Accepts <code>.docx</code> + <code>.zip</code></span>
@@ -1223,7 +1229,7 @@
   <script src="upload-media.js"></script>
   <script>
     const d = new Date(document.lastModified);
-    document.getElementById("last-updated").textContent = "Updated " + (isNaN(d) ? "unknown" : d.toUTCString());
+    document.getElementById("last-updated").textContent = "Last deployed: " + (isNaN(d) ? "unknown" : d.toUTCString());
   </script>
 </body>
 </html>
