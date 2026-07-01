@@ -16,7 +16,7 @@ The app is a single self-contained file: `index.html`. No build step, no depende
 ### What is built
 
 - Three test procedure tabs: **IM0004** (Closed Loop Systems, 51 steps), **IM3214** (Locktronics PLC LOGO Board, 26 steps), **IM6930** (PLC Fundamentals Trainer, 51 steps)
-- Header fields: Report ID (auto-derived from serial number as `IM-{code}-{serial}`), Date (auto-filled), Operator Name, Product Name, Serial Number, Build Reference
+- Header fields: Report ID (auto-derived from serial number as `IM-{code}-{serial}`), Date (auto-filled), Operator Name, Product (read-only — short name from the active tab's `productName`, e.g. Closed Loop / LOGO! / Fundamentals), Serial Number, Build Reference
 - Per-step: Pass/Fail/N/A toggle buttons (green/red), Comments, Sign Off (auto-filled with operator initials on Pass/Fail)
 - Overall result calculated automatically — PASS only if zero FAILs
 - Save Draft → localStorage, Load Draft to restore
@@ -83,7 +83,7 @@ Each step row has a `<div class="result-group" data-tab data-step data-section d
 
 ## Validation rules (in order)
 
-1. Operator Name, Product Name, Serial Number must be non-empty
+1. Operator Name, Serial Number must be non-empty (Product is auto-derived from the tab, not validated)
 2. All `.result-group[data-tab]` elements must have `data-result !== 'PENDING'`
 3. All `.signoff-input[data-tab]` elements must have a non-empty value
 

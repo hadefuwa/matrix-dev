@@ -594,8 +594,8 @@
             <input type="text" id="operator" class="field-input" placeholder="Enter operator name">
         </div>
         <div class="field-group">
-            <label class="field-label">Product Name <span style="color:var(--fail)">*</span></label>
-            <input type="text" id="product" class="field-input" placeholder="Enter product name">
+            <label class="field-label">Product</label>
+            <input type="text" id="product" class="field-input readonly" readonly>
         </div>
         <div class="field-group">
             <label class="field-label">Serial Number <span style="color:var(--fail)">*</span></label>
@@ -626,7 +626,7 @@
 
     <div class="validation-banner" id="val-banner"></div>
     <div class="validation-banner" id="required-banner" style="background:#FFF7ED;border-color:#FED7AA;border-left-color:#F97316;color:#C2410C;">
-        <strong>Complete the header fields before starting:</strong> Operator Name, Product Name and Serial Number are required.
+        <strong>Complete the header fields before starting:</strong> Operator Name and Serial Number are required.
     </div>
 
     <div id="panel-im0004" class="tab-panel active"></div>
@@ -682,6 +682,7 @@
 const PROCEDURES = {
     im0004: {
         code: 'IM0004',
+        productName: 'Closed Loop',
         subtitle: 'Maintenance on Closed Loop Systems',
         image: 'im0004-1.png',
         sections: [
@@ -776,6 +777,7 @@ const PROCEDURES = {
 
     im3214: {
         code: 'IM3214',
+        productName: 'LOGO!',
         subtitle: 'Locktronics — PLC LOGO Board',
         image: 'im3214.png',
         sections: [
@@ -845,6 +847,7 @@ const PROCEDURES = {
 
     im6930: {
         code: 'IM6930',
+        productName: 'Fundamentals',
         subtitle: 'PLC Fundamentals Trainer',
         image: 'IM6930.png',
         sections: [
@@ -951,10 +954,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('display-date').textContent = today;
 
     TABS.forEach(buildPanel);
+    syncProductField();
     updateOverall();
 
     // required-fields banner + live report ID update from serial number
-    ['operator','product','serialNumber'].forEach(id => {
+    ['operator','serialNumber'].forEach(id => {
         document.getElementById(id).addEventListener('input', () => {
             document.getElementById(id).classList.remove('error');
             checkRequiredFields();
@@ -975,6 +979,11 @@ function refreshReportId() {
     currentReportId = buildReportId(activeTab, serial);
     document.getElementById('reportId').value = currentReportId;
     document.getElementById('display-report-id').textContent = currentReportId;
+}
+
+// Product name is the active procedure's product — derived from the tab, never typed
+function syncProductField() {
+    document.getElementById('product').value = PROCEDURES[activeTab].productName;
 }
 
 // ── BUILD PANEL ───────────────────────────────────────────────────────────────
@@ -1057,6 +1066,7 @@ function switchTab(tab, btn) {
     btn.classList.add('active');
     activeTab = tab;
     refreshReportId();
+    syncProductField();
     updateOverall();
 }
 
@@ -1179,7 +1189,7 @@ function collectData() {
 
 // ── VALIDATE ──────────────────────────────────────────────────────────────────
 function validate() {
-    const required = ['operator', 'product', 'serialNumber'];
+    const required = ['operator', 'serialNumber'];
     const missing  = [];
     required.forEach(id => {
         const el = document.getElementById(id);
@@ -1234,7 +1244,6 @@ function loadDraft() {
     document.getElementById('reportDate').value = d.date || '';
     document.getElementById('display-date').textContent = d.date || '—';
     document.getElementById('operator').value    = d.operator || '';
-    document.getElementById('product').value     = d.product || '';
     document.getElementById('serialNumber').value = d.serialNumber || '';
     document.getElementById('buildRef').value    = d.buildReference || '';
     document.getElementById('comments').value    = d.comments || '';
@@ -1262,6 +1271,7 @@ function loadDraft() {
             updateChip(tab);
         });
     }
+    syncProductField();
     updateOverall();
     toast('success', 'Draft loaded successfully');
 }
@@ -1269,7 +1279,7 @@ function loadDraft() {
 // ── CLEAR FORM ────────────────────────────────────────────────────────────────
 function clearForm() {
     if (!confirm('Start a new report? All unsaved data will be cleared.')) return;
-    ['operator','product','serialNumber','buildRef','comments'].forEach(id => {
+    ['operator','serialNumber','buildRef','comments'].forEach(id => {
         document.getElementById(id).value = '';
     });
     checkRequiredFields();
@@ -1374,7 +1384,7 @@ function autoSignOff(el) {
 
 // ── REQUIRED FIELDS BANNER ────────────────────────────────────────────────────
 function checkRequiredFields() {
-    const missing = ['operator','product','serialNumber'].some(
+    const missing = ['operator','serialNumber'].some(
         id => !document.getElementById(id).value.trim()
     );
     const banner = document.getElementById('required-banner');
