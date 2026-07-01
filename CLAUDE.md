@@ -26,13 +26,10 @@ No build step, no lint step, no test runner beyond `build-all.js`.
 | `IMAGE_UPLOAD_DIR` | `./assets/uploads` | Directory for uploaded images |
 | `SITE_USERNAME` | `admin` | Legacy basic-auth username (no longer used by the request handler) |
 | `SITE_PASSWORD` | — | Legacy basic-auth password (no longer used by the request handler) |
-| `GATE_PASSWORD` | `matrix123` | Password for the site gate (see below). |
 
 ## Architecture
 
-**`server.js`** is the entire backend — raw Node.js `http` module, no framework. It handles static file serving, all API routes, the site password gate, rate limiting, and Gemini AI proxying.
-
-**Site password gate.** Every path except the public `/industrial-maintenance-usp/` page (plus `/favicon.*` and `/api/health`) requires the gate password. Unauthorized page requests get a custom gate page (notice that this is not the official Matrix TSL site, a link to the USP page, and a password box hidden behind two clicks); unauthorized `/api/*` requests get a 401. `POST /api/site-auth` with `{ "password": "..." }` validates against `GATE_PASSWORD` and, on success, sets the `matrix_site_auth` HttpOnly cookie (30-day, `Secure` behind HTTPS). The cookie value is `sha256("matrix-dev-gate::" + GATE_PASSWORD)`, so it is not the password itself.
+**`server.js`** is the entire backend — raw Node.js `http` module, no framework. It handles static file serving, all API routes, rate limiting, and Gemini AI proxying.
 
 **Data** is stored as flat JSON files in `data/` (`topics.json`, `hardware.json`, `templates.json`). No database.
 
