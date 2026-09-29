@@ -87,6 +87,11 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 405, { error: "Method not allowed" });
     }
 
+    if (pathname === "/api/reports") {
+      if (req.method === "PUT") return handleReportsReplace(req, res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+
     if (pathname === "/api/reports/export/detail") {
       if (req.method === "GET") return handleReportsDetailExport(res);
       return sendJson(res, 405, { error: "Method not allowed" });
@@ -252,6 +257,23 @@ async function handleReportSubmit(req, res) {
   reports.push(row);
   await fs.writeFile(REPORTS_FILE, JSON.stringify(reports, null, 2));
   return sendJson(res, 200, { ok: true, reportId: row.reportId });
+}
+
+async function handleReportsReplace(req, res) {
+  if (!ADMIN_TOKEN) return sendJson(res, 500, { error: "ADMIN_TOKEN is not configured on the server" });
+  if (!isAuthorized(req)) return sendJson(res, 401, { error: "Unauthorized" });
+
+  let body;
+  try {
+    body = await readJsonBody(req, { maxBytes: 5 * 1024 * 1024 });
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || "Invalid JSON body" });
+  }
+  if (!Array.isArray(body)) return sendJson(res, 400, { error: "Payload must be a JSON array" });
+
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(REPORTS_FILE, JSON.stringify(body, null, 2));
+  return sendJson(res, 200, { ok: true, count: body.length });
 }
 
 async function handleReportsDetailExport(res) {

@@ -1,0 +1,1166 @@
+[
+  {
+    "reportId": "IM-6930-SN-0001",
+    "date": "2026-03-20",
+    "submittedAt": "2026-03-20T12:00:00.000Z",
+    "operator": "Goshia Pomocka",
+    "product": "Fundamentals",
+    "serialNumber": "SN-0001",
+    "buildReference": "",
+    "procedure": "IM6930",
+    "overallResult": "PASS",
+    "totalSteps": 51,
+    "stepsPassed": 51,
+    "stepsFailed": 0,
+    "comments": "Must be fitted to backplate",
+    "sections": {
+      "1. Documentation Verification": [
+        {
+          "step": "1.1",
+          "criteria": "Verify that you have the latest Electrical drawings - as mentioned on the front of this document.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "1.2",
+          "criteria": "Ensure all documents are the latest revisions and properly approved.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "1.3",
+          "criteria": "Have Electrical wiring drawings printed out, along with a sufficient means of marking the drawings, such as a green highlighter.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "1.4",
+          "criteria": "Ensure all test equipment meets the applicable regulations. IEC/EN 61010-1 (Cat III 600V Minimum).",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        }
+      ],
+      "2. Visual Inspection": [
+        {
+          "step": "2.1",
+          "criteria": "Check that the product is free from any physical damage and is in a good clean condition.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "2.2",
+          "criteria": "Ensure that all labels, tags, and nameplates are correctly installed and legible.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "2.3",
+          "criteria": "Confirm that all components are properly mounted and secure. Ensure all DIN rails have the appropriate End Stops installed to prevent components from sliding.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "2.4",
+          "criteria": "Confirm power input (DC barrel jack) is correctly fused and marked \"24V DC ONLY\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "2.5",
+          "criteria": "Confirm all wires are labelled and have a wire number. Checking accuracy of these numbers will be done later.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "2.6",
+          "criteria": "Confirm Terminals X1, X2, X3 & X4 have the correct jumper bars installed. Shown on sheet 9 & 10 of the drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        }
+      ],
+      "3. Preparation & Dead Testing": [
+        {
+          "step": "3.1",
+          "criteria": "Verify PSU is not connected. No LED indicators should be lit.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.2",
+          "criteria": "Ensure circuit breaker MCB1 is turned off. The status colour strip on the breaker should be green with the switch in the down position.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.3",
+          "criteria": "Ensure Emergency Stop is not pressed, and that the button is reset in the up position.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.4",
+          "criteria": "Perform cable pull test on all removable wires, front and back of panel. Ensure all wires are mechanically terminated correctly.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.5",
+          "criteria": "Perform a green line test on the 24V circuits, checking wire continuity is correct and then marking the drawings with a green highlighter. The 24V circuits are (L1 and L2) outlined on sheet 2 of the drawings. Ensure correct continuity on both the 24V and 0V wires. Mark the physical drawings with your results.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.6",
+          "criteria": "Confirm MCB1 is wired correctly, from fuse on X0-1, by performing a continuity test, as shown on sheet 9. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.7",
+          "criteria": "Starting with the digital inputs on sheet 3, verify the wiring of the emergency stop. Press the emergency stop. Perform a continuity test on all the wiring S1 & S2. One side of each of the outer modules, should be wired to terminals X1. The other side should be wired to the first and second input on the PLC (0 & 1). Mark the drawings and reset the emergency stop.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.8",
+          "criteria": "Perform the same test for the blue reset button S3. No need to press this button. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.9",
+          "criteria": "Conduct a continuity test between the terminals on X3 and their correct destination in the PLC. Visually check X5-1 is a black wire, wired from the proximity sensor to Input 6 on the PLC. Use sheet 3. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.10",
+          "criteria": "Repeat the same test for R2. Wired from the potentiometer to the analogue input 0 on the PLC. Use sheet 4.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.11",
+          "criteria": "Repeat the same test for TT1. Wired from the temperature sensor to the analogue input 1 on the PLC. Use sheet 4.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.12",
+          "criteria": "Complete basic continuity test on sheet 5, PLC outputs. There are no male/female connectors for these wires. For the H10 Status LED, confirm the wire colours are correct. Blue to 0V and then black & brown to the PLC outputs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.13",
+          "criteria": "Complete continuity tests for the remaining wires on sheet 6. Ensure all wires on drawings are \"green-lined\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.15",
+          "criteria": "Confirm network/ethernet cable is installed correctly as shown on sheet 13.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "3.16",
+          "criteria": "Only proceed onto the next section if continuity tests are correct.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        }
+      ],
+      "4. Power-Up Sequence": [
+        {
+          "step": "4.1",
+          "criteria": "Use a 24V power supply unit (PSU) of at least 2A minimum current. Confirm the circuit breaker MCB1 is off and plug in the PSU's DC barrel into the socket at the back of the training rig. Confirm nothing has turned on, no lights should be on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.2",
+          "criteria": "Turn on MCB1, you should now see some components power on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.3",
+          "criteria": "Confirm the PLC has turned on. You should see LEDs on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.4",
+          "criteria": "Confirm the HMI has turned on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.5",
+          "criteria": "Confirm the temperature sensor LED is on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.6",
+          "criteria": "Turn the power off to program the PLC using the SD card. Insert the SD card. Power on the system. The \"RUN/STOP\" lamp will then flash for a period and then the \"MAINT\" lamp will start flashing. Power off the system. Remove the SD card. Power on the system, wait a minute and confirm PLC output LEDs (the ones at the bottom) are flashing. The \"RUN/STOP\" LED on the PLC must be steady green.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.7",
+          "criteria": "With the power on, check the firmware version of the HMI. This is done by selecting the third option on the left, system properties. You then select \"Panel Information\" and look at the Runtime version. If the runtime version does not state V20.X.X.X then it must be updated. This is done using the IM0004 USB stick. Select the Service and Commissioning button on the HMI, bottom of the left menu. Select Update OS. Scroll down and click on UBP_4_12_V20_0.fwf and then click Update OS button at the bottom and click OK on the popup alert. Then wait 5 minutes whilst the HMI reboots and upgrades. It is essential that power is kept on this entire time. Once the HMI has booted back into the standard menu, then proceed.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.8",
+          "criteria": "With the power on, program the HMI using the USB stick. Insert the USB into the back of the HMI, if you have not already done so. Select Runtime Properties, the 4th button in the menu on the left. Select Load project from storage. Select the USB stick in the dropdown menu. Click on HMI_RT in the projects on external storage table. Scroll down and press \"Load project.\" If asked for a password, enter \"Matrix123?\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.9",
+          "criteria": "Select the System Properties and the Display option and increase the brightness to 100%.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.10",
+          "criteria": "Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.11",
+          "criteria": "Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "4.12",
+          "criteria": "Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        }
+      ],
+      "5. Functional Testing": [
+        {
+          "step": "5.1",
+          "criteria": "Navigate to the Faults screen of the HMI. Main Menu > Faults. Press the reset button and confirm you have no faults. If faults are present, begin troubleshooting. The User Manual can help you here.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "5.2",
+          "criteria": "If no faults, press the emergency stop and confirm the status LED turns red.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "5.3",
+          "criteria": "Reset the fault and confirm the status LED becomes green again.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        }
+      ],
+      "6. Load Testing": [
+        {
+          "step": "6.1",
+          "criteria": "On the HMI, press the Start button and ensure all 6 LEDs on the right side of the rig are powered on. 3 Green, 3 Red.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.2",
+          "criteria": "Navigate to the IO screen and then systematically activate each input. Ensure you are on the inputs screen and not the outputs screen.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.3",
+          "criteria": "Press the first 4 buttons, confirm you can see all 4 inputs change state on the HMI. Inputs 0, 1 and 3 will go green on the screen. Whilst Input 2 will turn off, from green to grey when pressed.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.4",
+          "criteria": "Ensure the switch I4/I5 changes state as you turn the switch to the left and right. Ensure when the switch is left, Input 4 is on and Input 5 is off. Vice versa for the switch being right.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.5",
+          "criteria": "Trigger the proximity sensor and confirm that Input 6 goes green on the HMI. You may need to adjust the height of the sensor to ensure that flipping the swell latch beneath it, correctly triggers the sensor. This is vital. Applying little pressure to the swell latch should not immediately turn off the proximity sensor. If it does, adjust the proximity sensor lower.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.6",
+          "criteria": "Spin the potentiometer at Analogue Input 0, confirm you can see the value of the Analogue Input changing on the HMI.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.7",
+          "criteria": "Hold your fingers on the temperature sensor and confirm you can see Analogue Input 1 changing on the HMI. Hopefully increasing in value.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.8",
+          "criteria": "Use the HMI to navigate to worksheet 11 and press the start button. Then you should see the right motor M2 start up as you spin the potentiometer on AI0. Confirm the motor runs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "6.9",
+          "criteria": "Use the HMI to navigate to worksheet 12 and run the left motor M1 by pressing the green button on Input 0. Confirm the motor runs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        }
+      ],
+      "7. Documentation": [
+        {
+          "step": "7.1",
+          "criteria": "Note any discrepancies, comments or issues on the final page of this test procedure and rectify as required.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        },
+        {
+          "step": "7.2",
+          "criteria": "Sign off on the test procedure, confirming that all tests have been performed and that the product is functional and safe to use.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MP"
+        }
+      ]
+    }
+  },
+  {
+    "reportId": "IM-6930-SN-0002",
+    "date": "2026-03-20",
+    "submittedAt": "2026-03-20T12:01:00.000Z",
+    "operator": "Marcin Borski",
+    "product": "Fundamentals",
+    "serialNumber": "SN-0002",
+    "buildReference": "",
+    "procedure": "IM6930",
+    "overallResult": "PASS",
+    "totalSteps": 51,
+    "stepsPassed": 51,
+    "stepsFailed": 0,
+    "comments": "Accepted, awaiting Backplate Fix",
+    "sections": {
+      "1. Documentation Verification": [
+        {
+          "step": "1.1",
+          "criteria": "Verify that you have the latest Electrical drawings - as mentioned on the front of this document.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "1.2",
+          "criteria": "Ensure all documents are the latest revisions and properly approved.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "1.3",
+          "criteria": "Have Electrical wiring drawings printed out, along with a sufficient means of marking the drawings, such as a green highlighter.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "1.4",
+          "criteria": "Ensure all test equipment meets the applicable regulations. IEC/EN 61010-1 (Cat III 600V Minimum).",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        }
+      ],
+      "2. Visual Inspection": [
+        {
+          "step": "2.1",
+          "criteria": "Check that the product is free from any physical damage and is in a good clean condition.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "2.2",
+          "criteria": "Ensure that all labels, tags, and nameplates are correctly installed and legible.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "2.3",
+          "criteria": "Confirm that all components are properly mounted and secure. Ensure all DIN rails have the appropriate End Stops installed to prevent components from sliding.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "2.4",
+          "criteria": "Confirm power input (DC barrel jack) is correctly fused and marked \"24V DC ONLY\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "2.5",
+          "criteria": "Confirm all wires are labelled and have a wire number. Checking accuracy of these numbers will be done later.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "2.6",
+          "criteria": "Confirm Terminals X1, X2, X3 & X4 have the correct jumper bars installed. Shown on sheet 9 & 10 of the drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        }
+      ],
+      "3. Preparation & Dead Testing": [
+        {
+          "step": "3.1",
+          "criteria": "Verify PSU is not connected. No LED indicators should be lit.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.2",
+          "criteria": "Ensure circuit breaker MCB1 is turned off. The status colour strip on the breaker should be green with the switch in the down position.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.3",
+          "criteria": "Ensure Emergency Stop is not pressed, and that the button is reset in the up position.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.4",
+          "criteria": "Perform cable pull test on all removable wires, front and back of panel. Ensure all wires are mechanically terminated correctly.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.5",
+          "criteria": "Perform a green line test on the 24V circuits, checking wire continuity is correct and then marking the drawings with a green highlighter. The 24V circuits are (L1 and L2) outlined on sheet 2 of the drawings. Ensure correct continuity on both the 24V and 0V wires. Mark the physical drawings with your results.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.6",
+          "criteria": "Confirm MCB1 is wired correctly, from fuse on X0-1, by performing a continuity test, as shown on sheet 9. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.7",
+          "criteria": "Starting with the digital inputs on sheet 3, verify the wiring of the emergency stop. Press the emergency stop. Perform a continuity test on all the wiring S1 & S2. One side of each of the outer modules, should be wired to terminals X1. The other side should be wired to the first and second input on the PLC (0 & 1). Mark the drawings and reset the emergency stop.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.8",
+          "criteria": "Perform the same test for the blue reset button S3. No need to press this button. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.9",
+          "criteria": "Conduct a continuity test between the terminals on X3 and their correct destination in the PLC. Visually check X5-1 is a black wire, wired from the proximity sensor to Input 6 on the PLC. Use sheet 3. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.10",
+          "criteria": "Repeat the same test for R2. Wired from the potentiometer to the analogue input 0 on the PLC. Use sheet 4.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.11",
+          "criteria": "Repeat the same test for TT1. Wired from the temperature sensor to the analogue input 1 on the PLC. Use sheet 4.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.12",
+          "criteria": "Complete basic continuity test on sheet 5, PLC outputs. There are no male/female connectors for these wires. For the H10 Status LED, confirm the wire colours are correct. Blue to 0V and then black & brown to the PLC outputs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.13",
+          "criteria": "Complete continuity tests for the remaining wires on sheet 6. Ensure all wires on drawings are \"green-lined\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.15",
+          "criteria": "Confirm network/ethernet cable is installed correctly as shown on sheet 13.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "3.16",
+          "criteria": "Only proceed onto the next section if continuity tests are correct.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        }
+      ],
+      "4. Power-Up Sequence": [
+        {
+          "step": "4.1",
+          "criteria": "Use a 24V power supply unit (PSU) of at least 2A minimum current. Confirm the circuit breaker MCB1 is off and plug in the PSU's DC barrel into the socket at the back of the training rig. Confirm nothing has turned on, no lights should be on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.2",
+          "criteria": "Turn on MCB1, you should now see some components power on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.3",
+          "criteria": "Confirm the PLC has turned on. You should see LEDs on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.4",
+          "criteria": "Confirm the HMI has turned on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.5",
+          "criteria": "Confirm the temperature sensor LED is on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.6",
+          "criteria": "Turn the power off to program the PLC using the SD card. Insert the SD card. Power on the system. The \"RUN/STOP\" lamp will then flash for a period and then the \"MAINT\" lamp will start flashing. Power off the system. Remove the SD card. Power on the system, wait a minute and confirm PLC output LEDs (the ones at the bottom) are flashing. The \"RUN/STOP\" LED on the PLC must be steady green.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.7",
+          "criteria": "With the power on, check the firmware version of the HMI. This is done by selecting the third option on the left, system properties. You then select \"Panel Information\" and look at the Runtime version. If the runtime version does not state V20.X.X.X then it must be updated. This is done using the IM0004 USB stick. Select the Service and Commissioning button on the HMI, bottom of the left menu. Select Update OS. Scroll down and click on UBP_4_12_V20_0.fwf and then click Update OS button at the bottom and click OK on the popup alert. Then wait 5 minutes whilst the HMI reboots and upgrades. It is essential that power is kept on this entire time. Once the HMI has booted back into the standard menu, then proceed.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.8",
+          "criteria": "With the power on, program the HMI using the USB stick. Insert the USB into the back of the HMI, if you have not already done so. Select Runtime Properties, the 4th button in the menu on the left. Select Load project from storage. Select the USB stick in the dropdown menu. Click on HMI_RT in the projects on external storage table. Scroll down and press \"Load project.\" If asked for a password, enter \"Matrix123?\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.9",
+          "criteria": "Select the System Properties and the Display option and increase the brightness to 100%.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.10",
+          "criteria": "Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.11",
+          "criteria": "Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "4.12",
+          "criteria": "Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        }
+      ],
+      "5. Functional Testing": [
+        {
+          "step": "5.1",
+          "criteria": "Navigate to the Faults screen of the HMI. Main Menu > Faults. Press the reset button and confirm you have no faults. If faults are present, begin troubleshooting. The User Manual can help you here.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "5.2",
+          "criteria": "If no faults, press the emergency stop and confirm the status LED turns red.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "5.3",
+          "criteria": "Reset the fault and confirm the status LED becomes green again.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        }
+      ],
+      "6. Load Testing": [
+        {
+          "step": "6.1",
+          "criteria": "On the HMI, press the Start button and ensure all 6 LEDs on the right side of the rig are powered on. 3 Green, 3 Red.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.2",
+          "criteria": "Navigate to the IO screen and then systematically activate each input. Ensure you are on the inputs screen and not the outputs screen.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.3",
+          "criteria": "Press the first 4 buttons, confirm you can see all 4 inputs change state on the HMI. Inputs 0, 1 and 3 will go green on the screen. Whilst Input 2 will turn off, from green to grey when pressed.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.4",
+          "criteria": "Ensure the switch I4/I5 changes state as you turn the switch to the left and right. Ensure when the switch is left, Input 4 is on and Input 5 is off. Vice versa for the switch being right.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.5",
+          "criteria": "Trigger the proximity sensor and confirm that Input 6 goes green on the HMI. You may need to adjust the height of the sensor to ensure that flipping the swell latch beneath it, correctly triggers the sensor. This is vital. Applying little pressure to the swell latch should not immediately turn off the proximity sensor. If it does, adjust the proximity sensor lower.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.6",
+          "criteria": "Spin the potentiometer at Analogue Input 0, confirm you can see the value of the Analogue Input changing on the HMI.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.7",
+          "criteria": "Hold your fingers on the temperature sensor and confirm you can see Analogue Input 1 changing on the HMI. Hopefully increasing in value.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.8",
+          "criteria": "Use the HMI to navigate to worksheet 11 and press the start button. Then you should see the right motor M2 start up as you spin the potentiometer on AI0. Confirm the motor runs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "6.9",
+          "criteria": "Use the HMI to navigate to worksheet 12 and run the left motor M1 by pressing the green button on Input 0. Confirm the motor runs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        }
+      ],
+      "7. Documentation": [
+        {
+          "step": "7.1",
+          "criteria": "Note any discrepancies, comments or issues on the final page of this test procedure and rectify as required.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        },
+        {
+          "step": "7.2",
+          "criteria": "Sign off on the test procedure, confirming that all tests have been performed and that the product is functional and safe to use.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "MB"
+        }
+      ]
+    }
+  },
+  {
+    "reportId": "IM-6930-SN-0003",
+    "date": "2026-03-20",
+    "submittedAt": "2026-03-20T12:02:00.000Z",
+    "operator": "Paul Womersley",
+    "product": "Fundamentals",
+    "serialNumber": "SN-0003",
+    "buildReference": "",
+    "procedure": "IM6930",
+    "overallResult": "PASS",
+    "totalSteps": 51,
+    "stepsPassed": 51,
+    "stepsFailed": 0,
+    "comments": "Back plate needs to be fitted.",
+    "sections": {
+      "1. Documentation Verification": [
+        {
+          "step": "1.1",
+          "criteria": "Verify that you have the latest Electrical drawings - as mentioned on the front of this document.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "1.2",
+          "criteria": "Ensure all documents are the latest revisions and properly approved.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "1.3",
+          "criteria": "Have Electrical wiring drawings printed out, along with a sufficient means of marking the drawings, such as a green highlighter.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "1.4",
+          "criteria": "Ensure all test equipment meets the applicable regulations. IEC/EN 61010-1 (Cat III 600V Minimum).",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        }
+      ],
+      "2. Visual Inspection": [
+        {
+          "step": "2.1",
+          "criteria": "Check that the product is free from any physical damage and is in a good clean condition.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "2.2",
+          "criteria": "Ensure that all labels, tags, and nameplates are correctly installed and legible.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "2.3",
+          "criteria": "Confirm that all components are properly mounted and secure. Ensure all DIN rails have the appropriate End Stops installed to prevent components from sliding.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "2.4",
+          "criteria": "Confirm power input (DC barrel jack) is correctly fused and marked \"24V DC ONLY\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "2.5",
+          "criteria": "Confirm all wires are labelled and have a wire number. Checking accuracy of these numbers will be done later.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "2.6",
+          "criteria": "Confirm Terminals X1, X2, X3 & X4 have the correct jumper bars installed. Shown on sheet 9 & 10 of the drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        }
+      ],
+      "3. Preparation & Dead Testing": [
+        {
+          "step": "3.1",
+          "criteria": "Verify PSU is not connected. No LED indicators should be lit.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.2",
+          "criteria": "Ensure circuit breaker MCB1 is turned off. The status colour strip on the breaker should be green with the switch in the down position.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.3",
+          "criteria": "Ensure Emergency Stop is not pressed, and that the button is reset in the up position.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.4",
+          "criteria": "Perform cable pull test on all removable wires, front and back of panel. Ensure all wires are mechanically terminated correctly.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.5",
+          "criteria": "Perform a green line test on the 24V circuits, checking wire continuity is correct and then marking the drawings with a green highlighter. The 24V circuits are (L1 and L2) outlined on sheet 2 of the drawings. Ensure correct continuity on both the 24V and 0V wires. Mark the physical drawings with your results.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.6",
+          "criteria": "Confirm MCB1 is wired correctly, from fuse on X0-1, by performing a continuity test, as shown on sheet 9. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.7",
+          "criteria": "Starting with the digital inputs on sheet 3, verify the wiring of the emergency stop. Press the emergency stop. Perform a continuity test on all the wiring S1 & S2. One side of each of the outer modules, should be wired to terminals X1. The other side should be wired to the first and second input on the PLC (0 & 1). Mark the drawings and reset the emergency stop.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.8",
+          "criteria": "Perform the same test for the blue reset button S3. No need to press this button. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.9",
+          "criteria": "Conduct a continuity test between the terminals on X3 and their correct destination in the PLC. Visually check X5-1 is a black wire, wired from the proximity sensor to Input 6 on the PLC. Use sheet 3. Mark drawings.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.10",
+          "criteria": "Repeat the same test for R2. Wired from the potentiometer to the analogue input 0 on the PLC. Use sheet 4.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.11",
+          "criteria": "Repeat the same test for TT1. Wired from the temperature sensor to the analogue input 1 on the PLC. Use sheet 4.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.12",
+          "criteria": "Complete basic continuity test on sheet 5, PLC outputs. There are no male/female connectors for these wires. For the H10 Status LED, confirm the wire colours are correct. Blue to 0V and then black & brown to the PLC outputs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.13",
+          "criteria": "Complete continuity tests for the remaining wires on sheet 6. Ensure all wires on drawings are \"green-lined\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.15",
+          "criteria": "Confirm network/ethernet cable is installed correctly as shown on sheet 13.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "3.16",
+          "criteria": "Only proceed onto the next section if continuity tests are correct.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        }
+      ],
+      "4. Power-Up Sequence": [
+        {
+          "step": "4.1",
+          "criteria": "Use a 24V power supply unit (PSU) of at least 2A minimum current. Confirm the circuit breaker MCB1 is off and plug in the PSU's DC barrel into the socket at the back of the training rig. Confirm nothing has turned on, no lights should be on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.2",
+          "criteria": "Turn on MCB1, you should now see some components power on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.3",
+          "criteria": "Confirm the PLC has turned on. You should see LEDs on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.4",
+          "criteria": "Confirm the HMI has turned on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.5",
+          "criteria": "Confirm the temperature sensor LED is on.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.6",
+          "criteria": "Turn the power off to program the PLC using the SD card. Insert the SD card. Power on the system. The \"RUN/STOP\" lamp will then flash for a period and then the \"MAINT\" lamp will start flashing. Power off the system. Remove the SD card. Power on the system, wait a minute and confirm PLC output LEDs (the ones at the bottom) are flashing. The \"RUN/STOP\" LED on the PLC must be steady green.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.7",
+          "criteria": "With the power on, check the firmware version of the HMI. This is done by selecting the third option on the left, system properties. You then select \"Panel Information\" and look at the Runtime version. If the runtime version does not state V20.X.X.X then it must be updated. This is done using the IM0004 USB stick. Select the Service and Commissioning button on the HMI, bottom of the left menu. Select Update OS. Scroll down and click on UBP_4_12_V20_0.fwf and then click Update OS button at the bottom and click OK on the popup alert. Then wait 5 minutes whilst the HMI reboots and upgrades. It is essential that power is kept on this entire time. Once the HMI has booted back into the standard menu, then proceed.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.8",
+          "criteria": "With the power on, program the HMI using the USB stick. Insert the USB into the back of the HMI, if you have not already done so. Select Runtime Properties, the 4th button in the menu on the left. Select Load project from storage. Select the USB stick in the dropdown menu. Click on HMI_RT in the projects on external storage table. Scroll down and press \"Load project.\" If asked for a password, enter \"Matrix123?\".",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.9",
+          "criteria": "Select the System Properties and the Display option and increase the brightness to 100%.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.10",
+          "criteria": "Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.11",
+          "criteria": "Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "4.12",
+          "criteria": "Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        }
+      ],
+      "5. Functional Testing": [
+        {
+          "step": "5.1",
+          "criteria": "Navigate to the Faults screen of the HMI. Main Menu > Faults. Press the reset button and confirm you have no faults. If faults are present, begin troubleshooting. The User Manual can help you here.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "5.2",
+          "criteria": "If no faults, press the emergency stop and confirm the status LED turns red.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "5.3",
+          "criteria": "Reset the fault and confirm the status LED becomes green again.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        }
+      ],
+      "6. Load Testing": [
+        {
+          "step": "6.1",
+          "criteria": "On the HMI, press the Start button and ensure all 6 LEDs on the right side of the rig are powered on. 3 Green, 3 Red.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.2",
+          "criteria": "Navigate to the IO screen and then systematically activate each input. Ensure you are on the inputs screen and not the outputs screen.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.3",
+          "criteria": "Press the first 4 buttons, confirm you can see all 4 inputs change state on the HMI. Inputs 0, 1 and 3 will go green on the screen. Whilst Input 2 will turn off, from green to grey when pressed.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.4",
+          "criteria": "Ensure the switch I4/I5 changes state as you turn the switch to the left and right. Ensure when the switch is left, Input 4 is on and Input 5 is off. Vice versa for the switch being right.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.5",
+          "criteria": "Trigger the proximity sensor and confirm that Input 6 goes green on the HMI. You may need to adjust the height of the sensor to ensure that flipping the swell latch beneath it, correctly triggers the sensor. This is vital. Applying little pressure to the swell latch should not immediately turn off the proximity sensor. If it does, adjust the proximity sensor lower.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.6",
+          "criteria": "Spin the potentiometer at Analogue Input 0, confirm you can see the value of the Analogue Input changing on the HMI.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.7",
+          "criteria": "Hold your fingers on the temperature sensor and confirm you can see Analogue Input 1 changing on the HMI. Hopefully increasing in value.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.8",
+          "criteria": "Use the HMI to navigate to worksheet 11 and press the start button. Then you should see the right motor M2 start up as you spin the potentiometer on AI0. Confirm the motor runs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "6.9",
+          "criteria": "Use the HMI to navigate to worksheet 12 and run the left motor M1 by pressing the green button on Input 0. Confirm the motor runs.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        }
+      ],
+      "7. Documentation": [
+        {
+          "step": "7.1",
+          "criteria": "Note any discrepancies, comments or issues on the final page of this test procedure and rectify as required.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        },
+        {
+          "step": "7.2",
+          "criteria": "Sign off on the test procedure, confirming that all tests have been performed and that the product is functional and safe to use.",
+          "result": "PASS",
+          "comments": "",
+          "signOff": "PW"
+        }
+      ]
+    }
+  }
+]
