@@ -322,6 +322,14 @@
             padding-top: 2px;
         }
 
+        .step-thumb {
+            display: block;
+            width: 110px;
+            margin-top: 6px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+        }
+
         .criteria-text {
             font-size: 13.5px;
             line-height: 1.5;
@@ -699,7 +707,7 @@ const PROCEDURES = {
                 title: '2. Visual Inspection',
                 steps: [
                     { id:'2.1', criteria:'Check that the product is free from any physical damage and is in a good clean condition.' },
-                    { id:'2.2', criteria:'Ensure that all labels, tags, and nameplates are correctly installed and legible. Ensure silver CE marking sticker is printed on the back of the product.' },
+                    { id:'2.2', criteria:'Ensure that all labels, tags, and nameplates are correctly installed and legible. Ensure silver CE marking sticker is printed on the back of the product.', image:'nameplate-example.png' },
                     { id:'2.3', criteria:'Confirm that all components are properly mounted and secure. Ensure all DIN rails have the appropriate End Stops installed to prevent components from sliding off.' },
                     { id:'2.4', criteria:'Confirm power input (DC barrel jack) is correctly fused and marked "24V DC ONLY".' },
                     { id:'2.5', criteria:'Confirm all wires are labelled and have a wire number. Checking accuracy of these numbers will be done later.' },
@@ -864,7 +872,7 @@ const PROCEDURES = {
                 title: '2. Visual Inspection',
                 steps: [
                     { id:'2.1', criteria:'Check that the product is free from any physical damage and is in a good clean condition.' },
-                    { id:'2.2', criteria:'Ensure that all labels, tags, and nameplates are correctly installed and legible. Ensure silver CE marking sticker is printed on the back of the product.' },
+                    { id:'2.2', criteria:'Ensure that all labels, tags, and nameplates are correctly installed and legible. Ensure silver CE marking sticker is printed on the back of the product.', image:'nameplate-example.png' },
                     { id:'2.3', criteria:'Confirm that all components are properly mounted and secure. Ensure all DIN rails have the appropriate End Stops installed to prevent components from sliding.' },
                     { id:'2.4', criteria:'Confirm power input (DC barrel jack) is correctly fused and marked "24V DC ONLY".' },
                     { id:'2.5', criteria:'Confirm all wires are labelled and have a wire number. Checking accuracy of these numbers will be done later.' },
@@ -1030,7 +1038,7 @@ function buildPanel(tab) {
             row.className = 'step-row';
             row.innerHTML = `
                 <td><span class="step-num">${s.id}</span></td>
-                <td><span class="criteria-text">${s.criteria}</span></td>
+                <td><span class="criteria-text">${s.criteria}</span>${s.image ? `<a href="assets/${s.image}" target="_blank" title="Click to enlarge"><img src="assets/${s.image}" alt="Example nameplate" class="step-thumb"></a>` : ''}</td>
                 <td><textarea class="comments-cell-input" data-tab="${tab}" data-step="${s.id}" rows="1" placeholder="Notes..."></textarea></td>
                 <td>
                     <div class="result-group"
