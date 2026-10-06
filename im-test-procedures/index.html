@@ -781,9 +781,10 @@ const PROCEDURES = {
                     { id:'4.8',  criteria:'With the power on, check the firmware version of the HMI. This is done by selecting the third option on the left, system properties. You then select "Panel Information" and look at the Runtime version. If the runtime version does not state V20.X.X.X then it must be updated. This is done using the IM0004 USB stick. Select the Service and Commissioning button on the HMI, bottom of the left menu. Select Update OS. Scroll down and click on UBP_4_12_V20_0.fwf and then click Update OS button at the bottom and click OK on the popup alert. Then wait 5 minutes whilst the HMI reboots and upgrades. It is essential that power is kept on this entire time. Once the HMI has booted back into the standard menu, then proceed.' },
                     { id:'4.9',  criteria:'With the power on, program the HMI using the USB stick. Insert the USB into the back of the HMI, if you have not already done so. Select Runtime Properties, the 4th button in the menu on the left. Select Load project from storage. Select the USB stick in the dropdown menu. Click on HMI_RT in the projects on external storage table. Scroll down and press "Load project." If asked for a password, enter "Matrix123?".' },
                     { id:'4.10', criteria:'Select the System Properties and the Display option and increase the brightness to 100%.' },
-                    { id:'4.11', criteria:'Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.' },
-                    { id:'4.12', criteria:'Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.' },
-                    { id:'4.13', criteria:'Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage. The dome shaped Status LED on the top right of the rig.' },
+                    { id:'4.11', criteria:'Select System Properties > Screensaver and untick "Enable screensaver" to disable the screensaver on the HMI.' },
+                    { id:'4.12', criteria:'Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.' },
+                    { id:'4.13', criteria:'Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.' },
+                    { id:'4.14', criteria:'Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage. The dome shaped Status LED on the top right of the rig.' },
                 ]
             },
             {
@@ -946,9 +947,10 @@ const PROCEDURES = {
                     { id:'4.7',  criteria:'With the power on, check the firmware version of the HMI. This is done by selecting the third option on the left, system properties. You then select "Panel Information" and look at the Runtime version. If the runtime version does not state V20.X.X.X then it must be updated. This is done using the IM0004 USB stick. Select the Service and Commissioning button on the HMI, bottom of the left menu. Select Update OS. Scroll down and click on UBP_4_12_V20_0.fwf and then click Update OS button at the bottom and click OK on the popup alert. Then wait 5 minutes whilst the HMI reboots and upgrades. It is essential that power is kept on this entire time. Once the HMI has booted back into the standard menu, then proceed.' },
                     { id:'4.8',  criteria:'With the power on, program the HMI using the USB stick. Insert the USB into the back of the HMI, if you have not already done so. Select Runtime Properties, the 4th button in the menu on the left. Select Load project from storage. Select the USB stick in the dropdown menu. Click on HMI_RT in the projects on external storage table. Scroll down and press "Load project." If asked for a password, enter "Matrix123?".' },
                     { id:'4.9',  criteria:'Select the System Properties and the Display option and increase the brightness to 100%.' },
-                    { id:'4.10', criteria:'Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.' },
-                    { id:'4.11', criteria:'Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.' },
-                    { id:'4.12', criteria:'Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage. The dome shaped Status LED on the top right of the rig.' },
+                    { id:'4.10', criteria:'Select System Properties > Screensaver and untick "Enable screensaver" to disable the screensaver on the HMI.' },
+                    { id:'4.11', criteria:'Select the Runtime Properties again and select Automatic runtime start. Set the waiting time value to 0. Restart power to the training rig.' },
+                    { id:'4.12', criteria:'Confirm HMI boots into the Matrix software upon reboot. Remove USB stick.' },
+                    { id:'4.13', criteria:'Confirm the status LED has turned on, likely it will be red, but any colour is acceptable at this stage. The dome shaped Status LED on the top right of the rig.' },
                 ]
             },
             {
