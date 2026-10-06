@@ -169,7 +169,7 @@ Private Function BuildCover(src As Worksheet) As Worksheet
         End If
     Next i
 
-    Set cv = ThisWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count))
+    Set cv = ThisWorkbook.Worksheets.Add(Before:=src)
     cv.Name = COVER_SHEET
     cv.Cells.Font.Name = "Calibri"
     cv.Columns("A").ColumnWidth = 2
