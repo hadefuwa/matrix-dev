@@ -1360,8 +1360,10 @@ function exportJSON() {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href = url; a.download = filename; a.click();
-    URL.revokeObjectURL(url);
+    a.href = url; a.download = filename; a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 1000);
 
     document.getElementById('display-status').textContent = 'EXPORTED';
     toast('success', 'Exported: ' + filename);
