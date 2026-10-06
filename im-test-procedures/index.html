@@ -1233,6 +1233,13 @@ function collectData() {
 }
 
 // ── VALIDATE ──────────────────────────────────────────────────────────────────
+// The banner sits at the top of the page but the action buttons are at the bottom,
+// so scroll up to it and mirror the message in a toast.
+function showValidationError(banner) {
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    toast('error', banner.textContent);
+}
+
 function validate() {
     const required = ['operator', 'serialNumber'];
     const missing  = [];
@@ -1250,6 +1257,7 @@ function validate() {
         banner.textContent = 'Required fields missing: ' + missing.join(', ');
         banner.classList.add('show');
         setTimeout(() => banner.classList.remove('show'), 5000);
+        showValidationError(banner);
         return false;
     }
     // All steps must have a result and a sign-off
@@ -1261,12 +1269,14 @@ function validate() {
         banner.textContent = `${pending.length} step${pending.length > 1 ? 's' : ''} still need a Pass / Fail / N/A result`;
         banner.classList.add('show');
         setTimeout(() => banner.classList.remove('show'), 5000);
+        showValidationError(banner);
         return false;
     }
     if (unsigned.length) {
         banner.textContent = `${unsigned.length} step${unsigned.length > 1 ? 's' : ''} missing a sign-off`;
         banner.classList.add('show');
         setTimeout(() => banner.classList.remove('show'), 5000);
+        showValidationError(banner);
         return false;
     }
     banner.classList.remove('show');
