@@ -1334,6 +1334,11 @@ function loadDraft() {
 // ── CLEAR FORM ────────────────────────────────────────────────────────────────
 function clearForm() {
     if (!confirm('Start a new report? All unsaved data will be cleared.')) return;
+    resetForm();
+    toast('success', 'New report started — ' + currentReportId);
+}
+
+function resetForm() {
     ['operator','serialNumber','buildRef','comments'].forEach(id => {
         document.getElementById(id).value = '';
     });
@@ -1354,7 +1359,6 @@ function clearForm() {
 
     TABS.forEach(updateChip);
     updateOverall();
-    toast('success', 'New report started — ' + currentReportId);
 }
 
 // ── EXPORT JSON ───────────────────────────────────────────────────────────────
@@ -1413,7 +1417,15 @@ async function submitReport() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
+        if (res.status === 409) {
+            toast('error', 'A report for ' + data.reportId + ' has already been submitted');
+            return;
+        }
         if (!res.ok) throw new Error('Server error');
+        // Wipe the form (serial, operator, results) and any saved draft so the
+        // same serial number can't be resubmitted by accident.
+        try { localStorage.removeItem('pi308_draft'); } catch (_) {}
+        resetForm();
         document.getElementById('display-status').textContent = 'SUBMITTED';
         toast('success', 'Report submitted — ' + data.reportId);
     } catch (e) {

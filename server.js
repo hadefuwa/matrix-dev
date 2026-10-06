@@ -254,6 +254,10 @@ async function handleReportSubmit(req, res) {
     reports = JSON.parse(await fs.readFile(REPORTS_FILE, "utf8"));
   } catch (_) {}
 
+  if (row.reportId && reports.some(r => String(r.reportId).toLowerCase() === row.reportId.toLowerCase())) {
+    return sendJson(res, 409, { error: `A report for ${row.reportId} has already been submitted` });
+  }
+
   reports.push(row);
   await fs.writeFile(REPORTS_FILE, JSON.stringify(reports, null, 2));
   return sendJson(res, 200, { ok: true, reportId: row.reportId });
