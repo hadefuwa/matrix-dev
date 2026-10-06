@@ -311,6 +311,9 @@
             transition: background 0.1s;
         }
         .step-table tbody tr.step-row:hover { background: #FAFBFD; }
+        /* Passed rows: Excel-style light green fill so the current step stands out */
+        .step-table tbody tr.step-row:has(.result-group[data-result="PASS"]),
+        .step-table tbody tr.step-row:has(.result-group[data-result="PASS"]):hover { background: #E2EFDA; }
 
         .step-table td { padding: 9px 12px; vertical-align: top; }
 
@@ -547,7 +550,39 @@
         @media (max-width: 900px) {
             .main-content, .header-top, .report-info, .tab-nav { padding-left: 16px; padding-right: 16px; }
             .report-info-grid { grid-template-columns: 1fr 1fr; }
-            .step-table { display: block; overflow-x: auto; }
+        }
+        @media (max-width: 700px) {
+            /* Step table becomes stacked cards: no sideways scrolling */
+            .step-table, .step-table tbody { display: block; }
+            .step-table thead { display: none; }
+            .step-table tbody tr.step-row {
+                display: grid;
+                grid-template-columns: 44px 1fr;
+                gap: 10px 8px;
+                padding: 12px;
+            }
+            .step-table tbody tr.step-row td { padding: 0; min-width: 0; }
+            .step-table tbody tr.step-row td:nth-child(n+3) { grid-column: 1 / -1; }
+            .step-table tbody tr.step-row td:nth-child(3) textarea { min-width: 0; font-size: 16px; height: 44px; padding: 10px; }
+            .result-group { flex-direction: row; gap: 8px; }
+            .result-btn-row { flex: 2; gap: 8px; }
+            .result-btn { min-height: 44px; font-size: 14px; }
+            .r-na { width: auto; flex: 1; font-size: 13px; }
+            .signoff-input { width: 100%; min-height: 44px; font-size: 16px; }
+            .criteria-text { font-size: 14.5px; }
+            .step-thumb { width: 150px; }
+            .field-input { font-size: 16px; }
+            .header-top { padding-top: 12px; padding-bottom: 12px; }
+            .header-logo { height: 28px; }
+            .header-title { font-size: 17px; }
+            .meta-field { padding: 8px 16px; }
+            .main-content { padding-top: 14px; padding-bottom: 14px; }
+            .tab-btn { padding: 13px 16px; white-space: nowrap; }
+            .product-hero-info { padding: 14px 16px; }
+            .product-hero-name { font-size: 18px; }
+            .product-hero-img { height: 90px; padding-right: 12px; }
+            .btn-spacer { display: none; }
+            .actions-bar .btn { flex: 1 1 100%; justify-content: center; min-height: 44px; }
         }
         @media (max-width: 600px) {
             .report-info-grid { grid-template-columns: 1fr; }
