@@ -87,6 +87,12 @@ Each step row has a `<div class="result-group" data-tab data-step data-section d
 2. All `.result-group[data-tab]` elements must have `data-result !== 'PENDING'`
 3. All `.signoff-input[data-tab]` elements must have a non-empty value
 
+## Failed tests and retests
+
+- A unit with at least one FAIL can be submitted without finishing the remaining steps (confirm dialog); unreached steps are sent as `NOT TESTED` and counted in `stepsNotTested`. Every FAIL step must have a comment. Sign-off is only required on steps that have a result.
+- The form sends the base Report ID (`IM-{code}-{serial}`). `handleReportSubmit` in `server.js` assigns the attempt: first = base ID, then `-A2`, `-A3`... Once any attempt has PASSED the server returns 409. A second submit within 60 s of the latest attempt is also 409 (double-click guard).
+- `data/reports.json` entries carry `attempt`, `stepsNotTested`, `startedAt`, `durationSeconds`, `deviceId`, `ipAddress`, `userAgent`. The summary CSV appends these as extra columns at the end.
+
 ## Excel PDF export (`excel/ReportPdf.bas`)
 
 VBA module for `IM Test Reports.xlsm` that prints report tabs to PDF (`ExportReportPdf`, `ExportAllReportsPdf`, `AddPdfButton`). It is imported into the workbook manually (Alt+F11 → File → Import File) because "Trust access to the VBA project object model" is off. PDFs go to a `PDFs` folder next to the workbook (or `Documents\IM Test Report PDFs` when the workbook path is a web URL). Assumes the per-report tab layout: step header on row 4, Report ID in column A on the Summary sheet from row 4.

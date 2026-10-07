@@ -1282,7 +1282,9 @@ function showValidationError(banner) {
     toast('error', banner.textContent);
 }
 
-function validate() {
+// allowIncomplete: a unit that has FAILED a step may be submitted without finishing the
+// remaining steps (they are recorded as NOT TESTED).
+function validate(allowIncomplete = false) {
     const required = ['operator', 'serialNumber'];
     const missing  = [];
     required.forEach(id => {
@@ -1303,11 +1305,23 @@ function validate() {
         return false;
     }
     // All steps must have a result and a sign-off
+    const resultOf = step => (document.querySelector(`.result-group[data-tab="${activeTab}"][data-step="${step}"]`) || { dataset: {} }).dataset.result;
     const unsigned = Array.from(document.querySelectorAll(`.signoff-input[data-tab="${activeTab}"]`))
-        .filter(el => !el.value.trim());
+        .filter(el => !el.value.trim() && resultOf(el.dataset.step) !== 'PENDING');
     const pending = Array.from(document.querySelectorAll(`.result-group[data-tab="${activeTab}"]`))
         .filter(g => g.dataset.result === 'PENDING');
-    if (pending.length) {
+    // Every FAIL needs a comment explaining why
+    const uncommented = Array.from(document.querySelectorAll(`.comments-cell-input[data-tab="${activeTab}"]`))
+        .filter(el => !el.value.trim() && resultOf(el.dataset.step) === 'FAIL');
+    if (uncommented.length) {
+        const ids = uncommented.map(el => el.dataset.step).join(', ');
+        banner.textContent = `Add a comment explaining each failed step (${ids})`;
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 5000);
+        showValidationError(banner);
+        return false;
+    }
+    if (pending.length && !allowIncomplete) {
         banner.textContent = `${pending.length} step${pending.length > 1 ? 's' : ''} still need a Pass / Fail / N/A result`;
         banner.classList.add('show');
         setTimeout(() => banner.classList.remove('show'), 5000);
@@ -1431,13 +1445,22 @@ function exportJSON() {
 
 // ── SUBMIT REPORT ─────────────────────────────────────────────────────────────
 async function submitReport() {
-    if (!validate()) return;
-
-    const data = collectData();
-    const all        = Array.from(document.querySelectorAll(`.result-group[data-tab="${activeTab}"]`));
-    const totalSteps = all.length;
+    const all         = Array.from(document.querySelectorAll(`.result-group[data-tab="${activeTab}"]`));
+    const totalSteps  = all.length;
     const stepsFailed = all.filter(g => g.dataset.result === 'FAIL').length;
     const stepsPassed = all.filter(g => g.dataset.result === 'PASS' || g.dataset.result === 'N/A').length;
+    const stepsNotTested = all.filter(g => g.dataset.result === 'PENDING').length;
+    const incomplete  = stepsFailed > 0 && stepsNotTested > 0;
+
+    if (!validate(incomplete)) return;
+    if (incomplete && !confirm(`This unit has ${stepsFailed} failed step${stepsFailed > 1 ? 's' : ''}.\n\n` +
+        `The ${stepsNotTested} remaining step${stepsNotTested > 1 ? 's' : ''} will be recorded as NOT TESTED and the report submitted as FAILED.\n\nSubmit failed test?`)) return;
+
+    const data = collectData();
+    // Steps never reached are recorded explicitly rather than left as PENDING
+    Object.values(data.sections).forEach(steps => steps.forEach(s => {
+        if (s.result === 'PENDING') s.result = 'NOT TESTED';
+    }));
 
     const payload = {
         reportId:       data.reportId,
@@ -1448,7 +1471,7 @@ async function submitReport() {
         buildReference: data.buildReference,
         procedure:      data.procedure,
         overallResult:  data.overallResult,
-        totalSteps, stepsPassed, stepsFailed,
+        totalSteps, stepsPassed, stepsFailed, stepsNotTested,
         startedAt:       data.startedAt,
         durationSeconds: Math.round(elapsedMs() / 1000),
         deviceId:        getDeviceId(),
@@ -1468,16 +1491,20 @@ async function submitReport() {
             body: JSON.stringify(payload),
         });
         if (res.status === 409) {
-            toast('error', 'A report for ' + data.reportId + ' has already been submitted');
+            const err = await res.json().catch(() => ({}));
+            toast('error', err.error || ('A report for ' + data.reportId + ' has already been submitted'));
             return;
         }
         if (!res.ok) throw new Error('Server error');
+        const saved = await res.json().catch(() => ({}));
+        const savedId = saved.reportId || data.reportId;
         // Wipe the form (serial, operator, results) and any saved draft so the
         // same serial number can't be resubmitted by accident.
         try { localStorage.removeItem('pi308_draft'); } catch (_) {}
         resetForm();
         document.getElementById('display-status').textContent = 'SUBMITTED';
-        toast('success', 'Report submitted — ' + data.reportId);
+        toast(data.overallResult === 'FAIL' ? 'error' : 'success',
+            (data.overallResult === 'FAIL' ? 'Failed test recorded — ' : 'Report submitted — ') + savedId);
     } catch (e) {
         toast('error', 'Submission failed — check your connection');
     } finally {

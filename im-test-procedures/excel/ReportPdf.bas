@@ -135,7 +135,7 @@ End Function
 Private Function BuildCover(src As Worksheet) As Worksheet
     Dim cv As Worksheet, sm As Worksheet, r As Variant, i As Long, lastRow As Long
     Dim rid As String, proc As String, op As String, sn As String, res As String
-    Dim prod As String, build As String, dt As String, dur As String, dc As Variant, mins As Double
+    Dim prod As String, build As String, dt As String, dur As String, dc As Variant, ac As Variant, mins As Double, att As Long, nNT As Long
     Dim nPass As Long, nFail As Long, nNA As Long, v As String
     Dim ok As Boolean, clr As Long, navy As Long, grey As Long, lite As Long
 
@@ -167,6 +167,10 @@ Private Function BuildCover(src As Worksheet) As Worksheet
                 End If
             End If
         End If
+        ac = Application.Match("Attempt", sm.Rows(SUMMARY_HEADER_ROW), 0)
+        If Not IsError(ac) Then
+            If IsNumeric(sm.Cells(r, ac).Value) And Len(CStr(sm.Cells(r, ac).Value)) > 0 Then att = CLng(sm.Cells(r, ac).Value)
+        End If
     End If
     If Len(dur) = 0 Then dur = "Not recorded"
 
@@ -179,6 +183,8 @@ Private Function BuildCover(src As Worksheet) As Worksheet
             nFail = nFail + 1
         ElseIf v = "N/A" Then
             nNA = nNA + 1
+        ElseIf v = "NOT TESTED" Then
+            nNT = nNT + 1
         End If
     Next i
 
@@ -208,7 +214,8 @@ Private Function BuildCover(src As Worksheet) As Worksheet
             "in accordance with the above procedure, and that all required test steps were completed satisfactorily.", 11, False, vbBlack
     Else
         Banner cv, "B9:E10", "The product identified below has been tested in accordance with the above procedure. " & _
-            "One or more test steps FAILED. This product is NOT certified and must not be released.", 11, False, vbBlack
+            "One or more test steps FAILED" & IIf(nNT > 0, " and testing was stopped (" & nNT & " step(s) not tested)", "") & _
+            ". This product is NOT certified and must not be released.", 11, False, vbBlack
     End If
     cv.Range("B9:E10").WrapText = True
     cv.Range("B9:E10").VerticalAlignment = xlCenter
@@ -221,7 +228,7 @@ Private Function BuildCover(src As Worksheet) As Worksheet
 
     ' Product details
     SectionHead cv, "B14:E14", "PRODUCT DETAILS", navy
-    DetailRow cv, 15, "Report ID", rid, lite
+    DetailRow cv, 15, "Report ID", rid & IIf(att > 1, "  (Attempt " & att & ")", ""), lite
     DetailRow cv, 16, "Product", prod, lite
     DetailRow cv, 17, "Serial Number", sn, lite
     DetailRow cv, 18, "Procedure", proc, lite
@@ -231,11 +238,11 @@ Private Function BuildCover(src As Worksheet) As Worksheet
     DetailRow cv, 22, "Test Duration", dur, lite
 
     ' Result counts
-    SectionHead cv, "B23:E23", "TEST SUMMARY", navy
-    cv.Range("B24").Value = "Total Steps": cv.Range("C24").Value = "Passed"
-    cv.Range("D24").Value = "Failed": cv.Range("E24").Value = "N/A"
-    cv.Range("B25").Value = nPass + nFail + nNA: cv.Range("C25").Value = nPass
-    cv.Range("D25").Value = nFail: cv.Range("E25").Value = nNA
+    SectionHead cv, "B23:E23", "TEST SUMMARY  (" & (nPass + nFail + nNA + nNT) & " steps)", navy
+    cv.Range("B24").Value = "Passed": cv.Range("C24").Value = "Failed"
+    cv.Range("D24").Value = "N/A": cv.Range("E24").Value = "Not Tested"
+    cv.Range("B25").Value = nPass: cv.Range("C25").Value = nFail
+    cv.Range("D25").Value = nNA: cv.Range("E25").Value = nNT
     With cv.Range("B24:E24")
         .Font.Size = 9: .Font.Color = grey: .HorizontalAlignment = xlCenter
     End With
@@ -244,7 +251,7 @@ Private Function BuildCover(src As Worksheet) As Worksheet
         .Font.Size = 22: .Font.Bold = True: .HorizontalAlignment = xlCenter: .VerticalAlignment = xlCenter
         .Interior.Color = lite
     End With
-    If nFail > 0 Then cv.Range("D25").Font.Color = RGB(198, 40, 40)
+    If nFail > 0 Then cv.Range("C25").Font.Color = RGB(198, 40, 40)
 
     ' Sign-off
     SectionHead cv, "B27:E27", "AUTHORISATION", navy

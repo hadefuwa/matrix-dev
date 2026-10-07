@@ -251,6 +251,8 @@ async function handleReportSubmit(req, res) {
     totalSteps:     Number(body.totalSteps    || 0),
     stepsPassed:    Number(body.stepsPassed   || 0),
     stepsFailed:    Number(body.stepsFailed   || 0),
+    stepsNotTested: Number(body.stepsNotTested|| 0),
+    attempt:        1,
     comments:       String(body.comments      || ""),
     startedAt:       String(body.startedAt     || ""),
     durationSeconds: Math.max(0, Math.round(Number(body.durationSeconds) || 0)),
@@ -265,13 +267,31 @@ async function handleReportSubmit(req, res) {
     reports = JSON.parse(await fs.readFile(REPORTS_FILE, "utf8"));
   } catch (_) {}
 
-  if (row.reportId && reports.some(r => String(r.reportId).toLowerCase() === row.reportId.toLowerCase())) {
-    return sendJson(res, 409, { error: `A report for ${row.reportId} has already been submitted` });
+  // A failed unit can be retested: later submissions for the same base ID become -A2, -A3...
+  // Once an attempt has PASSED the unit is done, so further submissions are rejected.
+  const base = row.reportId;
+  if (base) {
+    const escaped = base.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp("^" + escaped + "(?:-A(\\d+))?$", "i");
+    const prior = reports.filter(r => re.test(String(r.reportId)));
+    if (prior.some(r => String(r.overallResult).toUpperCase() === "PASS")) {
+      return sendJson(res, 409, { error: `${base} has already passed — no further attempts needed` });
+    }
+    const newest = prior.reduce((t, r) => Math.max(t, Date.parse(r.submittedAt) || 0), 0);
+    if (Date.now() - newest < 60000) {
+      return sendJson(res, 409, { error: `A report for ${base} was just submitted` });
+    }
+    const last = prior.reduce((n, r) => {
+      const m = re.exec(String(r.reportId));
+      return Math.max(n, Number(r.attempt) || (m && m[1] ? Number(m[1]) : 1));
+    }, 0);
+    row.attempt = last + 1;
+    if (row.attempt > 1) row.reportId = `${base}-A${row.attempt}`;
   }
 
   reports.push(row);
   await fs.writeFile(REPORTS_FILE, JSON.stringify(reports, null, 2));
-  return sendJson(res, 200, { ok: true, reportId: row.reportId });
+  return sendJson(res, 200, { ok: true, reportId: row.reportId, attempt: row.attempt });
 }
 
 async function handleReportsReplace(req, res) {
@@ -338,8 +358,8 @@ async function handleReportsExport(res) {
     reports = JSON.parse(await fs.readFile(REPORTS_FILE, "utf8"));
   } catch (_) {}
 
-  const cols = ["reportId","date","submittedAt","operator","product","serialNumber","buildReference","procedure","overallResult","totalSteps","stepsPassed","stepsFailed","comments","startedAt","durationMin","deviceId","ipAddress","userAgent"];
-  const headers = ["Report ID","Date","Submitted At","Operator","Product","Serial Number","Build Reference","Procedure","Overall Result","Total Steps","Steps Passed","Steps Failed","Comments","Started At","Duration (min)","Device ID","IP Address","User Agent"];
+  const cols = ["reportId","date","submittedAt","operator","product","serialNumber","buildReference","procedure","overallResult","totalSteps","stepsPassed","stepsFailed","comments","startedAt","durationMin","deviceId","ipAddress","userAgent","attempt","stepsNotTested"];
+  const headers = ["Report ID","Date","Submitted At","Operator","Product","Serial Number","Build Reference","Procedure","Overall Result","Total Steps","Steps Passed","Steps Failed","Comments","Started At","Duration (min)","Device ID","IP Address","User Agent","Attempt","Steps Not Tested"];
 
   const escape = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
   const lines = [
