@@ -224,6 +224,12 @@ async function handlePutCsv(req, res, key) {
 
 const REPORTS_FILE = path.join(DATA_DIR, "reports.json");
 
+// Railway sits behind a proxy, so the real client IP is the first X-Forwarded-For entry.
+function clientIp(req) {
+  const fwd = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return fwd || req.socket.remoteAddress || "";
+}
+
 async function handleReportSubmit(req, res) {
   let body;
   try {
@@ -246,6 +252,11 @@ async function handleReportSubmit(req, res) {
     stepsPassed:    Number(body.stepsPassed   || 0),
     stepsFailed:    Number(body.stepsFailed   || 0),
     comments:       String(body.comments      || ""),
+    startedAt:       String(body.startedAt     || ""),
+    durationSeconds: Math.max(0, Math.round(Number(body.durationSeconds) || 0)),
+    deviceId:        String(body.deviceId      || "").slice(0, 64),
+    userAgent:       String(body.userAgent     || "").slice(0, 300),
+    ipAddress:       clientIp(req),
     sections:       body.sections             || {},
   };
 
@@ -327,13 +338,15 @@ async function handleReportsExport(res) {
     reports = JSON.parse(await fs.readFile(REPORTS_FILE, "utf8"));
   } catch (_) {}
 
-  const cols = ["reportId","date","submittedAt","operator","product","serialNumber","buildReference","procedure","overallResult","totalSteps","stepsPassed","stepsFailed","comments"];
-  const headers = ["Report ID","Date","Submitted At","Operator","Product","Serial Number","Build Reference","Procedure","Overall Result","Total Steps","Steps Passed","Steps Failed","Comments"];
+  const cols = ["reportId","date","submittedAt","operator","product","serialNumber","buildReference","procedure","overallResult","totalSteps","stepsPassed","stepsFailed","comments","startedAt","durationMin","deviceId","ipAddress","userAgent"];
+  const headers = ["Report ID","Date","Submitted At","Operator","Product","Serial Number","Build Reference","Procedure","Overall Result","Total Steps","Steps Passed","Steps Failed","Comments","Started At","Duration (min)","Device ID","IP Address","User Agent"];
 
   const escape = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
   const lines = [
     headers.map(escape).join(","),
-    ...reports.map(r => cols.map(c => escape(r[c])).join(","))
+    ...reports.map(r => cols.map(c =>
+      escape(c === "durationMin" ? (r.durationSeconds != null ? Math.round(r.durationSeconds / 6) / 10 : "") : r[c])
+    ).join(","))
   ];
 
   res.writeHead(200, {

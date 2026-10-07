@@ -135,7 +135,7 @@ End Function
 Private Function BuildCover(src As Worksheet) As Worksheet
     Dim cv As Worksheet, sm As Worksheet, r As Variant, i As Long, lastRow As Long
     Dim rid As String, proc As String, op As String, sn As String, res As String
-    Dim prod As String, build As String, dt As String
+    Dim prod As String, build As String, dt As String, dur As String, dc As Variant, mins As Double
     Dim nPass As Long, nFail As Long, nNA As Long, v As String
     Dim ok As Boolean, clr As Long, navy As Long, grey As Long, lite As Long
 
@@ -155,7 +155,20 @@ Private Function BuildCover(src As Worksheet) As Worksheet
     If Not IsError(r) Then
         prod = CStr(sm.Cells(r, 5).Value)
         build = CStr(sm.Cells(r, 7).Value)
+        ' Duration (min) column is looked up by header; blank for reports made before timing existed.
+        dc = Application.Match("Duration (min)", sm.Rows(SUMMARY_HEADER_ROW), 0)
+        If Not IsError(dc) Then
+            If IsNumeric(sm.Cells(r, dc).Value) And Len(CStr(sm.Cells(r, dc).Value)) > 0 Then
+                mins = CDbl(sm.Cells(r, dc).Value)
+                If mins >= 60 Then
+                    dur = Int(mins / 60) & "h " & Format$(Round(mins - Int(mins / 60) * 60, 0), "00") & "m"
+                Else
+                    dur = Format$(mins, "0.0") & " min"
+                End If
+            End If
+        End If
     End If
+    If Len(dur) = 0 Then dur = "Not recorded"
 
     lastRow = src.Cells(src.Rows.Count, 3).End(xlUp).Row
     For i = 5 To lastRow
@@ -215,6 +228,7 @@ Private Function BuildCover(src As Worksheet) As Worksheet
     DetailRow cv, 19, "Build Reference", build, lite
     DetailRow cv, 20, "Date of Test", dt, lite
     DetailRow cv, 21, "Tested By", op, lite
+    DetailRow cv, 22, "Test Duration", dur, lite
 
     ' Result counts
     SectionHead cv, "B23:E23", "TEST SUMMARY", navy

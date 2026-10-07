@@ -990,6 +990,45 @@ const TABS = ['im0004', 'im3214', 'im6930'];
 let currentReportId;
 let activeTab = 'im0004';
 
+// ── TEST TIMER ────────────────────────────────────────────────────────────────
+// Starts on the first Pass/Fail/N/A click. Time spent between a saved draft and
+// loading it again is not counted (only the base elapsed is carried over).
+let testStartedAt   = null;  // ISO string of first result
+let testElapsedBase = 0;     // ms carried over from a loaded draft
+let testSessionFrom = null;  // Date.now() when this page session started timing
+
+function elapsedMs() {
+    return testElapsedBase + (testSessionFrom ? Date.now() - testSessionFrom : 0);
+}
+function formatElapsed(ms) {
+    const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+    return h ? `${h}h ${String(m).padStart(2,'0')}m` : `${m}m ${String(s % 60).padStart(2,'0')}s`;
+}
+function startTimerIfNeeded() {
+    if (testSessionFrom) return;
+    testSessionFrom = Date.now();
+    if (!testStartedAt) testStartedAt = new Date().toISOString();
+}
+function resetTimer() {
+    testStartedAt = null; testElapsedBase = 0; testSessionFrom = null;
+}
+setInterval(() => {
+    const el = document.getElementById('elapsed-time');
+    if (el) el.textContent = testSessionFrom || testElapsedBase ? formatElapsed(elapsedMs()) : 'not started';
+}, 1000);
+
+// Random per-browser ID (not a hardware ID) so reports can be traced to a workstation.
+function getDeviceId() {
+    try {
+        let id = localStorage.getItem('im_device_id');
+        if (!id) {
+            id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+            localStorage.setItem('im_device_id', id);
+        }
+        return id;
+    } catch (_) { return ''; }
+}
+
 // ── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     refreshReportId();
@@ -1127,6 +1166,7 @@ function onResultBtn(btn, tab) {
         group.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         group.dataset.result = btn.dataset.value;
+        startTimerIfNeeded();
         // Auto sign-off on Pass or Fail
         if (btn.dataset.value === 'PASS' || btn.dataset.value === 'FAIL') {
             const sig = document.querySelector(`.signoff-input[data-tab="${tab}"][data-step="${group.dataset.step}"]`);
@@ -1180,7 +1220,7 @@ function updateOverall() {
     const label = document.getElementById('overall-label');
 
     if (label) label.textContent = `${activeTab.toUpperCase()} Result`;
-    stats.innerHTML = `${complete} / ${total} steps complete<br>${passed} passed &nbsp;·&nbsp; ${failed} failed`;
+    stats.innerHTML = `${complete} / ${total} steps complete<br>${passed} passed &nbsp;·&nbsp; ${failed} failed<br>Test time: <span id="elapsed-time">${testSessionFrom || testElapsedBase ? formatElapsed(elapsedMs()) : 'not started'}</span>`;
 
     el.classList.remove('pass', 'fail', 'pending');
     if (failed > 0) {
@@ -1227,6 +1267,8 @@ function collectData() {
         serialNumber:   document.getElementById('serialNumber').value,
         buildReference: document.getElementById('buildRef').value,
         overallResult:  document.getElementById('overall-result').textContent,
+        startedAt:      testStartedAt,
+        elapsedMs:      elapsedMs(),
         sections,
         comments:       document.getElementById('comments').value,
     };
@@ -1302,6 +1344,9 @@ function loadDraft() {
     document.getElementById('serialNumber').value = d.serialNumber || '';
     document.getElementById('buildRef').value    = d.buildReference || '';
     document.getElementById('comments').value    = d.comments || '';
+    testStartedAt   = d.startedAt || null;
+    testElapsedBase = Number(d.elapsedMs) || 0;
+    testSessionFrom = null;   // resumes on the next result click
 
     if (d.sections) {
         TABS.forEach(tab => {
@@ -1339,6 +1384,7 @@ function clearForm() {
 }
 
 function resetForm() {
+    resetTimer();
     ['operator','serialNumber','buildRef','comments'].forEach(id => {
         document.getElementById(id).value = '';
     });
@@ -1403,6 +1449,10 @@ async function submitReport() {
         procedure:      data.procedure,
         overallResult:  data.overallResult,
         totalSteps, stepsPassed, stepsFailed,
+        startedAt:       data.startedAt,
+        durationSeconds: Math.round(elapsedMs() / 1000),
+        deviceId:        getDeviceId(),
+        userAgent:       navigator.userAgent,
         comments:       data.comments,
         sections:       data.sections,
     };
