@@ -257,11 +257,8 @@ Private Function BuildCover(src As Worksheet) As Worksheet
     SectionHead cv, "B27:E27", "AUTHORISATION", navy
     cv.Rows(29).RowHeight = 36
     cv.Range("B29:C29").Borders(xlEdgeBottom).LineStyle = xlContinuous
-    cv.Range("D29:E29").Borders(xlEdgeBottom).LineStyle = xlContinuous
     cv.Range("B30").Value = "Tested by: " & op
-    cv.Range("D30").Value = "Approved by (signature):"
     cv.Range("B31").Value = "Date: " & dt
-    cv.Range("D31").Value = "Date:"
     cv.Range("B30:E31").Font.Size = 10
 
     ' Footer note
