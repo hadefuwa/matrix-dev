@@ -15,7 +15,7 @@ The app is a single self-contained file: `index.html`. No build step, no depende
 
 ### What is built
 
-- Three test procedure tabs: **IM0004** (Closed Loop Systems, 52 steps), **IM3214** (Locktronics PLC LOGO Board, 26 steps), **IM6930** (PLC Fundamentals Trainer, 52 steps)
+- Three test procedure tabs: **IM0004** (Closed Loop Systems, 53 steps), **IM3214** (Locktronics PLC LOGO Board, 26 steps), **IM6930** (PLC Fundamentals Trainer, 53 steps)
 - Header fields: Report ID (auto-derived from serial number as `IM-{code}-{serial}`), Date (auto-filled), Operator Name, Product (read-only — short name from the active tab's `productName`, e.g. Closed Loop / LOGO! / Fundamentals), Serial Number, Build Reference
 - Per-step: Pass/Fail/N/A toggle buttons (green/red), Comments, Sign Off (auto-filled with operator initials on Pass/Fail)
 - Overall result calculated automatically — PASS only if zero FAILs
