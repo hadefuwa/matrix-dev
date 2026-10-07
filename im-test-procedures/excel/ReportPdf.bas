@@ -236,6 +236,7 @@ Private Function BuildCover(src As Worksheet) As Worksheet
     DetailRow cv, 20, "Date of Test", dt, lite
     DetailRow cv, 21, "Tested By", op, lite
     DetailRow cv, 22, "Test Duration", dur, lite
+    AddProductPicture cv, proc
 
     ' Result counts
     SectionHead cv, "B23:E23", "TEST SUMMARY  (" & (nPass + nFail + nNA + nNT) & " steps)", navy
@@ -326,6 +327,63 @@ Private Sub DetailRow(ws As Worksheet, rw As Long, label As String, value As Str
     ws.Range(ws.Cells(rw, 2), ws.Cells(rw, 5)).Borders(xlEdgeBottom).Color = RGB(200, 200, 200)
     ws.Range(ws.Cells(rw, 2), ws.Cells(rw, 5)).VerticalAlignment = xlCenter
 End Sub
+
+' Puts the product photo in column E beside the product details. The small image is
+' downloaded from the server once and kept in a "ProductImages" folder next to the PDFs,
+' so later exports work offline. If it can't be found the cover is left as normal.
+Private Sub AddProductPicture(cv As Worksheet, proc As String)
+    Dim p As String, rw As Long, box As Range, pic As Object, sc As Double
+    On Error GoTo skip
+    p = ProductImagePath(proc)
+    If Len(p) = 0 Then Exit Sub
+
+    For rw = 15 To 22
+        cv.Range(cv.Cells(rw, 3), cv.Cells(rw, 5)).UnMerge
+        cv.Range(cv.Cells(rw, 3), cv.Cells(rw, 4)).Merge
+        cv.Cells(rw, 5).Borders(xlEdgeBottom).LineStyle = xlNone
+    Next rw
+
+    Set box = cv.Range("E15:E22")
+    Set pic = cv.Shapes.AddPicture(p, False, True, box.Left + 4, box.Top + 2, -1, -1)
+    pic.LockAspectRatio = msoTrue
+    sc = (box.Width - 8) / pic.Width
+    If (box.Height - 4) / pic.Height < sc Then sc = (box.Height - 4) / pic.Height
+    pic.Width = pic.Width * sc
+    pic.Top = box.Top + (box.Height - pic.Height) / 2
+    pic.Placement = xlMoveAndSize
+    Exit Sub
+skip:
+    Err.Clear
+End Sub
+
+' Returns the local path of the product image, downloading it first if needed ("" if unavailable).
+Private Function ProductImagePath(proc As String) As String
+    Dim dir As String, fp As String, code As String, http As Object, st As Object
+    code = LCase$(Trim$(proc))
+    If Len(code) = 0 Then Exit Function
+    dir = OutputFolder() & "\ProductImages"
+    fp = dir & "\" & code & ".png"
+    If Len(Dir$(fp)) > 0 Then ProductImagePath = fp: Exit Function
+
+    On Error GoTo fail
+    If Len(Dir$(OutputFolder(), vbDirectory)) = 0 Then MkDir OutputFolder()
+    If Len(Dir$(dir, vbDirectory)) = 0 Then MkDir dir
+    Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
+    http.Open "GET", "https://matrixtsl.dev/im-test-procedures/assets/thumbs/" & code & ".png", False
+    http.SetTimeouts 5000, 5000, 10000, 10000
+    http.Send
+    If http.Status <> 200 Then Exit Function
+    Set st = CreateObject("ADODB.Stream")
+    st.Type = 1
+    st.Open
+    st.Write http.ResponseBody
+    st.SaveToFile fp, 2
+    st.Close
+    ProductImagePath = fp
+    Exit Function
+fail:
+    Err.Clear
+End Function
 
 Private Function OutputFolder() As String
     Dim base As String
