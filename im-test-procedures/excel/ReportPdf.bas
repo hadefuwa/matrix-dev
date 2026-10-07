@@ -358,16 +358,16 @@ End Sub
 
 ' Returns the local path of the product image, downloading it first if needed ("" if unavailable).
 Private Function ProductImagePath(proc As String) As String
-    Dim dir As String, fp As String, code As String, http As Object, st As Object
+    Dim imgDir As String, fp As String, code As String, http As Object, st As Object
     code = LCase$(Trim$(proc))
     If Len(code) = 0 Then Exit Function
-    dir = OutputFolder() & "\ProductImages"
-    fp = dir & "\" & code & ".png"
+    imgDir = OutputFolder() & "\ProductImages"
+    fp = imgDir & "\" & code & ".png"
     If Len(Dir$(fp)) > 0 Then ProductImagePath = fp: Exit Function
 
     On Error GoTo fail
     If Len(Dir$(OutputFolder(), vbDirectory)) = 0 Then MkDir OutputFolder()
-    If Len(Dir$(dir, vbDirectory)) = 0 Then MkDir dir
+    If Len(Dir$(imgDir, vbDirectory)) = 0 Then MkDir imgDir
     Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
     http.Open "GET", "https://matrixtsl.dev/im-test-procedures/assets/thumbs/" & code & ".png", False
     http.SetTimeouts 5000, 5000, 10000, 10000
