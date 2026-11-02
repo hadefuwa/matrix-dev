@@ -320,7 +320,8 @@ async function handleReportsDetailExport(res) {
   const escape = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
   const headers = [
     "Report ID","Date","Submitted At","Operator","Serial Number",
-    "Procedure","Overall Result","Section","Step","Criteria","Result","Comments","Sign Off"
+    "Procedure","Overall Result","Section","Step","Criteria","Result","Comments","Sign Off",
+    "Duration (min)","Attempt"
   ];
   const lines = [headers.map(escape).join(",")];
 
@@ -338,6 +339,8 @@ async function handleReportsDetailExport(res) {
           escape(s.result),
           escape(s.comments),
           escape(s.signOff),
+          escape(r.durationSeconds != null ? Math.round(r.durationSeconds / 6) / 10 : ""),
+          escape(r.attempt ?? ""),
         ].join(","));
       });
     });

@@ -93,6 +93,10 @@ Each step row has a `<div class="result-group" data-tab data-step data-section d
 - The form sends the base Report ID (`IM-{code}-{serial}`). `handleReportSubmit` in `server.js` assigns the attempt: first = base ID, then `-A2`, `-A3`... Once any attempt has PASSED the server returns 409. A second submit within 60 s of the latest attempt is also 409 (double-click guard).
 - `data/reports.json` entries carry `attempt`, `stepsNotTested`, `startedAt`, `durationSeconds`, `deviceId`, `ipAddress`, `userAgent`. The summary CSV appends these as extra columns at the end.
 
+## Excel refresh macro (`excel/ReportRefresh.bas`)
+
+Source of the workbook's `ReportRefresh` module (Refresh Reports button). Summary is 20 columns and must match the server's `/api/reports/export` order exactly (`SummaryHeaders` + `NCOL`) — extend both together when adding export columns. Report tabs show Test Duration and Attempt in G1:H2 (from the detail export's trailing "Duration (min)" and "Attempt" columns). Step numbers are written as text so `4.10` isn't turned into `4.1`. To update the workbook: remove the old `ReportRefresh` module (no export) then import this file.
+
 ## Excel PDF export (`excel/ReportPdf.bas`)
 
 VBA module for `IM Test Reports.xlsm` that prints report tabs to PDF (`ExportReportPdf`, `ExportAllReportsPdf`, `AddPdfButton`). It is imported into the workbook manually (Alt+F11 → File → Import File) because "Trust access to the VBA project object model" is off. PDFs go to a `PDFs` folder next to the workbook (or `Documents\IM Test Report PDFs` when the workbook path is a web URL). Assumes the per-report tab layout: step header on row 4, Report ID in column A on the Summary sheet from row 4.
