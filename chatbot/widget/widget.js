@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var ENDPOINT = (document.currentScript && document.currentScript.dataset.endpoint) || "/api/chatbot/message";
-  var CONTACT = "https://www.matrixtsl.com/contact-us/";
+  var CONTACT = "https://www.matrixtsl.com/contact/";
   var history = [];
   var busy = false;
 

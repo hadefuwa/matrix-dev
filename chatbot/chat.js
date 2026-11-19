@@ -8,7 +8,7 @@ const MAX_TOOL_CALLS = Number(process.env.CHAT_MAX_TOOL_CALLS || 4);
 const MAX_HISTORY_TURNS = Number(process.env.CHAT_MAX_HISTORY || 6);
 const MAX_MESSAGE_CHARS = 1000;
 const MAX_TOKENS = Number(process.env.CHAT_MAX_TOKENS || 800);
-const CONTACT_URL = process.env.CHAT_CONTACT_URL || "https://www.matrixtsl.com/contact-us/";
+const CONTACT_URL = process.env.CHAT_CONTACT_URL || "https://www.matrixtsl.com/contact/";
 
 // Model slugs: CHAT_MODEL=z-ai/glm-5.3  or  anthropic/claude-sonnet-5.5
 const DEFAULT_MODEL = "z-ai/glm-5.3"; // cheap default; override with CHAT_MODEL
