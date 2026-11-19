@@ -57,7 +57,8 @@ const server = http.createServer(async (req, res) => {
           dataDir: DATA_DIR,
           imageUploadDir: UPLOADS_DIR,
           adminTokenConfigured: Boolean(ADMIN_TOKEN),
-          geminiConfigured: Boolean(GEMINI_API_KEY)
+          geminiConfigured: Boolean(GEMINI_API_KEY),
+          chatbotConfigured: Boolean(process.env.OPENROUTER_API_KEY)
         }
       });
     }
