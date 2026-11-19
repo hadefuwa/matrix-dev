@@ -11,7 +11,7 @@ const MAX_TOKENS = Number(process.env.CHAT_MAX_TOKENS || 800);
 const CONTACT_URL = process.env.CHAT_CONTACT_URL || "https://www.matrixtsl.com/contact-us/";
 
 // Model slugs: CHAT_MODEL=z-ai/glm-5.3  or  anthropic/claude-sonnet-5.5
-const DEFAULT_MODEL = "anthropic/claude-sonnet-5.5";
+const DEFAULT_MODEL = "z-ai/glm-5.3"; // cheap default; override with CHAT_MODEL
 
 const TOOLS = [
   {
