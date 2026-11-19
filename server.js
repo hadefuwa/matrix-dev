@@ -67,6 +67,11 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 405, { error: "Method not allowed" });
     }
 
+    if (pathname === "/api/chatbot/message") {
+      if (req.method === "POST") return handleSiteChat(req, res);
+      return sendJson(res, 405, { error: "Method not allowed" });
+    }
+
     if (pathname === "/api/sow/chat") {
       if (req.method === "POST") return handleSowChat(req, res);
       return sendJson(res, 405, { error: "Method not allowed" });
@@ -478,6 +483,28 @@ async function handleEblocksChat(req, res) {
     console.error("Gemini chat error:", error);
     return sendJson(res, 500, { error: "AI assistant request failed" });
   }
+}
+
+async function handleSiteChat(req, res) {
+  if (!process.env.OPENROUTER_API_KEY) {
+    return sendJson(res, 503, { error: "Chat assistant is not configured on the server" });
+  }
+  const rateLimit = checkRateLimit(getClientIp(req));
+  if (!rateLimit.ok) {
+    return sendJson(res, 429, { error: "Too many chat requests. Please wait a moment and try again.", retryAfterMs: rateLimit.retryAfterMs });
+  }
+  let body;
+  try {
+    body = await readJsonBody(req, { maxBytes: MAX_CHAT_BODY_BYTES });
+  } catch (error) {
+    return sendJson(res, 400, { error: error.message || "Invalid JSON body" });
+  }
+  const message = typeof body.message === "string" ? body.message.trim() : "";
+  if (!message) return sendJson(res, 400, { error: "message is required" });
+  if (message.length > 1000) return sendJson(res, 400, { error: "Message too long (max 1000 characters)" });
+
+  const result = await require("./chatbot/chat").answer(message, body.history);
+  return sendJson(res, 200, { answer: result.answer, sources: result.sources, toolCalls: result.toolCalls });
 }
 
 async function handleSowChat(req, res) {

@@ -1,2 +1,4 @@
 scorm-example/.git.embedded-backup/
 node_modules/
+chatbot/evals/results-*.json
+chatbot/evals/*.log
