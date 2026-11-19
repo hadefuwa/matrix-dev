@@ -977,6 +977,12 @@ async function serveStatic(pathname, res) {
     return sendFile(res, scopedPath);
   }
 
+  // Only the widget is public under /chatbot/ (keeps system-prompt.md and evals private).
+  if (pathname.startsWith("/chatbot/") && !pathname.startsWith("/chatbot/widget/")) {
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    return res.end("Not Found");
+  }
+
   const safePath = path.normalize(pathname).replace(/^(\.\.(\/|\\|$))+/, "");
   let filePath = path.join(ROOT_DIR, safePath);
 
